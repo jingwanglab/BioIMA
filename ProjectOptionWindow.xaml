@@ -1,0 +1,118 @@
+﻿<local:MoveWindow x:Class="wpf522.ProjectOptionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:local="clr-namespace:wpf522"
+        mc:Ignorable="d"
+         Height="450" Width="800" TitleForeground="White" BorderThickness="0"
+                 ShowTitleBar="False" Background="Transparent" WindowStyle="None" ShowCloseButton="False" ShowMinButton="False" ShowMaxRestoreButton="False"
+                 >
+    <local:MoveWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/ProjectHistoryWindowStyle.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </local:MoveWindow.Resources>
+    
+    <Border BorderBrush="Transparent" BorderThickness="1" CornerRadius="10" Background="#00000000">
+
+        <mah:MetroAnimatedTabControl  SelectedIndex="{Binding PageIndex}" TabPanelVisibility="Collapsed" Background="{x:Null}">
+            <mah:MetroTabItem Visibility="Collapsed">
+                <Grid Style="{StaticResource BkGrid}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Open Recent" Foreground="AliceBlue" FontSize="20" FontFamily="Hiragino Sans GB"  HorizontalAlignment="Left"  Margin="36,60,0,0" />
+                    <DockPanel>
+                        <Border Style="{StaticResource InputBoxBorderStyle}">
+                            <TextBox  Style="{StaticResource InputBoxStyle}" mah:TextBoxHelper.ButtonCommand="{Binding SearchProjectCommand}"
+                                  Text="{Binding InputName}"></TextBox>
+                        </Border>
+                        
+                        <Border Style="{StaticResource ListBoxBorderStyle}">
+                            
+                            <ListBox Style="{StaticResource ProjectListBox}" SelectedItem="{Binding SelectedItem}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border  Height="50">
+                                            <Grid MouseUp="RowClickEvent">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition></RowDefinition>
+                                                    <RowDefinition></RowDefinition>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="{Binding ProjectName}" FontSize="18" Margin="30, 0, 0, 0" VerticalAlignment="Center" Foreground="Black"></TextBlock>
+                                                <TextBlock Grid.Row="1" Text="{Binding ProjectPath}" FontSize="12" Margin="10, 0, 0, 0" VerticalAlignment="Center" Foreground="Black"></TextBlock>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Border>
+                    </DockPanel>
+
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition Height="80"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Start Here" FontSize="25" Foreground="AliceBlue"  FontFamily="Hiragino Sans GB" HorizontalAlignment="Left"  Margin="36,25,0,0" />
+                        <StackPanel VerticalAlignment="Center" >
+                     
+                            <Button Content="Open a project" Style="{StaticResource CommandBtn}" FontSize="18" FontFamily="Hiragino Sans GB" Command="{Binding OpenOtherProjectFileCommand}"></Button>
+                            <Button Content="Open a local folder" Style="{StaticResource CommandBtn}" FontSize="18" Command="{Binding OpenOtherProjectFolderCommand}" FontFamily="Hiragino Sans GB"></Button>
+                            <Button Content="Create a new project" Style="{StaticResource CommandBtn}" FontSize="18" FontFamily="Hiragino Sans GB" Command="{Binding CreateProjectCommand}"></Button>
+                        </StackPanel>
+                        <Button Grid.Row="1" Width="100" HorizontalAlignment="Right"
+                            Content="Cancel" Style="{StaticResource CommandBtn}" Command="{Binding CloseWindowCommand}"></Button>
+                    </Grid>
+                </Grid>
+            </mah:MetroTabItem>
+            <mah:MetroTabItem Visibility="Collapsed">
+                <Grid Style="{StaticResource BkGrid}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition Height="60"></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Creat your new project" Style="{StaticResource TitleText}"></TextBlock>
+
+                    <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Project name : " Style="{StaticResource SpanText}"></TextBlock>
+                        <Border Style="{StaticResource InputBoxBorderStyle}" Grid.Row="1" Margin="30, 0, 30, 0" Height="40">
+                            <TextBox Text="{Binding CreateProjectItem.ProjectName,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputBoxStyle}"></TextBox>
+                        </Border>
+
+                        <TextBlock Text="Location : " Grid.Row="2" Style="{StaticResource SpanText}"></TextBlock>
+                        <Border Style="{StaticResource InputBoxBorderStyle}" Grid.Row="3" Margin="30, 0, 30, 0" Height="40">
+                            <TextBox Text="{Binding CreateProjectItem.ProjectDir}" Style="{StaticResource MahApps.Styles.TextBox.Search}" Background="#00000000" BorderThickness="0" mah:TextBoxHelper.ButtonCommand="{Binding OpenDirCommand}" mah:TextBoxHelper.ButtonCommandParameter="0" VerticalContentAlignment="Center"></TextBox>
+                        </Border>
+                        <TextBlock Text="Configuration saving directory : " Grid.Row="4" Style="{StaticResource SpanText}"></TextBlock>
+                        <Border Style="{StaticResource InputBoxBorderStyle}" Grid.Row="5" Margin="30, 0, 30, 0" Height="40">
+                            <TextBox Text="{Binding CreateProjectItem.SaveTargetDataDir}" Style="{StaticResource MahApps.Styles.TextBox.Search}" Background="#00000000" BorderThickness="0" mah:TextBoxHelper.ButtonCommand="{Binding OpenDirCommand}" mah:TextBoxHelper.ButtonCommandParameter="1" VerticalContentAlignment="Center"></TextBox>
+                        </Border>
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft" Grid.Row="2">
+                        <Button Content="Creat " Style="{StaticResource OptionBtn}" Command="{Binding SureCreateProjectCommand}"></Button>
+                        <Button Content="Back" Style="{StaticResource OptionBtn}" Command="{Binding PreviousStepCommand}"></Button>
+                    </StackPanel>
+                </Grid>
+            </mah:MetroTabItem>
+        </mah:MetroAnimatedTabControl>
+    </Border>
+</local:MoveWindow>

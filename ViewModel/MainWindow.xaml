@@ -1,0 +1,506 @@
+﻿<mah:MetroWindow x:Class="wpf522.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:wpf522"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:svgc = "http://sharpvectors.codeplex.com/svgc/"
+        xmlns:converter="clr-namespace:wpf522.Converts"
+       xmlns:customer="clr-namespace:wpf522.CustomControls"  
+        Title="{Binding Version}" Height="auto" Width="800">
+
+    <mah:MetroWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/ListBoxStyle.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+
+
+            <converter:AnyConverter x:Key="ShapeConvertrIcon">
+                <converter:AnyConverter.AnyConverts>
+                    <converter:AnyItem From="{StaticResource BoxShape}" To="{StaticResource BoxIcon}"></converter:AnyItem>
+                    <converter:AnyItem From="{StaticResource PolygonShape}" To="{StaticResource PolygonIcon}"></converter:AnyItem>
+                </converter:AnyConverter.AnyConverts>
+            </converter:AnyConverter>
+
+            <converter:TypeShapeConvertToShapeAreaTypeName x:Key="TypeShapeToShapeArea"></converter:TypeShapeConvertToShapeAreaTypeName>
+        </ResourceDictionary>
+    </mah:MetroWindow.Resources>
+    <mah:MetroWindow.InputBindings>
+        <KeyBinding Command="{Binding SetDrawBoxCommand}" Key="{Binding ToolConfig.DrawBoxKeyCommand.HotKey.Key}" 
+                    Modifiers="{Binding ToolConfig.DrawBoxKeyCommand.HotKey.ModifierKeys}"></KeyBinding>
+        <KeyBinding Command="{Binding SetDrawPolygonCommand}" Key="{Binding ToolConfig.DrawPolygonKeyCommand.HotKey.Key}" 
+                    Modifiers="{Binding ToolConfig.DrawPolygonKeyCommand.HotKey.ModifierKeys}"></KeyBinding>
+        <KeyBinding Command="{Binding SetDrawSelectedCommand}" Key="{Binding ToolConfig.DrawSelectedKeyCommand.HotKey.Key}" 
+                    Modifiers="{Binding ToolConfig.DrawSelectedKeyCommand.HotKey.ModifierKeys}"></KeyBinding>
+        <KeyBinding Command="{Binding SetDrawNoneCommand}" Key="{Binding ToolConfig.DrawNoneKeyCommand.HotKey.Key}" 
+                    Modifiers="{Binding ToolConfig.DrawNoneKeyCommand.HotKey.ModifierKeys}"></KeyBinding>
+
+        <KeyBinding Command="{Binding SaveConfigCommand}" Key="{Binding ToolConfig.SaveConfigKeyCommand.HotKey.Key}" 
+                    Modifiers="{Binding ToolConfig.SaveConfigKeyCommand.HotKey.ModifierKeys}"></KeyBinding>
+        <KeyBinding Command="{Binding RemoveSelectedShapesCommand}" Key="{Binding ToolConfig.RemoveSelectedShapesKeyCommand.HotKey.Key}" 
+                    Modifiers="{Binding ToolConfig.RemoveSelectedShapesKeyCommand.HotKey.ModifierKeys}"></KeyBinding>
+
+        <KeyBinding Command="{Binding ImageMoveCommand}" CommandParameter="1" Key="{Binding ToolConfig.NextImageKeyCommand.HotKey.Key}" 
+                    Modifiers="{Binding ToolConfig.NextImageKeyCommand.HotKey.ModifierKeys}"></KeyBinding>
+        <KeyBinding Command="{Binding ImageMoveCommand}" CommandParameter="-1" Key="{Binding ToolConfig.PreviousKeyCommand.HotKey.Key}" 
+                    Modifiers="{Binding ToolConfig.PreviousKeyCommand.HotKey.ModifierKeys}"></KeyBinding>
+    </mah:MetroWindow.InputBindings>
+    <mah:MetroWindow.Flyouts>
+        <mah:FlyoutsControl>
+            <mah:Flyout Position="Left" MinWidth="600"   IsPinned="True" DataContext="{Binding ToolConfig}"
+                             IsModal="True" AreAnimationsEnabled="True" Header="快捷键设置" x:Name="LeftFly"
+                         CloseButtonVisibility="Visible">
+                <mah:Flyout.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="VerticalAlignment" Value="Center"></Setter>
+                        <Setter Property="HorizontalAlignment" Value="Right"></Setter>
+                        <Setter Property="Margin" Value="0, 0, 10, 0"></Setter>
+                    </Style>
+                    <Style TargetType="mah:HotKeyBox">
+                        <Setter Property="Margin" Value="1"></Setter>
+                    </Style>
+                </mah:Flyout.Resources>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="28"></RowDefinition>
+                        <RowDefinition Height="28"></RowDefinition>
+                        <RowDefinition Height="28"></RowDefinition>
+                        <RowDefinition Height="28"></RowDefinition>
+                        <RowDefinition Height="28"></RowDefinition>
+                        <RowDefinition Height="28"></RowDefinition>
+                        <RowDefinition Height="28"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="{Binding DrawBoxKeyCommand.Name}" Grid.Row="0"></TextBlock>
+                    <mah:HotKeyBox HotKey="{Binding DrawBoxKeyCommand.HotKey}" Grid.Row="0" Grid.Column="1"></mah:HotKeyBox>
+
+                    <TextBlock Text="{Binding DrawPolygonKeyCommand.Name}" Grid.Row="1"></TextBlock>
+                    <mah:HotKeyBox HotKey="{Binding DrawPolygonKeyCommand.HotKey}" Grid.Row="1" Grid.Column="1"></mah:HotKeyBox>
+
+                    <TextBlock Text="{Binding DrawSelectedKeyCommand.Name}" Grid.Row="2"></TextBlock>
+                    <mah:HotKeyBox HotKey="{Binding DrawSelectedKeyCommand.HotKey}" Grid.Row="2" Grid.Column="1"></mah:HotKeyBox>
+
+                    <TextBlock Text="{Binding DrawNoneKeyCommand.Name}" Grid.Row="3"></TextBlock>
+                    <mah:HotKeyBox HotKey="{Binding DrawNoneKeyCommand.HotKey}" Grid.Row="3" Grid.Column="1"></mah:HotKeyBox>
+
+                    <TextBlock Text="{Binding RemoveSelectedShapesKeyCommand.Name}" Grid.Row="4"></TextBlock>
+                    <mah:HotKeyBox HotKey="{Binding RemoveSelectedShapesKeyCommand.HotKey}" Grid.Row="4" Grid.Column="1"></mah:HotKeyBox>
+
+                    <TextBlock Text="{Binding NextImageKeyCommand.Name}" Grid.Row="5"></TextBlock>
+                    <mah:HotKeyBox HotKey="{Binding NextImageKeyCommand.HotKey}" Grid.Row="5" Grid.Column="1"></mah:HotKeyBox>
+
+                    <TextBlock Text="{Binding PreviousKeyCommand.Name}" Grid.Row="6"></TextBlock>
+                    <mah:HotKeyBox HotKey="{Binding PreviousKeyCommand.HotKey}" Grid.Row="6" Grid.Column="1"></mah:HotKeyBox>
+                </Grid>
+            </mah:Flyout>
+        </mah:FlyoutsControl>
+    </mah:MetroWindow.Flyouts>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="25*"></RowDefinition>
+            <RowDefinition Height="531*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Height="50" Background="#087F8C">
+            <Menu IsMainMenu="True" Background="#087F8C" FontWeight="Bold" FontSize="14" FontFamily="Console">
+                <MenuItem Header="Save" Background="#087F8C"  Height="auto" Width="57"  >
+                    <!--<MenuItem Header="打开文件夹" Command="{Binding OpenFolderCommand}"></MenuItem>-->
+                    <MenuItem Header="保存全部" Command="{Binding SaveAllCommand}" CommandParameter="不包含没有框选的"></MenuItem>
+                    <MenuItem Header="保存全部（包括没有框选的图片）" Command="{Binding SaveAllCommand}" CommandParameter="包含没有框选的"></MenuItem>
+                    <MenuItem Header="修改保存路径" Command="{Binding ModifySaveDirCommand}"></MenuItem>
+                    <MenuItem Header="导出yolo列表格式数据" Command="{Binding ExportYoloListCommand}"></MenuItem>
+                    <MenuItem Header="多边形转矩形" Command="{Binding ConvertPolygonToRectCommand}"></MenuItem>
+                </MenuItem>
+                <MenuItem Header="Option" Background="#087F8C"  Height="auto" Width="70" >
+                    <!--<MenuItem Header="绘制矩形框" Command="{Binding SetDrawBoxCommand}"></MenuItem>-->
+                    <!--<MenuItem Header="绘制多边形" Command="{Binding SetDrawPolygonCommand}"></MenuItem>-->
+                    <!--<MenuItem Header="绘制选择框" Command="{Binding SetDrawSelectedCommand}"></MenuItem>-->
+                    <MenuItem Header="无操作模式" Command="{Binding SetDrawNoneCommand}"></MenuItem>
+
+                    <MenuItem Header="全局类型转换" Command="{Binding ConvertTypesCommand}"></MenuItem>
+                </MenuItem>
+                <MenuItem Header="Settings" Background="#087F8C"  Height="auto" Width="80" >
+                    <MenuItem Header="快捷键设置" Command="{Binding OpenInputKeySetsCommand}" CommandParameter="{Binding ElementName=LeftFly,Path=.}"></MenuItem>
+                    <MenuItem Header="是否输出掩码图片">
+                        <CheckBox IsChecked="{Binding ToolConfig.IsCreateMaskImage}" Height="15" BorderBrush="White" BorderThickness="2"
+                                  Background="Black"></CheckBox>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="Tools" Background="#087F8C"  Height="auto" Width="80" >
+                    <MenuItem Header="Set Scales" Click="SetScales_Click" ></MenuItem>
+                </MenuItem>
+                <MenuItem Header="Image" Background="#087F8C"  Height="auto" Width="80" >
+                    <MenuItem Header="Type" Background="#087F8C"  Height="auto" Width="120" >
+                        <MenuItem Header="8-bit" Click="SetScales_Click" ></MenuItem>
+                        <MenuItem Header="16-bit" Click="SetScales_Click" ></MenuItem>
+                        <MenuItem Header="32-bit" Click="SetScales_Click" ></MenuItem>
+                    </MenuItem>
+                    <MenuItem Header="Adjust" Background="#087F8C"  Height="auto" Width="120" >
+                        <MenuItem Header="White Balance" Click="SetScales_Click" ></MenuItem>
+                        <MenuItem Header="16-bit" Click="SetScales_Click" ></MenuItem>
+                        <MenuItem Header="32-bit" Click="SetScales_Click" ></MenuItem>
+                    </MenuItem>
+                </MenuItem>
+                <!--<MenuItem Header="当前类别">
+                    <ComboBox ItemsSource="{Binding ToolConfig.ShapeTypeColorStructs}" DisplayMemberPath="TypeName" VerticalContentAlignment="Center" SelectedItem="{Binding ToolConfig.CurrentTypeName}" Height="25"></ComboBox>
+                </MenuItem>
+                <ComboBox Header="当前类别" ItemsSource="{Binding ToolConfig.ShapeTypeColorStructs}">
+                    <MenuItem.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                            </Grid>
+                        </DataTemplate>
+                    </MenuItem.ItemTemplate>
+                </ComboBox>-->
+
+            </Menu>
+        </StackPanel>
+        <Grid Grid.Row="1" Margin="-2,0,0,0" Grid.RowSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50"></ColumnDefinition>
+                <ColumnDefinition Width="0"></ColumnDefinition>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="3"></ColumnDefinition>
+                <ColumnDefinition Width="61*"></ColumnDefinition>
+                <ColumnDefinition Width="137*"/>
+                <ColumnDefinition Width="3"></ColumnDefinition>
+                <ColumnDefinition MinWidth="100" MaxWidth="200" Width="100*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <Border BorderBrush="#457b9d" HorizontalAlignment="Center" BorderThickness="0,0,0,1">
+                <StackPanel Grid.Column="0" Grid.Row="0" Height="auto"  HorizontalAlignment="Left"  Background="AliceBlue" Margin="2,0,-1,0" >
+
+                    <Button Width="50" Background="Transparent"  Click="OpenProjectOptionsWindow" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"    >
+                        <svgc:SvgViewbox IsHitTestVisible="False"  Source="pack://application:,,,/Images/openfile.svg"/>
+                    </Button>
+                    <Button Height="40" Background="Transparent" 
+        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+       >
+                        <svgc:SvgViewbox IsHitTestVisible="False" Source="pack://application:,,,/Images/next.svg"/>
+                    </Button>
+                    <Button Height="40" Background="Transparent" 
+        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+       >
+                        <svgc:SvgViewbox IsHitTestVisible="False" Source="pack://application:,,,/Images/previous.svg"/>
+                    </Button>
+                    <Button Height="40" Background="Transparent" Command="{Binding SetDrawPointCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"  >
+                        <svgc:SvgViewbox IsHitTestVisible="False"  Source="pack://application:,,,/Images/edit.svg"/>
+                    </Button>
+                    <Button Height="40" Background="Transparent" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Command="{Binding ColorButtonCommand}">
+                        <svgc:SvgViewbox IsHitTestVisible="False" Source="pack://application:,,,/Images/colors.svg"/>
+                    </Button>
+
+                    <Button Height="40" Background="Transparent" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Command="{Binding SetDrawPolygonCommand}">
+                        <svgc:SvgViewbox IsHitTestVisible="False"  Source="pack://application:,,,/Images/area.svg"/>
+                    </Button>
+
+                    <Button Height="40" Background="Transparent"   Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Command="{Binding SetAngleMeasureCommand}">
+                        <svgc:SvgViewbox IsHitTestVisible="False"  Source="pack://application:,,,/Images/angle.svg"/>
+
+                    </Button>
+                    <Button Height="40" Background="Transparent" Command="{Binding SetDrawLinesCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <Button.ToolTip>
+                            <TextBlock Text="Lines" FontSize="16" FontWeight="Bold" Foreground="#457b9d"/>
+                        </Button.ToolTip>
+                        <svgc:SvgViewbox IsHitTestVisible="False"  Source="pack://application:,,,/Images/line.svg"/>
+                    </Button>
+                    <Button Height="40" Background="Transparent" Command="{Binding SetDrawBoxCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <Button.ToolTip>
+                            <TextBlock Text="Box" FontSize="16" FontWeight="Bold" Foreground="#457b9d"/>
+                        </Button.ToolTip>
+                        <svgc:SvgViewbox IsHitTestVisible="False"  Source="pack://application:,,,/Images/rectangle.svg"/>
+                    </Button>
+                    <Button Height="40" Background="Transparent" Command="{Binding SetDrawPolygonCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <Button.ToolTip>
+                            <TextBlock Text="Polygon" FontSize="16" FontWeight="Bold" Foreground="#457b9d"/>
+                        </Button.ToolTip>
+                        <svgc:SvgViewbox IsHitTestVisible="False"  Source="pack://application:,,,/Images/label.svg"/>
+                    </Button>
+                    <Button Height="40" Background="Transparent" Command="{Binding SetDrawSelectedCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <Button.ToolTip>
+                            <TextBlock Text="Select" FontSize="16" FontWeight="Bold" Foreground="#457b9d"/>
+                        </Button.ToolTip>
+                        <svgc:SvgViewbox IsHitTestVisible="False"  Source="pack://application:,,,/Images/select.svg"/>
+                    </Button>
+                    <Button Height="40" Background="Transparent" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="SelectModelButton_Click">
+                        <svgc:SvgViewbox IsHitTestVisible="False"  Source="pack://application:,,,/Images/brain.svg"/>
+                    </Button>
+                    <Button Height="40" Background="Transparent" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <svgc:SvgViewbox IsHitTestVisible="False"  Source="pack://application:,,,/Images/ML.svg"/>
+                    </Button>
+                    <Button Height="40" Background="Transparent" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"   >
+                        <svgc:SvgViewbox IsHitTestVisible="False"  Source="pack://application:,,,/Images/zoom-out.svg"/>
+                    </Button>
+                    <Button Height="40" Background="Transparent" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" >
+                        <svgc:SvgViewbox IsHitTestVisible="False"  Source="pack://application:,,,/Images/zoom-in.svg"/>
+                    </Button>
+
+                </StackPanel>
+            </Border>
+            <mah:MetroAnimatedTabControl Style="{StaticResource ImageTabControl}" Grid.Column="1" SelectedIndex="{Binding TabViewSelectedIndex}" Grid.ColumnSpan="2">
+                <mah:MetroTabItem Header="TabItem" Height="22" VerticalAlignment="Bottom" >
+                    <mah:MetroTabItem.Content>
+                        <ListBox ItemsSource="{Binding ImageModels}" Style="{StaticResource ImageList}" SelectedIndex="{Binding SelectedIndex}"
+                         SelectedItem="{Binding CurrentImageModel}">
+                            <ListBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="打开输出的配置文件" Command="{Binding OpenImageConfigFileCommand}"></MenuItem>
+                                    <MenuItem Header="删除文件" Command="{Binding RemoveFileCommand}"></MenuItem>
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
+                        </ListBox>
+                    </mah:MetroTabItem.Content>
+                </mah:MetroTabItem>
+                <!--<mah:MetroTabItem Header="文件夹视图">
+                    <mah:MetroTabItem.Content>
+                        <TreeView Style="{StaticResource ImageTreeList}" SelectedItemChanged="TreeImageListSelectChanged"
+                              ItemsSource="{Binding ImageStructModels}" ItemTemplate="{StaticResource TreeNodeTemplate}">
+                            <TreeView.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="打开输出的配置文件" Command="{Binding OpenImageConfigFileCommand}"></MenuItem>
+                                    <MenuItem Header="删除文件" Command="{Binding RemoveFileCommand}"></MenuItem>
+                                </ContextMenu>
+                            </TreeView.ContextMenu>
+                        </TreeView>
+                    </mah:MetroTabItem.Content>
+                </mah:MetroTabItem>-->
+            </mah:MetroAnimatedTabControl>
+            <GridSplitter Grid.Column="3"></GridSplitter>
+
+            <mah:ContentControlEx Grid.Column="4" Content="{Binding CurrentImageModel}" ClipToBounds="True" Grid.ColumnSpan="2">
+                <mah:ContentControlEx.ContentTemplate>
+                    <DataTemplate>
+                        <customer:CanvasOption DataContext="{Binding Path=.}" 
+         CurrentDrawType="{Binding DataContext.ToolConfig.CurrentShapType,
+        RelativeSource={RelativeSource AncestorLevel=1, AncestorType=mah:ContentControlEx,Mode=FindAncestor}}">
+                        </customer:CanvasOption>
+                    </DataTemplate>
+                </mah:ContentControlEx.ContentTemplate>
+            </mah:ContentControlEx>
+            <GridSplitter Grid.Column="6"></GridSplitter>
+            <Grid Grid.Column="7">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="200" ></RowDefinition>
+                    <!-- 第一块：ListBox -->
+                    <RowDefinition Height="3"></RowDefinition>
+                    <!-- GridSplitter -->
+                    <RowDefinition></RowDefinition>
+                    <!-- 第二块：Colors和第二个ListBox -->
+                    <RowDefinition Height="193.77"></RowDefinition>
+                    <!-- 第三块：Results和数据表格 -->
+                </Grid.RowDefinitions>
+
+                <!-- 第一块：ListBox -->
+                <ListBox ItemsSource="{Binding CurrentImageModel.Shapes}" Grid.Row="0" SelectedItem="{Binding CurrentImageModel.SelectedShape}" Name="CurrentShapesListbox">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Height="25" MouseUp="ClickVisiableEventMouseUp">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="25"></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Image Source="{Binding Converter={StaticResource ShapeConvertrIcon},Path=ShapeType}" Width="16" Height="16" VerticalAlignment="Center"></Image>
+                                <ComboBox Grid.Column="1" BorderThickness="0"
+                              Visibility="Visible" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                              ItemsSource="{Binding DataContext.ToolConfig.ShapeTypeColorStructs,
+                              RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}}" 
+                              DisplayMemberPath="TypeName" SelectedValuePath="TypeName" 
+                              SelectedItem="{Binding TypeName, Converter={StaticResource TypeShapeToShapeArea}, Mode=TwoWay}"
+                              HorizontalContentAlignment="Center" VerticalContentAlignment="Center"></ComboBox>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="修改类型" Command="{Binding OpenModifyShapeTypeNameCommand}"></MenuItem>
+                            <MenuItem Header="删除选中框" Command="{Binding RemoveSelectedShapeAreaCommand}"></MenuItem>
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                </ListBox>
+
+                <Popup x:Name="TypeNameChangePopup" StaysOpen="False" Placement="Left" PlacementTarget="{Binding ElementName=CurrentShapesListbox, Path=.}">
+                    <ComboBox MinWidth="100" ItemsSource="{Binding ToolConfig.ShapeTypeColorStructs}" DisplayMemberPath="TypeName" SelectedValuePath="TypeName" SelectedItem="{Binding CurrentImageModel.SelectedShape.TypeName, Converter={StaticResource TypeShapeToShapeArea}}"></ComboBox>
+                </Popup>
+
+                <!-- GridSplitter -->
+                <GridSplitter Grid.Row="1"></GridSplitter>
+
+                <!-- 第二块：Colors和第二个ListBox -->
+                <Grid Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Border BorderThickness="1" CornerRadius="2" Background="{x:Null}">
+                        <Border.BorderBrush>
+                            <VisualBrush>
+                                <VisualBrush.Visual>
+                                    <Rectangle StrokeDashArray="4 2" Stroke="AliceBlue"
+                                   Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualWidth}"
+                                   Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualHeight}">
+                                    </Rectangle>
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </Border.BorderBrush>
+                        <TextBlock Text="Colors" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" Margin="4"></TextBlock>
+                    </Border>
+
+                    <ListBox Background="AliceBlue" ItemsSource="{Binding ToolConfig.ShapeTypeColorStructs}" Grid.Row="1" SelectedItem="{Binding ToolConfig.CurrentTypeName}" SelectedIndex="0"
+                 x:Name="TypeListBox" Margin="0,0,5,43">
+                        <ListBox.ContextMenu>
+                            <ContextMenu>
+                                <StackPanel Orientation="Vertical">
+                                    <MenuItem Header="添加一个类型" Command="{Binding CreateTypeCommand}"></MenuItem>
+                                    <MenuItem Header="修改类型名称" Command="{Binding OpenModifyShapeTypeColorPopupCommand}"></MenuItem>
+                                    <MenuItem Header="删除选中类型" Command="{Binding RemoveSelectedShapeTypeColorStructCommand}"></MenuItem>
+                                </StackPanel>
+                            </ContextMenu>
+                        </ListBox.ContextMenu>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition Width="40"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Border BorderBrush="{Binding TypeName, Converter={StaticResource TypeNameToColor}}" BorderThickness="2" CornerRadius="5" Height="25" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding TypeName}" VerticalAlignment="Center" FontSize="14" FontFamily="黑体" Margin="10, 0, 0, 0"></TextBlock>
+                                    </Border>
+                                    <mah:ToggleSwitch IsOn="{Binding IsChecked}" Grid.Column="1"></mah:ToggleSwitch>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Popup x:Name="CreateTypePopup" StaysOpen="True" Placement="Left" PlacementTarget="{Binding ElementName=TypeListBox, Path=.}">
+                        <DockPanel>
+                            <TextBox Text="{Binding CreateTypeStruct.TypeName}"></TextBox>
+                            <Button Content="确认" Command="{Binding SureCreateTypeCommand}" CommandParameter="{Binding ElementName=CreateTypePopup, Path=.}"></Button>
+                        </DockPanel>
+                    </Popup>
+
+                    <Popup StaysOpen="False" Name="ModifyShapeTypeColorStructNamePopup" Placement="Left" PlacementTarget="{Binding ElementName=TypeListBox, Path=.}">
+                        <TextBox Text="{Binding ToolConfig.CurrentTypeName.TypeName, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" MinWidth="100"></TextBox>
+                    </Popup>
+
+                    <Popup IsOpen="{Binding CurrentTypeName.IsChecked}" StaysOpen="True" Placement="Left" PlacementTarget="{Binding ElementName=TypeListBox}" DataContext="{Binding ToolConfig}">
+                        <Grid Width="200">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30"></RowDefinition>
+                                <RowDefinition Height="100"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Border Background="{Binding CurrentTypeName.TypeName, Converter={StaticResource TypeNameToColor}}"></Border>
+                            <mah:ColorPicker SelectedColor="{Binding CurrentTypeName.Color, Converter={StaticResource TypeNameToColorStr}}" Grid.Row="1"></mah:ColorPicker>
+                        </Grid>
+                    </Popup>
+                </Grid>
+                <GridSplitter Grid.Row="3"></GridSplitter>
+
+                <!-- 第三块：Results和数据表格 -->
+                <TextBlock Text="Results" Grid.Row="2" FontWeight="Bold" FontSize="15" VerticalAlignment="Top" Margin="2,154,6,0" Height="19"></TextBlock>
+
+                <ListView x:Name="ResultslistView" Grid.Row="2" ItemsSource="{Binding MeasureDataCollection}" Margin="0,178,0,4" Grid.RowSpan="2">
+                    <ListView.View>
+                        <GridView>
+                            <GridView.ColumnHeaderContainerStyle>
+                                <Style TargetType="GridViewColumnHeader">
+                                    <Setter Property="TextElement.FontWeight" Value="Normal" />
+                                    <Setter Property="TextElement.FontStyle" Value="Normal" />
+                                    <Setter Property="FontSize" Value="15" />
+                                    <Setter Property="Margin" Value="0 " />
+                                </Style>
+                            </GridView.ColumnHeaderContainerStyle>
+                            <GridViewColumn Header="Label" DisplayMemberBinding="{Binding Label}" />
+                            <GridViewColumn Header="Length" DisplayMemberBinding="{Binding Length}" />
+                            <GridViewColumn Header="Area" DisplayMemberBinding="{Binding Area}" />
+                            <GridViewColumn Header="Angle" DisplayMemberBinding="{Binding Angle}" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Grid>
+        </Grid>
+
+        <Border Background="#7F808080" x:Name="BkMask" Visibility="Hidden" Grid.RowSpan="3">
+            <Grid >
+                <Grid.Resources>
+                    <Style x:Key="ellipse" TargetType="Ellipse">
+                        <Setter Property="Width" Value="15"/>
+                        <Setter Property="Height" Value="15"/>
+                        <Setter Property="Canvas.Left" Value="42.5"/>
+                        <Setter Property="Fill" Value="#0d3f67"/>
+                        <Setter Property="RenderTransformOrigin" Value="0.5,3.33"/>
+                    </Style>
+
+                    <PowerEase x:Key="powerease" Power="3" EasingMode="EaseInOut"/>
+
+                </Grid.Resources>
+                <Canvas Width="100" Height="100">
+                    <Canvas.Triggers>
+                        <EventTrigger RoutedEvent="Loaded">
+                            <BeginStoryboard>
+                                <Storyboard Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)" RepeatBehavior="Forever">
+                                    <DoubleAnimation Storyboard.TargetName="e1" To="360" Duration="0:0:2" EasingFunction="{StaticResource powerease}" AccelerationRatio="0.1" DecelerationRatio="0.9"/>
+                                    <DoubleAnimation Storyboard.TargetName="e2" To="360" Duration="0:0:2" EasingFunction="{StaticResource powerease}" AccelerationRatio="0.3" DecelerationRatio="0.7"/>
+                                    <DoubleAnimation Storyboard.TargetName="e3" To="360" Duration="0:0:2" EasingFunction="{StaticResource powerease}" AccelerationRatio="0.5" DecelerationRatio="0.5"/>
+                                    <DoubleAnimation Storyboard.TargetName="e4" To="360" Duration="0:0:2" EasingFunction="{StaticResource powerease}" AccelerationRatio="0.7" DecelerationRatio="0.3"/>
+                                    <DoubleAnimation Storyboard.TargetName="e5" To="360" Duration="0:0:2" EasingFunction="{StaticResource powerease}" AccelerationRatio="0.9" DecelerationRatio="0.1"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Canvas.Triggers>
+
+                    <!--背景-->
+                    <Ellipse Width="100" Height="100" Fill="#f2f4f6"/>
+                    <Label Content="Loading"
+               FontSize="16"
+               FontFamily="Times New Roman"
+               Foreground="#6b48ff"
+               FontWeight="Bold"
+               Width="100" 
+               Height="100"
+               VerticalContentAlignment="Center" 
+               HorizontalContentAlignment="Center"/>
+                    <!-- 绘制椭圆；-->
+                    <Ellipse Name="e1" Style="{StaticResource ellipse}">
+                        <Ellipse.RenderTransform>
+                            <RotateTransform Angle="0"/>
+                        </Ellipse.RenderTransform>
+                    </Ellipse>
+                    <Ellipse Name="e2" Style="{StaticResource ellipse}">
+                        <Ellipse.RenderTransform>
+                            <RotateTransform Angle="0"/>
+                        </Ellipse.RenderTransform>
+                    </Ellipse>
+                    <Ellipse Name="e3" Style="{StaticResource ellipse}">
+                        <Ellipse.RenderTransform>
+                            <RotateTransform Angle="0"/>
+                        </Ellipse.RenderTransform>
+                    </Ellipse>
+                    <Ellipse Name="e4" Style="{StaticResource ellipse}">
+                        <Ellipse.RenderTransform>
+                            <RotateTransform Angle="0"/>
+                        </Ellipse.RenderTransform>
+                    </Ellipse>
+                    <Ellipse Name="e5" Style="{StaticResource ellipse}">
+                        <Ellipse.RenderTransform>
+                            <RotateTransform Angle="0"/>
+                        </Ellipse.RenderTransform>
+                    </Ellipse>
+                </Canvas>
+            </Grid>
+        </Border>
+    </Grid>
+</mah:MetroWindow>

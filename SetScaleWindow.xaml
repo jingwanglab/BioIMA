@@ -1,0 +1,89 @@
+﻿<Window
+       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="wpf522.SetScaleWindow"
+        Title="Set Scale" Background="AliceBlue" Height="404" Width="416"
+        WindowStyle="ToolWindow" 
+        Topmost="True">
+    <Grid RenderTransformOrigin="0.473,0.519">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Menu -->
+        <Border BorderBrush="Black" BorderThickness="0.5" >
+            <Menu Grid.Row="0" Background="LightGray">
+                <MenuItem Header="Option" Background="LightGray"  >
+                    <MenuItem Header="New Scale"/>
+                    <MenuItem Header="Delete"/>
+                </MenuItem>
+            </Menu>
+        </Border>
+        <!-- ListView -->
+
+        <ListView Grid.Row="1" x:Name="ListView1" SelectionMode="Single"  Background="AliceBlue" Margin="0,0,0,165" av:ItemsSource="{av:SampleData ItemCount=5}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Title" Width="80"/>
+                    <GridViewColumn Header="Pixel"/>
+                    <GridViewColumn Header="Length"/>
+                    <GridViewColumn Header="Unit" Width="50"/>
+                    <GridViewColumn Header="Size" Width="50"/>
+                    <GridViewColumn Header="Ratio" Width="50"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+
+        <Grid Grid.Row="3" Background="LightGray" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+
+            <Label Content="Title"  Margin="19,-148,127,147" Grid.ColumnSpan="2" RenderTransformOrigin="0.565,0.852"/>
+            <TextBox Grid.Column="1" x:Name="TitleTextBox" Margin="69,-149,16,151" RenderTransformOrigin="0.037,0.417"/>
+
+
+            <Label Grid.Column="2" Content="Ratio" RenderTransformOrigin="0.289,1.642" VerticalAlignment="Top" Margin="31,-149,139,0"/>
+            <TextBox Grid.Column="1" x:Name="RatioTextBox" IsReadOnly="True" Text="1" RenderTransformOrigin="2.277,3.102" Margin="115,-105,17,105"/>
+
+            <Label Content="Distance in pixels" HorizontalAlignment="Left" Margin="2,-101,0,100" Grid.ColumnSpan="2" RenderTransformOrigin="0.458,1.035" Width="109"/>
+            <TextBox Grid.Column="2" x:Name="WidthinpixelTextBox" Text="1" Margin="94,-150,28,150" RenderTransformOrigin="0.611,0.67"/>
+
+            <TextBox Grid.Column="1" x:Name="TextBox4" Text="10" Margin="115,-56,16,55" RenderTransformOrigin="0.13,0.652"/>
+            <TextBox Grid.Column="2" x:Name="TextBox2" Text="10" Margin="92,-104,29,105" RenderTransformOrigin="0.635,1.353"/>
+            <Label Grid.Column="1" Content="Unit of length" HorizontalAlignment="Left" Margin="206,-54,0,50" RenderTransformOrigin="0.353,0.784" Width="125" Grid.ColumnSpan="2"/>
+            <ComboBox Grid.Column="2" x:Name="UnitComboBox" Margin="92,-55,28,54" RenderTransformOrigin="0.49,0.597">
+                <ComboBoxItem Content="um"/>
+                <ComboBoxItem Content="mm"/>
+                <ComboBoxItem Content="cm"/>
+                <ComboBoxItem Content="px"/>
+            </ComboBox>
+
+            <Label Content="Known distance" HorizontalAlignment="Left" Margin="6,-53,0,53" Grid.ColumnSpan="2" RenderTransformOrigin="0.502,0.134" Width="101"/>
+            <Label Grid.Column="2" Content="Size" HorizontalAlignment="Left" RenderTransformOrigin="0.355,-0.34" Margin="33,-104,0,104"/>
+
+        </Grid>
+
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" x:Name="Button1" Content="Reset" Click="Reset_Click" Width="50"  />
+            <Button Grid.Column="1" x:Name="Button2" Content="Apply" Click="Apply_Click" Width="50" />
+            <Button Grid.Column="2" x:Name="Button3" Content="Save" Click="Save_Click" Width="50" />
+            <Button Grid.Column="3" x:Name="Button4" Content="Close" Click="Close_Click" Width="50" />
+        </Grid>
+
+    </Grid>
+</Window>

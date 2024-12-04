@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_LastSelectedProfileId>E:\projects\WPF\wpf522\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Compile Update="AutoSamSeg\autoResultWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CanvasOption.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="CustomDialogs\GlobalTypeConverter.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="ProjectOptionWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="AutoSamSeg\SAMSegWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="SetScaleWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="ModelSelectionWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="AutoSamSeg\autoResultWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="CustomControls\CanvasOption.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="CustomDialogs\FolderBrowserDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="CustomDialogs\GlobalTypeConverter.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="AutoSamSeg\SAMSegWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="SetScaleWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="ViewModel\MainWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="ProjectOptionWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Styles\BaseStyle.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Styles\ListBoxStyle.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Styles\ProjectHistoryWindowStyle.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="ModelSelectionWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+</Project>

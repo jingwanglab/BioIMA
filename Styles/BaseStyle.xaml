@@ -1,0 +1,50 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:system="clr-namespace:System;assembly=mscorlib"
+                    xmlns:enums="clr-namespace:wpf522.Models.Enums"
+                    xmlns:converter="clr-namespace:wpf522.Converts">
+
+    <system:Boolean x:Key="Bool_True">True</system:Boolean>
+    <system:Boolean x:Key="Bool_False">False</system:Boolean>
+
+    <system:Int32 x:Key="Int_1">1</system:Int32>
+    <system:Int32 x:Key="Int_2">2</system:Int32>
+
+    <enums:ShapeType x:Key="BoxShape">Box</enums:ShapeType>
+    <enums:ShapeType x:Key="PolygonShape">Polygon</enums:ShapeType>
+
+    <BitmapImage x:Key="FolderIcon" UriSource="/Images/openfile.png"></BitmapImage>
+    <BitmapImage x:Key="FileIcon" UriSource="/Images/openfile.png"></BitmapImage>
+    <BitmapImage x:Key="RemoteFolderIcon" UriSource="/Images/openfile.png"></BitmapImage>
+
+    <BitmapImage x:Key="LocalIcon" UriSource="/Icons/本地.png"></BitmapImage>
+    <BitmapImage x:Key="RemoteIcon" UriSource="/Icons/远程.png"></BitmapImage>
+
+    <BitmapImage x:Key="BoxIcon" UriSource="/Icons/矩形.png"></BitmapImage>
+    <BitmapImage x:Key="PolygonIcon" UriSource="/Icons/多边形.png"></BitmapImage>
+
+    <BitmapImage x:Key="ModifyIcon" UriSource="/Icons/修改.png"></BitmapImage>
+
+    <Visibility x:Key="ToVisiable">Visible</Visibility>
+    <Visibility x:Key="ToHidden">Hidden</Visibility>
+    <Visibility x:Key="ToCollapsed">Collapsed</Visibility>
+    
+    
+
+    <converter:TypeNameConvertToColorBrushConverter x:Key="TypeNameToColor"></converter:TypeNameConvertToColorBrushConverter>
+    <converter:TypeNameConvertToColorConverter x:Key="TypeNameToColorStr"></converter:TypeNameConvertToColorConverter>
+
+
+    <converter:AnyConverter x:Key="BoolTrueToVisible">
+        <converter:AnyConverter.AnyConverts>
+            <converter:AnyItem From="{StaticResource Bool_True}" To="{StaticResource ToVisiable}"></converter:AnyItem>
+            <converter:AnyItem From="{StaticResource Bool_False}" To="{StaticResource ToCollapsed}"></converter:AnyItem>
+        </converter:AnyConverter.AnyConverts>
+    </converter:AnyConverter>
+
+    <converter:AnyConverter x:Key="BoolTrueToNotVisible">
+        <converter:AnyConverter.AnyConverts>
+            <converter:AnyItem From="{StaticResource Bool_True}" To="{StaticResource ToCollapsed}"></converter:AnyItem>
+            <converter:AnyItem From="{StaticResource Bool_False}" To="{StaticResource ToVisiable}"></converter:AnyItem>
+        </converter:AnyConverter.AnyConverts>
+    </converter:AnyConverter>
+</ResourceDictionary>

@@ -1,0 +1,177 @@
+﻿<Window x:Class="wpf522.SAMSegWindow"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:svgc = "http://sharpvectors.codeplex.com/svgc/"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:wpf522"
+        mc:Ignorable="d"
+        Title="SegWindow" Height="600" Width="1000" Background="#457b9d">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="AliceBlue"/>
+            <!-- 浅灰色背景 -->
+            <Setter Property="Foreground" Value="Black"/>
+            <!-- 黑色文字 -->
+            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+            <Setter Property="TextElement.FontWeight" Value="Normal"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1.2*"/>
+            <ColumnDefinition Width="0.42*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Column="0">
+            <DockPanel x:Name="LoadImgGrid" Panel.ZIndex="1"  >
+                <Button x:Name="ImgSelButton" Height="50" Width="50" Click="SelectFileButton_Click" Margin="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Left">
+                    <svgc:SvgViewbox IsHitTestVisible="False" Source="Images/openfile.svg" Width="36" Height="36" />
+                </Button>
+                <TextBox x:Name="ImgPathTxt" Height="30" Width="600" Text="/image path" Background="#457b9d" Margin="0,8,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
+            </DockPanel>
+            <ScrollViewer x:Name="ImgScrollViewer" Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                <Canvas x:Name="ImgCanvas" Visibility="Collapsed" PreviewMouseLeftButtonDown="image_MouseLeftButtonDown" MouseMove="image_MouseMove" PreviewMouseLeftButtonUp="image_PreviewMouseLeftButtonUp">
+                    <Image x:Name="mImage" Stretch="Fill"  
+                    Canvas.Left="0" Canvas.Top="0" Canvas.Right="0" Canvas.Bottom="0"/>
+                    <Image x:Name="mMask" Stretch="Fill"  
+                    Canvas.Left="0" Canvas.Top="0" Canvas.Right="0" Canvas.Bottom="0"/>
+
+                </Canvas>
+                
+                <!--<Canvas x:Name="ImgCanvas" 
+            Visibility="Visible"
+            PreviewMouseLeftButtonDown="image_MouseLeftButtonDown"
+            
+            PreviewMouseMove="image_MouseMove">
+                    <Image x:Name="mImage" Stretch="Fill"
+               Canvas.Left="0" Canvas.Top="0" />
+                    <Image x:Name="mMask" Stretch="Fill"
+               Canvas.Left="0" Canvas.Top="0" />
+                </Canvas>-->
+            </ScrollViewer>
+        </Grid>
+        <TextBlock x:Name="StatusTxt" Width="250" TextWrapping="Wrap" VerticalAlignment="Bottom" Foreground="LightCoral" Margin="0,50,0,0"/>
+        <Grid Grid.Column="1" Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- 第一排：按钮和 Expander -->
+                <RowDefinition Height="Auto"/>
+                <!-- 第二排：Undo, Redo, Reload 按钮 -->
+                <RowDefinition Height="Auto"/>
+                <!-- 第三排：Measure, Count 按钮 -->
+                <RowDefinition Height="Auto"/>
+                <!-- 第四排：Results 文本 -->
+                <RowDefinition Height="*"/>
+                <!-- 第五排：DataGrid -->
+            </Grid.RowDefinitions>
+
+            <!-- 第一排：按钮图标和 Expander -->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                <StackPanel>
+                    <Button Width="50" Background="Transparent" Click="SetRuler_Click" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <svgc:SvgViewbox IsHitTestVisible="False" Source="Images/ruler2.svg" Height="36" Width="34"/>
+                    </Button>
+                    <Button Width="50" Background="Transparent" Click="Startseg_Click" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <svgc:SvgViewbox IsHitTestVisible="False" Source="Images/point.svg"/>
+                    </Button>
+                    <Button Width="50" Background="Transparent" Click="AddPoint_Click" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <svgc:SvgViewbox IsHitTestVisible="False" Source="Images/pointplus.svg"/>
+                    </Button>
+                    <Button Width="50" Background="Transparent" Click="RemovePoint_Click" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <svgc:SvgViewbox IsHitTestVisible="False" Source="Images/depoint.svg"/>
+                    </Button>
+                    <Button Width="50" Background="Transparent" Click="DrawBox_Click" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <svgc:SvgViewbox IsHitTestVisible="False" Source="Images/boxse.svg"/>
+                    </Button>
+                    <Button Width="50" Background="Transparent" Click="Bdiameter_Click" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <svgc:SvgViewbox IsHitTestVisible="False" Source="Images/diameter.svg"/>
+                    </Button>
+                    <Button Width="50" Background="Transparent"  Click="BCarea_Click"  Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <svgc:SvgViewbox IsHitTestVisible="False" Source="Images/area6.svg"/>
+                    </Button>
+                    <Button Width="50" Background="Transparent"  Click="Bperimeter_Click" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <svgc:SvgViewbox IsHitTestVisible="False" Source="Images/perimeter2.svg"/>
+                    </Button>
+                    <Button Width="50" Background="Transparent" Click="BReset_Click" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <svgc:SvgViewbox IsHitTestVisible="False" Source="Images/reset.svg"/>
+                    </Button>
+                </StackPanel>
+
+                <StackPanel VerticalAlignment="Top" Margin="10,0,0,0">
+                    <Expander x:Name="madjExp" Header="Adjust" IsExpanded="False">
+                        <StackPanel>
+                            <Button x:Name="m1" Width="70" Height="30" Content="Match"/>
+                        </StackPanel>
+                    </Expander>
+                    <Expander x:Name="mEverythingExp" Header="EveryThing" IsExpanded="False">
+                        <StackPanel>
+                            <DockPanel Width="200" Height="50" HorizontalAlignment="Left" Margin="5,0,0,0">
+                                <TextBlock Margin="5,0,0,0" Height="20"><Run Text="points_per_side:"/></TextBlock>
+                                <TextBox x:Name="mPoints_per_side" Margin="5,0,0,0" Height="20" Text="4"/>
+                            </DockPanel>
+                            <DockPanel Width="200" Height="50" HorizontalAlignment="Left" Margin="5,0,0,0">
+                                <TextBlock Margin="5,0,0,0" Height="20"><Run Text="pred_iou_thresh:"/></TextBlock>
+                                <TextBox x:Name="mPred_iou_thresh" Margin="5,0,0,0" Height="20" Text="0.88"/>
+                            </DockPanel>
+                            <DockPanel Width="200" Height="50" HorizontalAlignment="Left" Margin="5,0,0,0">
+                                <TextBlock Margin="5,0,0,0" Height="20"><Run Text="stability_score_thresh:"/></TextBlock>
+                                <TextBox x:Name="mStability_score_thresh" Margin="5,0,0,0" Height="20" Text="0.95"/>
+                            </DockPanel>
+                            <Button x:Name="mAutoSeg" Width="70" Height="30" Content="AutoSeg" Click="mAutoSeg_Click"/>
+                   
+                </StackPanel>
+                    </Expander>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- 第二排：Undo, Redo, Reload 按钮 -->
+            <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,5,0,0">
+                <Button x:Name="BUndo" Width="60" Height="30" Content="Undo" Click="BUndo_Click" Margin="10,0,0,0"/>
+                <Button x:Name="BRedo" Width="60" Height="30" Content="Redo" Click="BRedo_Click" Margin="10,0,0,0"/>
+                <Button x:Name="BReLoad" Width="80" Height="30" Content="Reload" Click="BReLoad_Click" Margin="10,0,0,0"/>
+            </StackPanel>
+
+            <!-- 第三排：Measure, Count 按钮 -->
+            <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="0,5,0,0">
+              
+                <!--<Button x:Name="BCcircumference" Width="80" Height="30" Content="Perimeter" Click="Bperimeter_Click" Margin="10,0,0,0"/>-->
+             
+            </StackPanel>
+          
+            <!-- 第四排：Results 文本 -->
+            <TextBlock Text="Results" Grid.Row="3" FontWeight="Bold" FontSize="15" VerticalAlignment="Top" Margin="10,5,10,0"/>
+
+
+            <!-- 第五排：DataGrid -->
+            <DataGrid x:Name="ResultsDataGrid"
+              ItemsSource="{Binding DataCollection}"
+              AutoGenerateColumns="False"
+              Grid.Row="4"
+              Margin="10,5,0,0">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding ID}" Width="1*"/>
+                    <DataGridTextColumn Header="Length" Binding="{Binding Length}" Width="2*"/>
+                    <DataGridTextColumn Header="Area" Binding="{Binding Area}" Width="2*"/>
+                    <DataGridTextColumn Header="Pixels" Binding="{Binding Pixels}" Width="2*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Grid>
+</Window>
