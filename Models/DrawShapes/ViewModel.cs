@@ -34,6 +34,7 @@ namespace agmeasure
                 OnPropertyChanged("InkStrokes");
             }
         }
+
         public class ViewModel2 : INotifyPropertyChanged
         {
             private string meaInfo;

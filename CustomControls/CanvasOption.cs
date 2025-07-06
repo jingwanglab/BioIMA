@@ -24,6 +24,8 @@ using HandyControl.Controls;
 using System.Windows.Media.TextFormatting;
 using System.Collections.ObjectModel;
 using System.IO;
+using SharpVectors.Converters;
+using static wpf522.SAMSegWindow;
 
 namespace wpf522.CustomControls
 {
@@ -48,7 +50,9 @@ namespace wpf522.CustomControls
         /// 是否为测量行为
         /// </summary>
         public bool isMeasure = false;
-
+        /// 是否为颜色提取行为
+        /// </summary>
+        public bool IsColorPicking { get; set; } = false;
         /// <summary>
         /// 测量对象集合
         /// </summary>
@@ -143,6 +147,29 @@ namespace wpf522.CustomControls
             isDrawingAngle = true;
         }
 
+        //public Image Image => (this.DataContext as ImageContentInfoModel)?.Image;
+
+
+        /// <summary>
+        /// 这里开始设置标尺
+        /// </summary>
+        private Point? _rulerStartPoint = null;
+        private Line _rulerLine;
+        private TextBlock _rulerText;
+        private Ellipse _startPointEllipse, _endPointEllipse;
+        private double _pixelToRealRatio = 1.0; // 像素与实际单位的比例
+        public event Action<double> SaveArea;
+        public ObservableCollection<LabelItem> Labels { get; set; } = new ObservableCollection<LabelItem>();
+        public LabelItem SelectedLabel { get; set; }
+
+        public ObservableCollection<DataModel> DataCollection { get; set; } = new ObservableCollection<DataModel>();
+
+        private int _currentId = 1; // 用于生成唯一的ID
+
+        private string _unit = "cm"; // 用于保存用户设定的单位这里假设默认单位是 "cm"，实际情况会在用户输入后更新
+        private string _currentFileName;
+
+        ///
         // 点击 "Color" 按钮，切换绘制模式
         private void ColorButton_Click(object sender, RoutedEventArgs e)
         {
@@ -174,12 +201,12 @@ namespace wpf522.CustomControls
         private bool isDrawingFirstLine = false;
         private bool isDrawingSecondLine = false;
         private bool isDrawingAngle = false;
-       
+
 
         // 多边形掩膜
         private Polygon polygonMask;
         private Shape selectedShape = null;
-      
+
 
         //定义存储测量数据的类
         public class MeasureData
@@ -215,14 +242,14 @@ namespace wpf522.CustomControls
 
             if (this.ImageModel is null || e.ChangedButton != MouseButton.Left || CurrentDrawType == ShapeType.None) return;
             var point = e.GetPosition(DrawCanvas);
-            // 获取当前图像的 WriteableBitmap
-            WriteableBitmap writeableBitmap = GetWriteableBitmapFromImageSource(DrawImageBox);
+            //// 获取当前图像的 WriteableBitmap
+            //WriteableBitmap writeableBitmap = GetWriteableBitmapFromImageSource(DrawImageBox);
 
-            // 获取鼠标点击位置的颜色
-            var color = GetColorAtPixel((int)point.X, (int)point.Y, writeableBitmap);
+            //// 获取鼠标点击位置的颜色
+            //var color = GetColorAtPixel((int)point.X, (int)point.Y, writeableBitmap);
 
             // 在这里可以处理获取的颜色，例如显示颜色信息
-            ShowColorResultWindow(color);
+            //ShowColorResultWindow(color);
             // 配置荧光球动画
             Ellipse glowEllipse = new Ellipse();
             glowEllipse.Width = 20;
@@ -303,8 +330,8 @@ namespace wpf522.CustomControls
                 }
 
             }
-            
-        
+
+
             else if (CurrentDrawType == ShapeType.Box && !IsDrawBox)
             {
                 // 绘制矩形框
@@ -318,9 +345,9 @@ namespace wpf522.CustomControls
             }
             // 绘制颜色框
             else if (CurrentDrawType == ShapeType.ColorPicker && !isDrawingColorBox)
-            { 
-              
-               RectangleShape = new Rectangle
+            {
+
+                RectangleShape = new Rectangle
                 {
                     Width = 0,
                     Height = 0,
@@ -510,10 +537,6 @@ namespace wpf522.CustomControls
             // 显示面积
             ShowArea(polygonPoints, area);
 
-         
-
-
-
             // 清空多边形数据
             PolygonShape.Clear();
             IsDrawPolygon = false;
@@ -675,14 +698,18 @@ namespace wpf522.CustomControls
             if (e.ChangedButton == MouseButton.Left) //检查鼠标按钮是否为左
             {
                 var point = e.GetPosition(DrawCanvas); //获取鼠标相对 DrawCanvas 的位置。
-                //                                       // 获取当前图像的 WriteableBitmap
-                //WriteableBitmap writeableBitmap = GetWriteableBitmapFromImageSource(DrawImageBox);
+                                                       // ✅ 只有在颜色拾取模式下才执行颜色测量
+                if (ToolConfig.IsColorPicking)
+                {
+                    WriteableBitmap writeableBitmap = GetWriteableBitmapFromImageSource(DrawImageBox);
+                    var color = GetColorAtPixel((int)point.X, (int)point.Y, writeableBitmap);
+                    ShowColorResultWindow(color);
 
-                //// 获取鼠标点击位置的颜色
-                //var color = GetColorAtPixel((int)point.X, (int)point.Y, writeableBitmap);
+                    // 如果你点击一次颜色后就自动关闭颜色拾取模式：
+                    // ToolConfig.IsColorPicking = false;
 
-                //// 在这里可以处理获取的颜色，例如显示颜色信息
-                //ShowColorResultWindow(color);
+                    return;
+                }
                 if (IsDrawPolygon)
                 {
                     CurrentLin.X2 = point.X;
@@ -822,7 +849,7 @@ namespace wpf522.CustomControls
                 }
 
             }
-            else if (CurrentDrawType == ShapeType.Box && IsDrawBox )
+            else if (CurrentDrawType == ShapeType.Box && IsDrawBox)
             {
                 // 绘制矩形框的逻辑
                 var p = new Point(Canvas.GetLeft(RectangleShape), Canvas.GetTop(RectangleShape));
@@ -847,7 +874,7 @@ namespace wpf522.CustomControls
                 Canvas.SetLeft(RectangleShape, Math.Min(point.X, initialPoint.X));
                 Canvas.SetTop(RectangleShape, Math.Min(point.Y, initialPoint.Y));
             }
-        
+
             else if (CurrentDrawType == ShapeType.Lines)
             {
                 Point movePoint = e.GetPosition(DrawCanvas);  // 更改为 movePoint
@@ -922,6 +949,159 @@ namespace wpf522.CustomControls
         }
 
 
+        // 将显示坐标映射到原始图像的坐标
+        private Point DisplayToImageCoords(Point displayPoint)
+        {
+            if (DrawImageBox.RenderTransform is TransformGroup transformGroup &&
+                transformGroup.Children[0] is ScaleTransform scaleTransform)
+            {
+                double scale = scaleTransform.ScaleX; // X和Y使用同样的比例缩放
+
+                // 计算在原始图像中的对应坐标
+                double xInOriginal = displayPoint.X / scale;
+                double yInOriginal = displayPoint.Y / scale;
+
+                return new Point(xInOriginal, yInOriginal);
+            }
+
+            return displayPoint; // 如果没有缩放，直接返回原始点
+        }
+
+        // 设置标尺两端点
+    //    public void SetRuler_Click(object sender, RoutedEventArgs e)
+    //    {
+    //        // 检查 DrawCanvas 是否为 null
+    //if (DrawCanvas == null)
+    //        {
+    //            System.Windows.MessageBox.Show("DrawCanvas is not initialized.");
+    //            return;
+    //        }
+
+    //        //ResetRuler(); // 先重置标尺
+
+    //        System.Windows.MessageBox.Show("请在图像上选择标尺的起点和终点。");
+
+    //        // 重置标尺起点
+    //        _rulerStartPoint = null;
+
+    //        // 设置当前模式为 SettingRuler
+    //        //this.currentMode = Mode.SettingRuler;
+
+    //        // 注册鼠标左键点击事件，选择起点和终点
+    //        MouseLeftButtonDown += SetRulerPoints;
+    //    }
+
+    //    // 设置标尺两端点
+    //    private void SetRulerPoints(object sender, MouseButtonEventArgs e)
+    //    {
+            
+
+    //        // 获取显示坐标上的点击位置
+    //        Point clickedPointInDisplay = e.GetPosition(this.DrawCanvas);
+
+    //        // 将显示坐标转换为原始图像的坐标（用于计算）
+    //        Point clickedPointInOriginal = DisplayToImageCoords(clickedPointInDisplay);
+
+    //        // 如果没有起点，则设置起点并绘制
+    //        if (_rulerStartPoint == null)
+    //        {
+    //            _rulerStartPoint = clickedPointInOriginal; // 存储原始坐标
+
+    //            // 在Canvas上绘制起点（使用显示坐标）
+    //            _startPointEllipse = new Ellipse
+    //            {
+    //                Width = 5,
+    //                Height = 5,
+    //                Fill = Brushes.Blue
+    //            };
+    //            Canvas.SetLeft(_startPointEllipse, clickedPointInDisplay.X - 2.5);
+    //            Canvas.SetTop(_startPointEllipse, clickedPointInDisplay.Y - 2.5);
+    //            DrawCanvas.Children.Add(_startPointEllipse);
+
+    //            System.Windows.MessageBox.Show("起点已设定，请选择标尺的终点。");
+    //        }
+    //        else
+    //        {
+    //            // 设置终点并绘制线段
+    //            _endPointEllipse = new Ellipse
+    //            {
+    //                Width = 5,
+    //                Height = 5,
+    //                Fill = Brushes.Red
+    //            };
+    //            Canvas.SetLeft(_endPointEllipse, clickedPointInDisplay.X - 2.5);
+    //            Canvas.SetTop(_endPointEllipse, clickedPointInDisplay.Y - 2.5);
+    //            DrawCanvas.Children.Add(_endPointEllipse);
+
+    //            // 在Canvas上绘制线段（使用显示坐标）
+    //            _rulerLine = new Line
+    //            {
+    //                Stroke = Brushes.Green,
+    //                StrokeThickness = 2,
+    //                X1 = Canvas.GetLeft(_startPointEllipse) + 2.5,
+    //                Y1 = Canvas.GetTop(_startPointEllipse) + 2.5,
+    //                X2 = clickedPointInDisplay.X,
+    //                Y2 = clickedPointInDisplay.Y
+    //            };
+    //            DrawCanvas.Children.Add(_rulerLine);
+
+    //            // 计算原始图像中的距离
+    //            double pixelDistance = Math.Sqrt(
+    //                Math.Pow(clickedPointInOriginal.X - _rulerStartPoint.Value.X, 2) +
+    //                Math.Pow(clickedPointInOriginal.Y - _rulerStartPoint.Value.Y, 2)
+    //            );
+
+    //            // 提示用户输入实际长度和单位
+    //            string input = Microsoft.VisualBasic.Interaction.InputBox(
+    //                "请输入标尺的实际长度（例如10.0）：", "设定标尺长度", "1.0");
+
+    //            if (double.TryParse(input, out double actualLength))
+    //            {
+    //                _pixelToRealRatio = actualLength / pixelDistance;
+
+    //                string unit = Microsoft.VisualBasic.Interaction.InputBox(
+    //                    "请输入单位（例如cm、mm、m等）：", "设定单位", "cm");
+
+    //                _unit = unit;
+    //                System.Windows.MessageBox.Show($"标尺设置成功：1 像素 = {_pixelToRealRatio} {unit}");
+
+    //                // 在中点显示标尺的长度
+    //                TextBlock rulerText = new TextBlock
+    //                {
+    //                    Text = $"{actualLength} {unit}",
+    //                    Foreground = Brushes.Black,
+    //                    Background = Brushes.White,
+    //                    FontWeight = FontWeights.Bold
+    //                };
+
+    //                Canvas.SetLeft(rulerText, (_rulerLine.X1 + _rulerLine.X2) / 2);
+    //                Canvas.SetTop(rulerText, (_rulerLine.Y1 + _rulerLine.Y2) / 2);
+    //                DrawCanvas.Children.Add(rulerText);
+
+    //                // 完成后解绑鼠标事件
+    //                DrawCanvas.MouseLeftButtonDown -= SetRulerPoints;
+    //            }
+    //            else
+    //            {
+    //                System.Windows.MessageBox.Show("无效输入，请重试。");
+    //                ResetRuler();
+    //            }
+    //        }
+    //    }
+
+
+
+        // 重置标尺设置
+        private void ResetRuler()
+        {
+            _rulerStartPoint = null;
+
+            // 移除线和端点
+            if (_rulerLine != null) DrawCanvas.Children.Remove(_rulerLine);
+            if (_startPointEllipse != null) DrawCanvas.Children.Remove(_startPointEllipse);
+            if (_endPointEllipse != null) DrawCanvas.Children.Remove(_endPointEllipse);
+        }
+
 
         /// <summary>
         /// 鼠标离开事件
@@ -955,18 +1135,18 @@ namespace wpf522.CustomControls
                 IsDrawLines = false;
             }
         }
-      
-    /// <summary>
-    /// 将绘制的多边形（由线条构成）转换为一个 ShapePolygon 对象
-    /// </summary>
-    /// <returns></returns>
-    private ShapePolygon ConvertToShapePolygon()
+
+        /// <summary>
+        /// 将绘制的多边形（由线条构成）转换为一个 ShapePolygon 对象
+        /// </summary>
+        /// <returns></returns>
+        private ShapePolygon ConvertToShapePolygon()
         {
             var x = double.MaxValue;
             var y = double.MaxValue;
             foreach (var item in PolygonShape)
             {
-                if(item.X1 < x)
+                if (item.X1 < x)
                 {
                     x = item.X1;
                 }
@@ -1086,7 +1266,7 @@ namespace wpf522.CustomControls
             // 创建垂直布局的面板
             var stackPanel = new StackPanel
             {
-                
+
                 Margin = new Thickness(10)
             };
 
@@ -1138,85 +1318,3 @@ namespace wpf522.CustomControls
 
 
 #endregion
-// <summary>
-/// 创造线段图形信息
-/// </summary>
-//public class LineInfo : CanvasOption
-//{
-//    private Line line; // 声明 line 变量在类的作用域内
-
-//    /// <summary>
-//    /// 创建线段
-//    /// </summary>
-//    /// <param name="point">起点坐标</param>
-//    public void CreateLine(Point point)
-//    {
-//        line = new Line
-//        {
-//            //线段颜色
-//            Stroke = Brushes.Blue,
-//            //线段粗细
-//            StrokeThickness = 2,
-//            //圆角顶点
-//            StrokeLineJoin = PenLineJoin.Round,
-//            StrokeEndLineCap = PenLineCap.Round,
-//            StrokeStartLineCap = PenLineCap.Round,
-//            //起点的X、Y坐标
-//            X1 = point.X,
-//            Y1 = point.Y,
-//            //终点的X、Y坐标
-//            X2 = point.X,
-//            Y2 = point.Y,
-//        };
-
-//        Canvas canvas = new Canvas();
-//        canvas.Children.Add(line);
-//        DrawCanvas.Children.Add(canvas);
-//    }
-
-//    /// <summary>
-//    /// 绘制图形
-//    /// </summary>
-//    /// <param name="point">当前坐标</param>
-//    //public override void DrawShape(Point point)
-//    //{
-//    //    if (line != null)
-//    //    {
-//    //        line.X2 = point.X;
-//    //        line.Y2 = point.Y;
-//    //    }
-//    //}
-
-//    /// <summary>
-//    /// 绘制控制点
-//    /// </summary>
-//    /// <param name="point">鼠标坐标</param>
-//    /// <param name="tag">控制点标志</param>
-//    /// <returns></returns>
-//    private Dictionary<string, Ellipse> CtrlPoints = new Dictionary<string, Ellipse>();
-
-//    public Ellipse DrawCtrlPoint(Point point, string tag)
-//    {
-//        Ellipse ctrlPoint = new Ellipse
-//        {
-//            StrokeThickness = 2, // 设置边框宽度
-//            Stroke = Brushes.Black, // 设置边框颜色
-//            Fill = Brushes.White, // 设置填充颜色
-//            Width = 10, // 设置宽度
-//            Height = 10, // 设置高度
-//            Margin = new Thickness(point.X - 5, point.Y - 5, point.X - 5, point.Y - 5),
-//            Visibility = Visibility.Hidden
-//        };
-
-//        if (!CtrlPoints.ContainsKey(tag))
-//        {
-//            CtrlPoints.Add(tag, ctrlPoint);
-//            DrawCanvas.Children.Add(ctrlPoint);
-//            ctrlPoint.Tag = tag;
-//        }
-
-//        return ctrlPoint;
-//    }
-//}
-
-

@@ -9,10 +9,10 @@
         </Grid.ColumnDefinitions>
         <ListBox x:Name="ModelListBox" Margin="10,10,10,10" Grid.ColumnSpan="2" SelectionChanged="ModelListBox_SelectionChanged">
             <ListBoxItem Content="SAM"/>
-            <ListBoxItem Content="Segmentanything (ViT-B)"/>
+            <!--<ListBoxItem Content="Segmentanything (ViT-B)"/>
             <ListBoxItem Content="Segmentanything (ViT-L)"/>
             <ListBoxItem Content="Segmentanything (ViT-H)"/>
-            <ListBoxItem Content="Yolov5s"/>
+            <ListBoxItem Content="Yolov5s"/>-->
             <ListBoxItem Content="Load Custom Model......"/>
         </ListBox>
         <Button Content="Select" Width="50" Height="30" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Click="SelectButton_Click" Grid.ColumnSpan="2"/>

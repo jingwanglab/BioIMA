@@ -31,7 +31,7 @@ namespace wpf522.Models
         /// <summary>
         /// 版本号
         /// </summary>
-        public string Version { get; set; } = _V;///Version 是自动属性，初始值为 _V。这里将该属性作为版本号。
+        public string Version { get; set; } = _V;///Version自动属性，初始值为 _V，版本号。
         
         /// <summary>
         /// 创建的类型
@@ -74,14 +74,18 @@ namespace wpf522.Models
             set
             {
                 _imageContentInfoModel = value;
-                _imageContentInfoModel.LoadImageInfo(ToolConfig);
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CurrentImageModel"));
+                if (_imageContentInfoModel != null)
+                {
+                    _imageContentInfoModel.LoadImageInfo(ToolConfig); // 加载图像信息
+                }
+                OnPropertyChanged("CurrentImageModel");
             }
         }
 
         /// <summary>
         /// 选中的序号
         /// </summary>
+        /// 
         public int SelectedIndex { get; set; } = 0;
         /// <summary>
         /// 页面显示切换视图序号
@@ -119,10 +123,13 @@ namespace wpf522.Models
         /// <summary>
         /// 让当前对象中的某个字段发生变更通知
         /// </summary>
-        public void ChangeProperty(string propertyName) {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        //public void ChangeProperty(string propertyName) {
+        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        //}
+        public void ChangeProperty(string propertyName)
+        {
+            OnPropertyChanged(propertyName);
         }
-  
         /// <summary>
         /// 保存配置文件
         /// </summary>
@@ -157,7 +164,7 @@ namespace wpf522.Models
                 }
                 if (string.IsNullOrEmpty(this.ToolConfig.OpenUriHistory) == false)
                 {
-                    LoadImages(ToolConfig.OpenUriHistory);
+                    LoadImages(ToolConfig.OpenUriHistory); // 加载图像
                 }
                 Version = _V + ": " + this.ToolConfig.OpenUriHistory;
             }
@@ -203,7 +210,8 @@ namespace wpf522.Models
                 ImageModels.Add(model);
             }
             UpdateShapeAndColor();
-            Version = _V + ", 当前打开的路径 : " + this.ToolConfig.OpenUriHistory;
+            Version = _V + ", : " + this.ToolConfig.OpenUriHistory;
+            OnPropertyChanged("ImageModels");  // 触发 UI 更新
             // 引发 ImagesLoaded 事件
         }
         
@@ -280,7 +288,10 @@ namespace wpf522.Models
             }
 
         }
-
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
         /// <summary>
         /// 更新本地颜色和形状(当加载的数据中默认没有对应的需要的形状和颜色)
         /// 首先创建一个 shapes 列表用于存储所有形状信息

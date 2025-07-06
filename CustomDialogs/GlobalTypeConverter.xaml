@@ -12,7 +12,7 @@
             <RowDefinition Height="80"></RowDefinition>
             <RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
-        <TextBlock Text="Setting Conversion Type" VerticalAlignment="Center" FontSize="20" Margin="30, 0, 0, 0" FontFamily="微软雅黑" FontWeight="Bold"></TextBlock>
+        <TextBlock Text="Setting Conversion Type" VerticalAlignment="Center" FontSize="20" Margin="30, 0, 0, 0" FontFamily="Arail" FontWeight="Bold"></TextBlock>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center" Height="40">
             <ComboBox ItemsSource="{Binding TypeFroms}" SelectedItem="{Binding SelectedFrom}" DisplayMemberPath="TypeName" MinWidth="100" VerticalContentAlignment="Center" BorderThickness="0"></ComboBox>
@@ -23,7 +23,7 @@
 
         <StackPanel Orientation="Horizontal" Grid.Row="2" FlowDirection="RightToLeft">
             <Button Content="Cancel" Margin="10, 0, 10, 0" Width="80" Click="CancaleClick"></Button>
-            <Button Content="Confirm" Margin="10, 0, 10, 0" Width="80" Click="SureClick"></Button>
+            <Button Content="OK" Margin="10, 0, 10, 0" Width="80" Click="SureClick"></Button>
         </StackPanel>
     </Grid>
 </mah:CustomDialog>

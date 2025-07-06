@@ -19,7 +19,7 @@
     <BitmapImage x:Key="LocalIcon" UriSource="/Icons/本地.png"></BitmapImage>
     <BitmapImage x:Key="RemoteIcon" UriSource="/Icons/远程.png"></BitmapImage>
 
-    <BitmapImage x:Key="BoxIcon" UriSource="/Icons/矩形.png"></BitmapImage>
+    <BitmapImage x:Key="BoxIcon" UriSource="/Images/boxse.svg"></BitmapImage>
     <BitmapImage x:Key="PolygonIcon" UriSource="/Icons/多边形.png"></BitmapImage>
 
     <BitmapImage x:Key="ModifyIcon" UriSource="/Icons/修改.png"></BitmapImage>

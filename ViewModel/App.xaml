@@ -1,21 +1,19 @@
 ﻿<Application x:Class="wpf522.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:wpf522"
+             xmlns:converts="clr-namespace:wpf522.Converts"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-   
         <ResourceDictionary>
+            <!-- 颜色转换器 -->
+            <converts:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+
+            <!-- MahApps.Metro resource dictionaries -->
             <ResourceDictionary.MergedDictionaries>
-                <!-- MahApps.Metro resource dictionaries. Make sure that all file names are Case Sensitive! -->
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                <!-- Theme setting -->
-           
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Teal.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-        
     </Application.Resources>
-    
 </Application>

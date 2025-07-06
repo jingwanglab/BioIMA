@@ -80,7 +80,7 @@
                         <RowDefinition Height="60"></RowDefinition>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Text="Creat your new project" Style="{StaticResource TitleText}"></TextBlock>
+                    <TextBlock Text="Creat a new project" Style="{StaticResource TitleText}"></TextBlock>
 
                     <Grid Grid.Row="1">
                         <Grid.RowDefinitions>

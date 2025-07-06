@@ -42,8 +42,7 @@ namespace wpf522
         /// 主模型
         /// </summary>
         /// 
-
-
+        private CanvasOption canvasOption; // 声明 CanvasOption
         public MainModel MainModel { get; set; }
         /// <summary>
         /// 单例
@@ -316,5 +315,11 @@ namespace wpf522
         {
             throw new NotImplementedException();
         }
+
+        // 设置标尺点击事件
+        //private void SetRuler_Click(object sender, RoutedEventArgs e)
+        //{
+        //    canvasOption.SetRuler_Click(sender, e); // 调用 CanvasOption 中的 SetRuler_Click 方法
+        //}
     }
 }

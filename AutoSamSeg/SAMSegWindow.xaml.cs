@@ -14,6 +14,11 @@ using wpf522.AutoSamSeg;
 using System.Collections.ObjectModel;
 using System.Windows.Shapes;
 using System.Threading.Tasks;
+using YourNamespace.Models;
+using YourNamespace.ViewModels;
+using System.Globalization;
+using System.Windows.Data;
+using Newtonsoft.Json;
 
 namespace wpf522
 {
@@ -51,6 +56,8 @@ namespace wpf522
         private Ellipse _startPointEllipse, _endPointEllipse;
         private double _pixelToRealRatio = 1.0; // 像素与实际单位的比例
         public event Action<double> SaveArea;
+        public ObservableCollection<LabelItem> Labels { get; set; } = new ObservableCollection<LabelItem>();
+        public LabelItem SelectedLabel { get; set; }
 
         public ObservableCollection<DataModel> DataCollection { get; set; } = new ObservableCollection<DataModel>();
 
@@ -58,6 +65,10 @@ namespace wpf522
 
         private string _unit = "cm"; // 用于保存用户设定的单位这里假设默认单位是 "cm"，实际情况会在用户输入后更新
         private string _currentFileName;
+
+        public LabelViewModel LabelVM { get; set; }
+
+        
 
         public class DataModel
         {
@@ -119,7 +130,7 @@ namespace wpf522
         //    this.mImage.Source = bitmap;//显示图像
 
 
-        //}这里开始是原始方法看这里aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        //}这里开始是原始方法aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
         //public SAMSegWindow()
         //{
         //    InitializeComponent();
@@ -163,10 +174,16 @@ namespace wpf522
             //this.mImage.MouseRightButtonDown += Image_MouseRightButtonDown;
             //this.mImage.MouseMove += Image_MouseMove;
             //this.mImage.MouseRightButtonUp += Image_MouseRightButtonUp;
+
+            // 初始化 ViewModel 并绑定到 DataContext
+            LabelVM = new LabelViewModel();
+            this.DataContext = LabelVM;
         }
 
         private Point _lastMousePosition;
         private bool _isDragging = false;
+        private bool isLabelingMode = false; // 标记模式标志
+
         private void SAMSegWindow_MouseUp(object sender, MouseButtonEventArgs e)
         {
             if (_isDragging)
@@ -312,6 +329,8 @@ namespace wpf522
         // 鼠标左键按下事件处理提示点程序
         private void image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            // 如果当前模式是 None，不执行任何操作
+            if (this.currentMode == Mode.None) return;
             // 检查点击是否发生在 ImgCanvas 区域内
             if (!this.ImgCanvas.IsMouseOver)
             {
@@ -423,19 +442,13 @@ namespace wpf522
         /// <summary>
         /// 图像路径选择
         /// </summary>
-        private void SelectFileButton_Click(object sender, RoutedEventArgs e)
+        private async void SelectFileButton_Click(object sender, RoutedEventArgs e)
         {
-            // Create OpenFileDialog
             Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
-
-            // Set filter for file extension and default file extension
             openFileDialog.DefaultExt = ".png";
             openFileDialog.Filter = "Image files (*.jpg, *.jpeg, *.png)|*.jpg;*.jpeg;*.png|All files (*.*)|*.*";
 
-            // Display OpenFileDialog by calling ShowDialog method
-            Nullable<bool> result = openFileDialog.ShowDialog();
-
-            // Get the selected file name and display in a TextBox
+            bool? result = openFileDialog.ShowDialog();
             if (result == true)
             {
                 this.ImgPathTxt.Text = openFileDialog.FileName;
@@ -444,46 +457,51 @@ namespace wpf522
                 if (!File.Exists(this.mImagePath))
                     return;
 
-
-                // Set _currentFileName to the name of the selected file
                 _currentFileName = System.IO.Path.GetFileName(this.mImagePath);
-
-
                 this.LoadImgGrid.Visibility = Visibility.Collapsed;
                 this.ImgCanvas.Visibility = Visibility.Visible;
                 this.LoadImage(this.mImagePath);
-                this.ShowStatus("Image Loaded");
+
+                // **✅ 确保状态文本和进度条可见**
+                this.StatusTxt.Visibility = Visibility.Visible;
+                this.ProgressBarStatus.Visibility = Visibility.Visible;
+
+                ShowStatus("Image Loaded", 10); // 10%
 
                 // 清除之前绘制的元素
                 ClearDrawnElements(this.ImgCanvas);
 
-                this.LoadImage(this.mImagePath);
-                this.ShowStatus("Image Loaded");
-                Thread thread = new Thread(() =>
+                await Task.Run(() =>
                 {
-                    this.mSam.LoadONNXModel();//加载Segment Anything模型
+                    // 1️⃣ 加载 ONNX 模型
+                    Dispatcher.BeginInvoke(new Action(() => ShowStatus("Loading ONNX Model...", 30)));
+                    this.mSam.LoadONNXModel();
 
-                    UI.Invoke(new Action(delegate
-                    {
-                        this.ShowStatus("ONNX Model Loaded ✔");
-                    }));
-                    // 读取图像
+                    Dispatcher.BeginInvoke(new Action(() => ShowStatus("ONNX Model Loaded ✔", 50))); // 50%
+
+                    // 2️⃣ 读取图像并处理
+                    Dispatcher.BeginInvoke(new Action(() => ShowStatus("Processing Image...", 70))); // 70%
                     OpenCvSharp.Mat image = OpenCvSharp.Cv2.ImRead(this.mImagePath, OpenCvSharp.ImreadModes.Color);
-                    this.mImgEmbedding = this.mSam.Encode(image, this.mOrgwid, this.mOrghei);//Image Embedding
+
+                    Dispatcher.BeginInvoke(new Action(() => ShowStatus("Encoding Image...", 80))); // 80%
+                    this.mImgEmbedding = this.mSam.Encode(image, this.mOrgwid, this.mOrghei);
 
                     this.mAutoMask = new SAMAutoMask();
                     this.mAutoMask.mImgEmbedding = this.mImgEmbedding;
                     this.mAutoMask.mSAM = this.mSam;
                     image.Dispose();
-                    UI.Invoke(new Action(delegate
-                    {
-                        this.ShowStatus("Image Embedding ✔");
-                    }));
-                });
-                thread.Start();
 
-            }
+                    Dispatcher.BeginInvoke(new Action(() => ShowStatus("Image Embedding ✔", 100))); // 100%
+                });
+                // 任务完成后，让 UI 再停留 0.1 秒**
+                await Task.Delay(100);
+                this.ProgressBarStatus.Visibility = Visibility.Collapsed;
+                this.StatusTxt.Visibility = Visibility.Collapsed; // **隐藏状态文本**
+            
         }
+        }
+
+
 
         private void BReLoad_Click(object sender, RoutedEventArgs e)
         {
@@ -571,7 +589,13 @@ namespace wpf522
         private void BReset_Click(object sender, RoutedEventArgs e)
         {
             this.Reset();
+
+            // 重新进入分割模式
+            this.currentMode = Mode.CreatingHints;
+            this.mCurOp = Operation.Point; // 或者 Operation.Box，根据需要选择操作
+            this.mOpType = OpType.ADD; // 可选，设置当前操作类型（添加/移除）
         }
+
         /// <summary>
         /// 显示分割结果
         /// </summary>
@@ -738,22 +762,51 @@ namespace wpf522
         /// <summary>
         /// 显示状态信息
         /// </summary>
-        void ShowStatus(string message)
+        void ShowStatus(string message, int progress = -1)
         {
-            this.StatusTxt.Text = message;
+            Dispatcher.Invoke(() =>
+            {
+                this.StatusTxt.Text = message; // 更新状态文本
+                if (progress >= 0) // 只更新有效的进度
+                {
+                    this.ProgressBarStatus.Visibility = Visibility.Visible;
+                    this.ProgressBarStatus.Value = progress;
+                }
+            });
         }
+
+
         void Reset()
         {
             this.ClearAnation();
             this.mPromotionList.Clear();
             this.mMask.Source = null;
         }
+        //private void Startseg_Click(object sender, RoutedEventArgs e)
+        //{
+        //    this.currentMode = Mode.CreatingHints; // 切换到提示点模式
+        //    this.mCurOp = Operation.Point;  // 设置为点操作
+        //    this.mOpType = OpType.ADD;      // 设置为增加点
+        //}
         private void Startseg_Click(object sender, RoutedEventArgs e)
         {
-            this.currentMode = Mode.CreatingHints; // 切换到提示点模式
-            this.mCurOp = Operation.Point;  // 设置为点操作
-            this.mOpType = OpType.ADD;      // 设置为增加点
+            //if (!isLabelingMode)
+            //{
+            //    MessageBox.Show("请先生成标签并完成标记！");
+            //    return;
+            //}
+
+            // 启动分割
+            this.currentMode = Mode.CreatingHints;
+            this.mCurOp = Operation.Point;
+            this.mOpType = OpType.ADD;
+
+            // 退出标记模式
+            isLabelingMode = false;
+            StartsegButton.IsEnabled = true;
+            MessageBox.Show("Try clicking the image to perform segmentation!");
         }
+
         // 加点操作
         private void AddPoint_Click(object sender, RoutedEventArgs e)
         {
@@ -775,20 +828,20 @@ namespace wpf522
         }
 
 
-        private void mAutoSeg_Click(object sender, RoutedEventArgs e)
-        {
-            this.mAutoMask.points_per_side = int.Parse(this.mPoints_per_side.Text);
-            this.mAutoMask.pred_iou_thresh = float.Parse(this.mPred_iou_thresh.Text);
-            this.mAutoMask.stability_score_thresh = float.Parse(this.mStability_score_thresh.Text);
-            this.ShowStatus("Auto Segment......");
-            Thread thread = new Thread(() =>
-            {
-                this.mCurOp = Operation.Everything;
-                this.mAutoMaskData = this.mAutoMask.Generate(this.mImagePath);
-                this.ShowMask(this.mAutoMaskData);
-            });
-            thread.Start();
-        }
+        //private void mAutoSeg_Click(object sender, RoutedEventArgs e)
+        //{
+        //    this.mAutoMask.points_per_side = int.Parse(this.mPoints_per_side.Text);
+        //    this.mAutoMask.pred_iou_thresh = float.Parse(this.mPred_iou_thresh.Text);
+        //    this.mAutoMask.stability_score_thresh = float.Parse(this.mStability_score_thresh.Text);
+        //    this.ShowStatus("Auto Segment......");
+        //    Thread thread = new Thread(() =>
+        //    {
+        //        this.mCurOp = Operation.Everything;
+        //        this.mAutoMaskData = this.mAutoMask.Generate(this.mImagePath);
+        //        this.ShowMask(this.mAutoMaskData);
+        //    });
+        //    thread.Start();
+        //}
         MaskData MatchTextAndImage(string txt)
         {
             var txtEmbedding = this.mCLIP.TxtEncoder(txt);
@@ -889,7 +942,7 @@ namespace wpf522
 
             ResetRuler(); // 先重置标尺
 
-            MessageBox.Show("请在图像上选择标尺的起点和终点。");
+            MessageBox.Show("Please select the start and end points of the ruler on the image.");
 
             // 重置标尺起点
             _rulerStartPoint = null;
@@ -931,7 +984,7 @@ namespace wpf522
                 Canvas.SetTop(_startPointEllipse, clickedPointInDisplay.Y - 2.5);
                 ImgCanvas.Children.Add(_startPointEllipse);
 
-                MessageBox.Show("起点已设定，请选择标尺的终点。");
+                MessageBox.Show("Start point set. Please select the end point of the ruler.");
             }
             else
             {
@@ -966,17 +1019,17 @@ namespace wpf522
 
                 // 提示用户输入实际长度和单位
                 string input = Microsoft.VisualBasic.Interaction.InputBox(
-                    "请输入标尺的实际长度（例如10.0）：", "设定标尺长度", "1.0");
+                      "Please enter the actual length of the ruler (e.g., 10.0):", "Set Ruler Length", "1.0");
 
                 if (double.TryParse(input, out double actualLength))
                 {
                     _pixelToRealRatio = actualLength / pixelDistance;
 
                     string unit = Microsoft.VisualBasic.Interaction.InputBox(
-                        "请输入单位（例如cm、mm、m等）：", "设定单位", "cm");
+                       "Please enter the unit (e.g., cm, mm, m):", "Set Unit", "cm");
 
                     _unit = unit;
-                    MessageBox.Show($"标尺设置成功：1 像素 = {_pixelToRealRatio} {unit}");
+                    MessageBox.Show($"Ruler set successfully: 1 pixel = {_pixelToRealRatio} {unit}");
 
                     // 在中点显示标尺的长度
                     TextBlock rulerText = new TextBlock
@@ -996,7 +1049,7 @@ namespace wpf522
                 }
                 else
                 {
-                    MessageBox.Show("无效输入，请重试。");
+                    MessageBox.Show("Invalid input, please try again.");
                     ResetRuler();
                 }
             }
@@ -1014,27 +1067,13 @@ namespace wpf522
             if (_startPointEllipse != null) ImgCanvas.Children.Remove(_startPointEllipse);
             if (_endPointEllipse != null) ImgCanvas.Children.Remove(_endPointEllipse);
         }
-        //private void BCarea_Click(object sender, RoutedEventArgs e)
-        //{
-
-        //    // 更新 TextBlock 来显示掩膜的面积
-        //    string areaText = $"Mask Area: {_maskPixelCount} pixels"; // 定义 areaText 变量
-        // // 创建并显示结果窗口
-
-        //    autoResultWindow resultWindow = new autoResultWindow(areaText);
-        //    // 获取鼠标位置
-        //    Point mousePosition = Mouse.GetPosition(this);
-        //    // 设置新窗口的位置
-        //    resultWindow.Left = this.Left + mousePosition.X;
-        //    resultWindow.Top = this.Top + mousePosition.Y;
-        //    resultWindow.ShowDialog();
-        //}
+       
 
         private void BCarea_Click(object sender, RoutedEventArgs e)
         {
             if (_pixelToRealRatio <= 0)
             {
-                MessageBox.Show("请先设定标尺！");
+                MessageBox.Show("Please set the scale first!");
                 return;
             }
 
@@ -1121,16 +1160,19 @@ namespace wpf522
 
         private void Bperimeter_Click(object sender, RoutedEventArgs e)
         {
+            // 禁用分割功能
+            this.currentMode = Mode.None;
+
             if (_pixelToRealRatio <= 0)
             {
-                MessageBox.Show("请先设定标尺！");
+                MessageBox.Show("Please set the scale first!");
                 return;
             }
 
             // 确保 mask 数据存在
             if (this.mMask == null)
             {
-                MessageBox.Show("未找到掩膜数据！");
+                MessageBox.Show("Mask data not found!");
                 return;
             }
 
@@ -1175,7 +1217,6 @@ namespace wpf522
         }
 
         // 计算最小外接圆的中心和半径
-
 
 
         private (Point center, double radius) CalculateEnclosingCircle(float[] mask)
@@ -1317,33 +1358,40 @@ namespace wpf522
             canvas.Children.Add(line);
             _drawnElements.Add(line); // 将线条添加到列表中
 
-            // 在第一个端点位置创建显示长度的 TextBlock
-            TextBlock lengthText1 = new TextBlock
+            // 创建可复制的 TextBox
+            TextBox lengthText = new TextBox
             {
-                Text = $"{lengthInRealUnits:F2} {_unit}", // 仅显示真实长度
+                Text = $"{lengthInRealUnits:F2} {_unit}",
                 Foreground = brush,
                 FontSize = 12,
-                Background = new SolidColorBrush(Color.FromArgb(60, 240, 248, 255)) // 透明度的 AliceBlue
+                Background = Brushes.Transparent, // 透明背景
+                BorderThickness = new Thickness(0), // 无边框
+                IsReadOnly = true, // 只读
+                AcceptsReturn = false, // 单行文本
+                Padding = new Thickness(2, 0, 2, 0) // 避免文本贴边
             };
 
-            // 在第一个端点位置创建显示长度的 TextBlock
-            TextBlock lengthText = new TextBlock
-            {
-                Text = $"{lengthInRealUnits:F2} {_unit}", // 仅显示真实长度
-                Foreground = brush,
-                FontSize = 12,
-                Background = new SolidColorBrush(Color.FromArgb(60, 240, 248, 255)) //
-            };
-
-            // 设置 TextBlock 的位置（在第一个端点）
+            // 设置位置
             Canvas.SetLeft(lengthText, point1.X);
             Canvas.SetTop(lengthText, point1.Y);
 
+            // 右键菜单
+            ContextMenu contextMenu = new ContextMenu();
+            MenuItem copyMenuItem = new MenuItem { Header = "Copy" };
+            copyMenuItem.Click += (s, e) => Clipboard.SetText(lengthText.Text);
+            contextMenu.Items.Add(copyMenuItem);
+            lengthText.ContextMenu = contextMenu;
 
-            // 添加 TextBlock 到 Canvas
+            // 阻止右键点击触发其他功能
+            lengthText.PreviewMouseRightButtonDown += (s, e) => e.Handled = true;
+
+            // 添加到 Canvas
             canvas.Children.Add(lengthText);
-            _drawnElements.Add(lengthText); // 将 TextBlock 添加到列表
+            _drawnElements.Add(lengthText);
         }
+
+
+
 
         // 计算两个点之间的距离
         private double Distance(Point p1, Point p2)
@@ -1365,20 +1413,265 @@ namespace wpf522
 
             return isEdge;
         }
+        public class LabelItem
+        {
+            public string Name { get; set; }
+            public Color Color { get; set; }
+            public bool IsChecked { get; set; } = true;
+            public float[] MaskData { get; set; } // 掩膜数据
+            public string JsonPath { get; set; } // 保存的JSON路径
+    }
+
+
+        public class LabelViewModel
+        {
+            public ObservableCollection<LabelItem> Labels { get; set; } = new ObservableCollection<LabelItem>();
+
+            public LabelViewModel()
+            {
+                // 示例数据
+                Labels.Add(new LabelItem { Name = "Label 1", Color = ((SolidColorBrush)Brushes.Red).Color });
+                Labels.Add(new LabelItem { Name = "Label 2", Color = ((SolidColorBrush)Brushes.Blue).Color });
+
+            }
+        }
+
+        //private void BLabel_Click(object sender, RoutedEventArgs e)
+        //{
+        //    LabelVM.Labels.Add(new LabelItem { Name = "New Label", Color = Brushes.Green });
+        //}
+        private void BLabel_Click(object sender, RoutedEventArgs e)
+        {
+            if (mMaskData == null)
+            {
+                MessageBox.Show("Please generate a mask first!");
+                return;
+            }
+
+            var selectedLabel = SelectedLabel ?? Labels.FirstOrDefault();
+            if (selectedLabel == null)
+            {
+                MessageBox.Show("Please add labels first!");
+                return;
+            }
+
+            // 用户选择保存路径
+            Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Title = "Save Label File",
+                Filter = "JSON 文件 (*.json)|*.json",
+                FileName = $"{selectedLabel.Name}.json"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                // 生成JSON
+                string jsonPath = saveFileDialog.FileName;
+                var jsonData = new
+                {
+                    Label = selectedLabel.Name,
+                    Color = selectedLabel.Color.ToString(),
+                    Mask = selectedLabel.MaskData
+                };
+
+                try
+                {
+                    // 保存JSON文件
+                    File.WriteAllText(jsonPath, JsonConvert.SerializeObject(jsonData, Formatting.Indented));
+                    selectedLabel.JsonPath = jsonPath;
+
+                    // 生成轮廓
+                    DisplayContour(selectedLabel.MaskData, selectedLabel.Color);
+
+                    // 进入标记模式，禁用Startseg_Click
+                    isLabelingMode = true;
+                    StartsegButton.IsEnabled = false;
+                    MessageBox.Show($"标签 '{selectedLabel.Name}' 已生成并保存至：\n{jsonPath}\n请进行标记，然后点击“启动分割”继续。");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"保存文件失败：{ex.Message}");
+                }
+            }
+            else
+            {
+                MessageBox.Show("保存操作已取消。");
+            }
+        }
+
+
+
+        private void UpdateMaskDisplay()
+        {
+            WriteableBitmap bp = new WriteableBitmap(mOrgwid, mOrghei, 96, 96, PixelFormats.Pbgra32, null);
+            byte[] pixelData = new byte[mOrgwid * mOrghei * 4];
+            Array.Clear(pixelData, 0, pixelData.Length);
+
+            foreach (var label in Labels.Where(l => l.IsChecked))
+            {
+                for (int y = 0; y < mOrghei; y++)
+                {
+                    for (int x = 0; x < mOrgwid; x++)
+                    {
+                        int ind = y * mOrgwid + x;
+                        if (label.MaskData[ind] > mSam.mask_threshold)
+                        {
+                            pixelData[4 * ind] = label.Color.B;
+                            pixelData[4 * ind + 1] = label.Color.G;
+                            pixelData[4 * ind + 2] = label.Color.R;
+                            pixelData[4 * ind + 3] = 150; // 透明度
+                        }
+                    }
+                }
+            }
+
+            bp.WritePixels(new Int32Rect(0, 0, mOrgwid, mOrghei), pixelData, mOrgwid * 4, 0);
+            mMask.Source = bp;
+        }
+
+        public class ColorToBrushConverter : IValueConverter
+        {
+            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                if (value is Color color)
+                {
+                    return new SolidColorBrush(color);
+                }
+                return Brushes.Transparent;
+            }
+
+            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                if (value is SolidColorBrush brush)
+                {
+                    return brush.Color;
+                }
+                return Colors.Transparent;
+            }
+        }
+
+        private void ChangeColor_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedLabel != null)
+            {
+                var currentColor = SelectedLabel.Color; // 使用 Color 代替 SolidColorBrush
+                var colorDialog = new System.Windows.Forms.ColorDialog
+                {
+                    Color = System.Drawing.Color.FromArgb(currentColor.A, currentColor.R, currentColor.G, currentColor.B)
+                };
+
+                if (colorDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    SelectedLabel.Color = Color.FromRgb(colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B);
+                    UpdateMaskDisplay();
+                }
+            }
+        }
+        private void SaveImageWithLabels_Click(object sender, RoutedEventArgs e)
+        {
+            if (Labels.Count == 0)
+            {
+                MessageBox.Show("没有标签可保存！");
+                return;
+            }
+
+            var saveDialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "PNG 图像 (*.png)|*.png|JPEG 图像 (*.jpg)|*.jpg"
+            };
+
+            if (saveDialog.ShowDialog() == true)
+            {
+                var bitmap = new RenderTargetBitmap((int)mImage.ActualWidth, (int)mImage.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+                bitmap.Render(mImage);
+
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(bitmap));
+
+                using (var fs = new FileStream(saveDialog.FileName, FileMode.Create))
+                {
+                    encoder.Save(fs);
+                }
+
+                MessageBox.Show($"图像已保存至: {saveDialog.FileName}");
+            }
+        }
+        private void AddLabel_Click(object sender, RoutedEventArgs e)
+        {
+            Random rand = new Random();
+            Color randomColor = Color.FromRgb((byte)rand.Next(256), (byte)rand.Next(256), (byte)rand.Next(256));
+
+            var newLabel = new LabelItem
+            {
+                Name = $"Label {Labels.Count + 1}",
+                Color = randomColor,
+                IsChecked = true,
+                MaskData = new float[mOrgwid * mOrghei] // 空掩膜
+            };
+
+            Labels.Add(newLabel);
+            MessageBox.Show("新标签已添加！");
+        }
+        private void RenameLabel_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedLabel == null)
+            {
+                MessageBox.Show("请选择要重命名的标签！");
+                return;
+            }
+
+            string newName = Microsoft.VisualBasic.Interaction.InputBox("输入新的标签名称：", "重命名标签", SelectedLabel.Name);
+            if (!string.IsNullOrWhiteSpace(newName))
+            {
+                SelectedLabel.Name = newName;
+                MessageBox.Show("标签已重命名！");
+            }
+        }
+        private void DisplayContour(float[] maskData, Color color)
+        {
+            WriteableBitmap contourBitmap = new WriteableBitmap(mOrgwid, mOrghei, 96, 96, PixelFormats.Pbgra32, null);
+            byte[] pixels = new byte[mOrgwid * mOrghei * 4];
+
+            for (int y = 1; y < mOrghei - 1; y++)
+            {
+                for (int x = 1; x < mOrgwid - 1; x++)
+                {
+                    int index = y * mOrgwid + x;
+                    if (maskData[index] > mSam.mask_threshold)
+                    {
+                        // 检查边缘
+                        if (maskData[index - 1] <= mSam.mask_threshold || maskData[index + 1] <= mSam.mask_threshold ||
+                            maskData[index - mOrgwid] <= mSam.mask_threshold || maskData[index + mOrgwid] <= mSam.mask_threshold)
+                        {
+                            pixels[4 * index] = color.B;
+                            pixels[4 * index + 1] = color.G;
+                            pixels[4 * index + 2] = color.R;
+                            pixels[4 * index + 3] = 255;
+                        }
+                    }
+                }
+            }
+
+            contourBitmap.WritePixels(new Int32Rect(0, 0, mOrgwid, mOrghei), pixels, mOrgwid * 4, 0);
+            mMask.Source = contourBitmap;
+        }
+
 
         // 按钮点击事件，显示直径和最大内部距离
         private void Bdiameter_Click(object sender, RoutedEventArgs e)
         {
+            // 禁用分割功能
+            this.currentMode = Mode.None;
             if (_pixelToRealRatio <= 0)
             {
-                MessageBox.Show("请先设定标尺！");
+                MessageBox.Show("Please set the scale first!");
                 return;
             }
 
             // 确保掩膜数据存在
             if (this.mMaskData == null)
             {
-                MessageBox.Show("未找到掩膜数据！");
+                MessageBox.Show("Mask data not found!");
                 return;
             }
           

@@ -3,10 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:svgc = "http://sharpvectors.codeplex.com/svgc/"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:converter="clr-namespace:wpf522.Converts"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:wpf522"
         mc:Ignorable="d"
-        Title="SegWindow" Height="600" Width="1000" Background="#457b9d">
+        Title="SegWindow" Height="800" Width="1250" Background="#457b9d">
+    
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Background" Value="AliceBlue"/>
@@ -25,12 +28,13 @@
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
     </Window.Resources>
+    
 
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1.2*"/>
-            <ColumnDefinition Width="0.42*"/>
+            <ColumnDefinition Width="0.8*"/>
+            <ColumnDefinition Width="0.3*"/>
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
@@ -44,7 +48,7 @@
                 <Button x:Name="ImgSelButton" Height="50" Width="50" Click="SelectFileButton_Click" Margin="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Left">
                     <svgc:SvgViewbox IsHitTestVisible="False" Source="Images/openfile.svg" Width="36" Height="36" />
                 </Button>
-                <TextBox x:Name="ImgPathTxt" Height="30" Width="600" Text="/image path" Background="#457b9d" Margin="0,8,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
+                <TextBox x:Name="ImgPathTxt" Height="30" Width="800" Text="/image path" Background="#457b9d" Margin="0,8,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
             </DockPanel>
             <ScrollViewer x:Name="ImgScrollViewer" Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
                 <Canvas x:Name="ImgCanvas" Visibility="Collapsed" PreviewMouseLeftButtonDown="image_MouseLeftButtonDown" MouseMove="image_MouseMove" PreviewMouseLeftButtonUp="image_PreviewMouseLeftButtonUp">
@@ -67,7 +71,12 @@
                 </Canvas>-->
             </ScrollViewer>
         </Grid>
-        <TextBlock x:Name="StatusTxt" Width="250" TextWrapping="Wrap" VerticalAlignment="Bottom" Foreground="LightCoral" Margin="0,50,0,0"/>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,10,0,10">
+            <TextBlock x:Name="StatusTxt" Width="250" TextWrapping="Wrap" Foreground="AliceBlue" HorizontalAlignment="Center"/>
+            <ProgressBar x:Name="ProgressBarStatus" Minimum="0" Maximum="100" Background="AliceBlue" Height="1" Width="250" 
+                 Visibility="Collapsed" Margin="0,5,0,0"/>
+        </StackPanel>
+
         <Grid Grid.Column="1" Grid.Row="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -88,7 +97,7 @@
                     <Button Width="50" Background="Transparent" Click="SetRuler_Click" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
                         <svgc:SvgViewbox IsHitTestVisible="False" Source="Images/ruler2.svg" Height="36" Width="34"/>
                     </Button>
-                    <Button Width="50" Background="Transparent" Click="Startseg_Click" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                    <Button x:Name="StartsegButton" Width="50" Background="Transparent" Click="Startseg_Click" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
                         <svgc:SvgViewbox IsHitTestVisible="False" Source="Images/point.svg"/>
                     </Button>
                     <Button Width="50" Background="Transparent" Click="AddPoint_Click" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
@@ -114,35 +123,61 @@
                     </Button>
                 </StackPanel>
 
-                <StackPanel VerticalAlignment="Top" Margin="10,0,0,0">
-                    <Expander x:Name="madjExp" Header="Adjust" IsExpanded="False">
-                        <StackPanel>
-                            <Button x:Name="m1" Width="70" Height="30" Content="Match"/>
-                        </StackPanel>
-                    </Expander>
-                    <Expander x:Name="mEverythingExp" Header="EveryThing" IsExpanded="False">
-                        <StackPanel>
-                            <DockPanel Width="200" Height="50" HorizontalAlignment="Left" Margin="5,0,0,0">
-                                <TextBlock Margin="5,0,0,0" Height="20"><Run Text="points_per_side:"/></TextBlock>
-                                <TextBox x:Name="mPoints_per_side" Margin="5,0,0,0" Height="20" Text="4"/>
-                            </DockPanel>
-                            <DockPanel Width="200" Height="50" HorizontalAlignment="Left" Margin="5,0,0,0">
-                                <TextBlock Margin="5,0,0,0" Height="20"><Run Text="pred_iou_thresh:"/></TextBlock>
-                                <TextBox x:Name="mPred_iou_thresh" Margin="5,0,0,0" Height="20" Text="0.88"/>
-                            </DockPanel>
-                            <DockPanel Width="200" Height="50" HorizontalAlignment="Left" Margin="5,0,0,0">
-                                <TextBlock Margin="5,0,0,0" Height="20"><Run Text="stability_score_thresh:"/></TextBlock>
-                                <TextBox x:Name="mStability_score_thresh" Margin="5,0,0,0" Height="20" Text="0.95"/>
-                            </DockPanel>
-                            <Button x:Name="mAutoSeg" Width="70" Height="30" Content="AutoSeg" Click="mAutoSeg_Click"/>
-                   
+                <!-- 标签管理面板 -->
+                <StackPanel Orientation="Vertical" Margin="10">
+
+                    <!-- 顶部按钮组 -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <Button Content="Save" Width="80" Height="30" Click="SaveImageWithLabels_Click" Margin="0,0,10,0"/>
+                        <Button Content="Add" Width="80" Height="30" Click="AddLabel_Click" Margin="0,0,10,0"/>
+                        <Button Content="Convert" Width="80" Height="30" Click="RenameLabel_Click"/>
+                    </StackPanel>
+
+                    <!-- 底部标签管理面板 -->
+                    <ListBox Background="#457b9d"
+             ItemsSource="{Binding Labels}"
+             SelectedItem="{Binding SelectedLabel}"
+             x:Name="TypeListBox"
+             VerticalAlignment="Stretch"
+             Height="300">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="30"/>
+                                        <!-- 颜色 -->
+                                        <ColumnDefinition Width="*"/>
+                                        <!-- 标签名 -->
+                                        <ColumnDefinition Width="60"/>
+                                        <!-- 开关 -->
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- 颜色选择 --><!--
+                                    <Border Width="25" Height="25" Background="{Binding Color, Converter={StaticResource ColorToBrushConverter}}"
+                            BorderThickness="1" CornerRadius="5" Grid.Column="0" VerticalAlignment="Center">
+                                        <Button Width="25" Height="25" Background="{Binding Color}" Click="ChangeColor_Click"/>
+                                    </Border>-->
+
+                                    <!-- 标签名编辑 --><!--
+                                    <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" 
+                             VerticalAlignment="Center" FontSize="14" Grid.Column="1" Margin="5,0,0,0"/>-->
+
+                                    <!-- 显示开关 --><!--
+                                    <CheckBox IsChecked="{Binding IsChecked}" Content="显示" Grid.Column="2" VerticalAlignment="Center"
+                              Checked="ToggleContourVisibility_Click" Unchecked="ToggleContourVisibility_Click"/>-->
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
                 </StackPanel>
-                    </Expander>
-                </StackPanel>
+
+
             </StackPanel>
 
             <!-- 第二排：Undo, Redo, Reload 按钮 -->
             <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,5,0,0">
+                <Button x:Name="BLabel" Width="80" Height="30" Content="Label" Click="BLabel_Click" Margin="10,0,0,0"/>
                 <Button x:Name="BUndo" Width="60" Height="30" Content="Undo" Click="BUndo_Click" Margin="10,0,0,0"/>
                 <Button x:Name="BRedo" Width="60" Height="30" Content="Redo" Click="BRedo_Click" Margin="10,0,0,0"/>
                 <Button x:Name="BReLoad" Width="80" Height="30" Content="Reload" Click="BReLoad_Click" Margin="10,0,0,0"/>

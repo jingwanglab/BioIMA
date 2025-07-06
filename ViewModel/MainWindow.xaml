@@ -50,9 +50,9 @@
     <mah:MetroWindow.Flyouts>
         <mah:FlyoutsControl>
             <mah:Flyout Position="Left" MinWidth="600"   IsPinned="True" DataContext="{Binding ToolConfig}"
-                             IsModal="True" AreAnimationsEnabled="True" Header="快捷键设置" x:Name="LeftFly"
+                             IsModal="True" AreAnimationsEnabled="True" Header="Shortcut Keys" x:Name="LeftFly"
                          CloseButtonVisibility="Visible">
-                <mah:Flyout.Resources>
+                <mah:Flyout.Resources>  
                     <Style TargetType="TextBlock">
                         <Setter Property="VerticalAlignment" Value="Center"></Setter>
                         <Setter Property="HorizontalAlignment" Value="Right"></Setter>
@@ -114,23 +114,23 @@
             <Menu IsMainMenu="True" Background="#087F8C" FontWeight="Bold" FontSize="14" FontFamily="Console">
                 <MenuItem Header="Save" Background="#087F8C"  Height="auto" Width="57"  >
                     <!--<MenuItem Header="打开文件夹" Command="{Binding OpenFolderCommand}"></MenuItem>-->
-                    <MenuItem Header="保存全部" Command="{Binding SaveAllCommand}" CommandParameter="不包含没有框选的"></MenuItem>
-                    <MenuItem Header="保存全部（包括没有框选的图片）" Command="{Binding SaveAllCommand}" CommandParameter="包含没有框选的"></MenuItem>
-                    <MenuItem Header="修改保存路径" Command="{Binding ModifySaveDirCommand}"></MenuItem>
-                    <MenuItem Header="导出yolo列表格式数据" Command="{Binding ExportYoloListCommand}"></MenuItem>
-                    <MenuItem Header="多边形转矩形" Command="{Binding ConvertPolygonToRectCommand}"></MenuItem>
+                    <MenuItem Header="Save All" Command="{Binding SaveAllCommand}" CommandParameter="Exclude unlabled"></MenuItem>
+                    <MenuItem Header="Save All (Include unlabled images)" Command="{Binding SaveAllCommand}" CommandParameter="Include unlabled"></MenuItem>
+                    <MenuItem Header="Change Save Path" Command="{Binding ModifySaveDirCommand}"></MenuItem>
+                    <MenuItem Header="Export YOLO List Format" Command="{Binding ExportYoloListCommand}"></MenuItem>
+                    <MenuItem Header="Convert Polygon to Rectangle" Command="{Binding ConvertPolygonToRectCommand}"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="Option" Background="#087F8C"  Height="auto" Width="70" >
                     <!--<MenuItem Header="绘制矩形框" Command="{Binding SetDrawBoxCommand}"></MenuItem>-->
                     <!--<MenuItem Header="绘制多边形" Command="{Binding SetDrawPolygonCommand}"></MenuItem>-->
                     <!--<MenuItem Header="绘制选择框" Command="{Binding SetDrawSelectedCommand}"></MenuItem>-->
-                    <MenuItem Header="无操作模式" Command="{Binding SetDrawNoneCommand}"></MenuItem>
+                    <MenuItem Header="No Action Mode" Command="{Binding SetDrawNoneCommand}"></MenuItem>
 
-                    <MenuItem Header="全局类型转换" Command="{Binding ConvertTypesCommand}"></MenuItem>
+                    <MenuItem Header="Global Type Conversion" Command="{Binding ConvertTypesCommand}"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="Settings" Background="#087F8C"  Height="auto" Width="80" >
-                    <MenuItem Header="快捷键设置" Command="{Binding OpenInputKeySetsCommand}" CommandParameter="{Binding ElementName=LeftFly,Path=.}"></MenuItem>
-                    <MenuItem Header="是否输出掩码图片">
+                    <MenuItem Header="Shortcut Keys Settings" Command="{Binding OpenInputKeySetsCommand}" CommandParameter="{Binding ElementName=LeftFly,Path=.}"></MenuItem>
+                    <MenuItem Header="Export Mask Images">
                         <CheckBox IsChecked="{Binding ToolConfig.IsCreateMaskImage}" Height="15" BorderBrush="White" BorderThickness="2"
                                   Background="Black"></CheckBox>
                     </MenuItem>
@@ -138,7 +138,7 @@
                 <MenuItem Header="Tools" Background="#087F8C"  Height="auto" Width="80" >
                     <MenuItem Header="Set Scales" Click="SetScales_Click" ></MenuItem>
                 </MenuItem>
-                <MenuItem Header="Image" Background="#087F8C"  Height="auto" Width="80" >
+                <!--<MenuItem Header="Image" Background="#087F8C"  Height="auto" Width="80" >
                     <MenuItem Header="Type" Background="#087F8C"  Height="auto" Width="120" >
                         <MenuItem Header="8-bit" Click="SetScales_Click" ></MenuItem>
                         <MenuItem Header="16-bit" Click="SetScales_Click" ></MenuItem>
@@ -149,7 +149,7 @@
                         <MenuItem Header="16-bit" Click="SetScales_Click" ></MenuItem>
                         <MenuItem Header="32-bit" Click="SetScales_Click" ></MenuItem>
                     </MenuItem>
-                </MenuItem>
+                </MenuItem>-->
                 <!--<MenuItem Header="当前类别">
                     <ComboBox ItemsSource="{Binding ToolConfig.ShapeTypeColorStructs}" DisplayMemberPath="TypeName" VerticalContentAlignment="Center" SelectedItem="{Binding ToolConfig.CurrentTypeName}" Height="25"></ComboBox>
                 </MenuItem>
@@ -238,16 +238,15 @@
                     <Button Height="40" Background="Transparent" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="SelectModelButton_Click">
                         <svgc:SvgViewbox IsHitTestVisible="False"  Source="pack://application:,,,/Images/brain.svg"/>
                     </Button>
-                    <Button Height="40" Background="Transparent" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                    <!--<Button Height="40" Background="Transparent" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
                         <svgc:SvgViewbox IsHitTestVisible="False"  Source="pack://application:,,,/Images/ML.svg"/>
-                    </Button>
+                    </Button>-->
                     <Button Height="40" Background="Transparent" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"   >
                         <svgc:SvgViewbox IsHitTestVisible="False"  Source="pack://application:,,,/Images/zoom-out.svg"/>
                     </Button>
-                    <Button Height="40" Background="Transparent" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" >
-                        <svgc:SvgViewbox IsHitTestVisible="False"  Source="pack://application:,,,/Images/zoom-in.svg"/>
+                    <Button Height="40" Background="Transparent"  Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                        <svgc:SvgViewbox IsHitTestVisible="False" Source="pack://application:,,,/Images/zoom-in.svg"/>
                     </Button>
-
                 </StackPanel>
             </Border>
             <mah:MetroAnimatedTabControl Style="{StaticResource ImageTabControl}" Grid.Column="1" SelectedIndex="{Binding TabViewSelectedIndex}" Grid.ColumnSpan="2">
@@ -257,8 +256,8 @@
                          SelectedItem="{Binding CurrentImageModel}">
                             <ListBox.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="打开输出的配置文件" Command="{Binding OpenImageConfigFileCommand}"></MenuItem>
-                                    <MenuItem Header="删除文件" Command="{Binding RemoveFileCommand}"></MenuItem>
+                                    <MenuItem Header="Open Output Config File" Command="{Binding OpenImageConfigFileCommand}"></MenuItem>
+                                    <MenuItem Header="Delete File" Command="{Binding RemoveFileCommand}"></MenuItem>
                                 </ContextMenu>
                             </ListBox.ContextMenu>
                         </ListBox>
@@ -325,8 +324,8 @@
                     </ListBox.ItemTemplate>
                     <ListBox.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="修改类型" Command="{Binding OpenModifyShapeTypeNameCommand}"></MenuItem>
-                            <MenuItem Header="删除选中框" Command="{Binding RemoveSelectedShapeAreaCommand}"></MenuItem>
+                            <MenuItem Header="Change Label" Command="{Binding OpenModifyShapeTypeNameCommand}"></MenuItem>
+                            
                         </ContextMenu>
                     </ListBox.ContextMenu>
                 </ListBox>
@@ -338,7 +337,7 @@
                 <!-- GridSplitter -->
                 <GridSplitter Grid.Row="1"></GridSplitter>
 
-                <!-- 第二块：Colors和第二个ListBox -->
+                <!-- 第二块：Lables和第二个ListBox -->
                 <Grid Grid.Row="2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="25"></RowDefinition>
@@ -355,7 +354,9 @@
                                 </VisualBrush.Visual>
                             </VisualBrush>
                         </Border.BorderBrush>
-                        <TextBlock Text="Colors" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" Margin="4"></TextBlock>
+                        <TextBlock Text="Lables" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" Margin="4">
+                        </TextBlock>
+                       
                     </Border>
 
                     <ListBox Background="AliceBlue" ItemsSource="{Binding ToolConfig.ShapeTypeColorStructs}" Grid.Row="1" SelectedItem="{Binding ToolConfig.CurrentTypeName}" SelectedIndex="0"
@@ -363,9 +364,9 @@
                         <ListBox.ContextMenu>
                             <ContextMenu>
                                 <StackPanel Orientation="Vertical">
-                                    <MenuItem Header="添加一个类型" Command="{Binding CreateTypeCommand}"></MenuItem>
-                                    <MenuItem Header="修改类型名称" Command="{Binding OpenModifyShapeTypeColorPopupCommand}"></MenuItem>
-                                    <MenuItem Header="删除选中类型" Command="{Binding RemoveSelectedShapeTypeColorStructCommand}"></MenuItem>
+                                    <MenuItem Header="Add new annotation" Command="{Binding CreateTypeCommand}"></MenuItem>
+                                    <MenuItem Header="Change the label name" Command="{Binding OpenModifyShapeTypeColorPopupCommand}"></MenuItem>
+                                    <MenuItem Header="Delete the selected annotation" Command="{Binding RemoveSelectedShapeTypeColorStructCommand}"></MenuItem>
                                 </StackPanel>
                             </ContextMenu>
                         </ListBox.ContextMenu>
@@ -377,7 +378,7 @@
                                         <ColumnDefinition Width="40"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
                                     <Border BorderBrush="{Binding TypeName, Converter={StaticResource TypeNameToColor}}" BorderThickness="2" CornerRadius="5" Height="25" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding TypeName}" VerticalAlignment="Center" FontSize="14" FontFamily="黑体" Margin="10, 0, 0, 0"></TextBlock>
+                                        <TextBlock Text="{Binding TypeName}" VerticalAlignment="Center" FontSize="14" FontFamily="Bold" Margin="10, 0, 0, 0"></TextBlock>
                                     </Border>
                                     <mah:ToggleSwitch IsOn="{Binding IsChecked}" Grid.Column="1"></mah:ToggleSwitch>
                                 </Grid>
@@ -388,7 +389,7 @@
                     <Popup x:Name="CreateTypePopup" StaysOpen="True" Placement="Left" PlacementTarget="{Binding ElementName=TypeListBox, Path=.}">
                         <DockPanel>
                             <TextBox Text="{Binding CreateTypeStruct.TypeName}"></TextBox>
-                            <Button Content="确认" Command="{Binding SureCreateTypeCommand}" CommandParameter="{Binding ElementName=CreateTypePopup, Path=.}"></Button>
+                            <Button Content="OK" Command="{Binding SureCreateTypeCommand}" CommandParameter="{Binding ElementName=CreateTypePopup, Path=.}"></Button>
                         </DockPanel>
                     </Popup>
 

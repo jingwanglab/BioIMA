@@ -17,6 +17,7 @@ namespace wpf522.AutoSamSeg
 {
     /// <summary>
     /// autoResultWindow.xaml 的交互逻辑
+    /// 
     /// </summary>
 
     public partial class autoResultWindow : Window

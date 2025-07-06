@@ -43,6 +43,7 @@ namespace wpf522.Models
         /// <summary>
         /// 框选多边形命令
         /// </summary>
+        /// 
         public ICommand SetDrawPolygonCommand { get; set; }
         /// <summary>
         /// 不进行任何操作模式
@@ -128,7 +129,13 @@ namespace wpf522.Models
         public ICommand ColorButtonCommand { get; set; }
 
         /// <summary>
-        /// 角度测量命令
+        /// 颜色测量命令
+        /// </summary>
+        /// 
+        public ICommand SetRulerCommand { get; set; }
+
+        /// <summary>
+        /// 标尺设置命令
         /// </summary>
         private MainModel()
         {
@@ -148,32 +155,38 @@ namespace wpf522.Models
                 }
                 catch (Exception ex)
                 {
-                    await MainWindow.Instance.ShowMessageAsync("错误!", "打开文件夹失败 : " + ex.Message);
+                    await MainWindow.Instance.ShowMessageAsync("Error!", "Failed to open folder: " + ex.Message);
                 }
             });
             SetDrawBoxCommand = new SampleCommand(o => true, o => {
                 ToolConfig.CurrentShapType = ShapeType.Box;
+                ToolConfig.IsColorPicking = false; // 关闭颜色拾取模式
             });
             SetDrawPolygonCommand = new SampleCommand(o => true, o => {
                 ToolConfig.CurrentShapType = ShapeType.Polygon;
+                ToolConfig.IsColorPicking = false; // 关闭颜色拾取模式
             });
             SetDrawLinesCommand = new SampleCommand(o => true, o => {
                 ToolConfig.CurrentShapType = ShapeType.Lines;
+                ToolConfig.IsColorPicking = false; // 关闭颜色拾取模式
             });
             SetDrawSelectedCommand = new SampleCommand(o => true, o =>
             {
                 ToolConfig.CurrentShapType = ShapeType.Selected;
+                ToolConfig.IsColorPicking = false; //  关闭颜色拾取模式
             });
             SetDrawNoneCommand = new SampleCommand(o => true, o => { ToolConfig.CurrentShapType = ShapeType.None; });
 
             SetAngleMeasureCommand = new SampleCommand(o => true, o => 
             {
                 ToolConfig.CurrentShapType = ShapeType.Angle;
+                ToolConfig.IsColorPicking = false; //  关闭颜色拾取模式
             });
 
             ColorButtonCommand = new SampleCommand(o => true, o =>
             {
                 ToolConfig.CurrentShapType = ShapeType.ColorPicker;
+                ToolConfig.IsColorPicking = true; //  开启颜色拾取模式
             });
 
             OpenInputKeySetsCommand = new SampleCommand(o => true, o =>
@@ -201,7 +214,7 @@ namespace wpf522.Models
                 }
                 catch (Exception ex)
                 {
-                    await MainWindow.Instance.ShowMessageAsync("错误!", "保存失败 : " + ex.Message);
+                    await MainWindow.Instance.ShowMessageAsync("Error!", "Save failed: " + ex.Message);
                 }
             });
 
@@ -226,7 +239,7 @@ namespace wpf522.Models
                 }
                 catch (Exception ex)
                 {
-                    await MainWindow.Instance.ShowMessageAsync("错误!", "保存失败 : " + ex.Message);
+                    await MainWindow.Instance.ShowMessageAsync("Error!", "Save failed: " + ex.Message);
                 }
                 finally
                 {
@@ -253,7 +266,7 @@ namespace wpf522.Models
                 }
                 catch (Exception ex)
                 {
-                    MainWindow.Instance.ShowMessageAsync("错误!", "删除失败 : " + ex.Message);
+                    MainWindow.Instance.ShowMessageAsync("Error!", "Delete failed: " + ex.Message); ;
                 }
             });
             //图片移动命令
@@ -293,7 +306,7 @@ namespace wpf522.Models
             // 创建命令
             CreateTypeCommand = new SampleCommand(o => true, o => {
                 Popup p = MainWindow.Instance.CreateTypePopup;
-                string name = "未指定";
+                string name = "label1";
                 while (ToolConfig.ShapeTypeColorStructs.Where(p => p.TypeName.Equals(name + NameIndex)).Count() > 0)
                 {
                     NameIndex++;
@@ -312,7 +325,7 @@ namespace wpf522.Models
                 p.IsOpen = false;
                 if (ToolConfig.ShapeTypeColorStructs.Where(p => p.TypeName.Equals(CreateTypeStruct.TypeName)).Count() > 0)
                 {
-                    MainWindow.Instance.ShowMessageAsync("错误!", "类型名称已经存在!");
+                    MainWindow.Instance.ShowMessageAsync("Error!", "label already exists!");
                     return;
                 }
                 else
@@ -356,7 +369,7 @@ namespace wpf522.Models
             SaveAllCommand = new SampleCommand(o => true, async o => {
                 try
                 {
-                    bool withNotBoard = o.Equals("包含没有框选的");
+                    bool withNotBoard = o.Equals("Include unselected items");
                     if (string.IsNullOrEmpty(ToolConfig.SaveFileConfigHistory) || Directory.Exists(ToolConfig.SaveFileConfigHistory) == false)
                     {
                         var dir = await MainWindow.Instance.OpenFolderDialogAsync();
@@ -380,14 +393,14 @@ namespace wpf522.Models
                         }
                         catch (Exception ex)
                         {
-                            await MainWindow.Instance.ShowMessageAsync("保存异常", ex.Message);
+                            await MainWindow.Instance.ShowMessageAsync("Save Error", ex.Message);
                         }
                     });
                     MainWindow.Instance.CloseWait();
                 }
                 catch (Exception ex)
                 {
-                    await MainWindow.Instance.ShowMessageAsync("错误!", "保存失败 : " + ex.Message);
+                    await MainWindow.Instance.ShowMessageAsync("Error!", "Save failed: " + ex.Message);
                 }
             });
 
@@ -456,7 +469,7 @@ namespace wpf522.Models
                 }
                 catch (Exception ex)
                 {
-                    await MainWindow.Instance.ShowMessageAsync("错误", ex.Message);
+                    await MainWindow.Instance.ShowMessageAsync("Error!", ex.Message);
                 }
             });
             // 删除文件
@@ -482,7 +495,7 @@ namespace wpf522.Models
                 }
                 catch (Exception ex)
                 {
-                    await MainWindow.Instance.ShowMessageAsync("错误!", ex.ToString());
+                    await MainWindow.Instance.ShowMessageAsync("Error!", ex.ToString());
                 }
             });
 
@@ -527,7 +540,7 @@ namespace wpf522.Models
                 }
                 catch (Exception ex)
                 {
-                    await MainWindow.Instance.ShowMessageAsync("错误!", ex.ToString());
+                    await MainWindow.Instance.ShowMessageAsync("Error!", ex.ToString());
                 }
                 finally
                 {
@@ -543,7 +556,7 @@ namespace wpf522.Models
                 }
                 catch (Exception ex)
                 {
-                    await MainWindow.Instance.ShowMessageAsync("异常", ex.ToString());
+                    await MainWindow.Instance.ShowMessageAsync("Error", ex.ToString());
                 }
             });
         }
@@ -573,7 +586,7 @@ namespace wpf522.Models
         /// <param name="configPath"></param>
         public MainModel(string configPath) : base()
         {
-            if (!File.Exists(configPath)) throw new Exception("项目文件不存在");
+            if (!File.Exists(configPath)) throw new Exception("Project file does not exist");
             this.ConfigSavePath = configPath;
             this.LoadConfig();
         }
@@ -584,7 +597,7 @@ namespace wpf522.Models
         /// <returns></returns>
         public static MainModel CreateMainModelByFolder(string dir)
         {
-            if (Directory.Exists(dir) == false) throw new Exception("目录不存在...");
+            if (Directory.Exists(dir) == false) throw new Exception("Directory does not exist...");
             MainModel model = new MainModel();
             model.LoadImages(dir);
             model.ToolConfig.ProjectName = Path.GetFileNameWithoutExtension(dir);

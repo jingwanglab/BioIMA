@@ -39,38 +39,38 @@ namespace wpf522.Models
         /// <summary>
         /// 绘制矩形命令
         /// </summary>
-        public InputKey DrawBoxKeyCommand { get; set; } = new InputKey() { Name = "绘制矩形", HotKey = new HotKey(Key.Q, ModifierKeys.Control) };
+        public InputKey DrawBoxKeyCommand { get; set; } = new InputKey() { Name = "Draw Box", HotKey = new HotKey(Key.Q, ModifierKeys.Control) };
 
         /// <summary>
         /// 绘制多边形命令
         /// </summary>
-        public InputKey DrawPolygonKeyCommand { get; set; } = new InputKey() { Name = "绘制多边形", HotKey = new HotKey(Key.W, ModifierKeys.Control) };
+        public InputKey DrawPolygonKeyCommand { get; set; } = new InputKey() { Name = "Draw Polygon", HotKey = new HotKey(Key.W, ModifierKeys.Control) };
         /// <summary>
         /// 框选选中命令
         /// </summary>
-        public InputKey DrawSelectedKeyCommand { get; set; } = new InputKey() { Name = "框选选中", HotKey = new HotKey(Key.E, ModifierKeys.Control) };
+        public InputKey DrawSelectedKeyCommand { get; set; } = new InputKey() { Name = "Select Box", HotKey = new HotKey(Key.E, ModifierKeys.Control) };
         /// <summary>
         /// 设置没有操作模式
         /// </summary>
-        public InputKey DrawNoneKeyCommand { get; set; } = new InputKey() { Name = "进入无操作", HotKey = new HotKey(Key.R, ModifierKeys.Control) };
+        public InputKey DrawNoneKeyCommand { get; set; } = new InputKey() { Name = "No Operation", HotKey = new HotKey(Key.R, ModifierKeys.Control) };
         /// <summary>
         /// 保存配置命令
         /// </summary>
-        public InputKey SaveConfigKeyCommand { get; set; } = new InputKey() { Name = "保存配置", HotKey = new HotKey(Key.S, ModifierKeys.Control) };
+        public InputKey SaveConfigKeyCommand { get; set; } = new InputKey() { Name = "Save Config", HotKey = new HotKey(Key.S, ModifierKeys.Control) };
         /// <summary>
         /// 删除选中的命令
         /// </summary>
-        public InputKey RemoveSelectedShapesKeyCommand { get; set; } = new InputKey() { Name = "删除选中", HotKey = new HotKey(Key.Delete) };
+        public InputKey RemoveSelectedShapesKeyCommand { get; set; } = new InputKey() { Name = "Delete Selected", HotKey = new HotKey(Key.Delete) };
 
         /// <summary>
         /// 下一张图片
         /// </summary>
-        public InputKey NextImageKeyCommand { get; set; } = new InputKey() { Name = "下一张图片", HotKey = new HotKey(Key.D) };
+        public InputKey NextImageKeyCommand { get; set; } = new InputKey() { Name = "Next Image", HotKey = new HotKey(Key.D) };
 
         /// <summary>
         /// 前一张命令
         /// </summary>
-        public InputKey PreviousKeyCommand { get; set; } = new InputKey() { Name = "上一张图片", HotKey = new HotKey(Key.A) };
+        public InputKey PreviousKeyCommand { get; set; } = new InputKey() { Name = "Previous Image", HotKey = new HotKey(Key.A) };
         /// <summary>
         /// 属性变更
         /// </summary>
@@ -94,6 +94,9 @@ namespace wpf522.Models
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
+         /// 颜色
+        public static bool IsColorPicking { get; set; } = false;
+
         public string GetImageModelSavePath(ImageContentInfoModel model)
         {
             string targetFile = "";
@@ -144,7 +147,7 @@ namespace wpf522.Models
                 }
                 else
                 {
-                    ShapeTypeColorStructs.Add(new ShapeTypeColorStruct() { TypeName = "未指定", Color = GetRandomColor() });
+                    ShapeTypeColorStructs.Add(new ShapeTypeColorStruct() { TypeName = "label1", Color = GetRandomColor() });
                     CurrentTypeName = ShapeTypeColorStructs.First();
                 }
             }
