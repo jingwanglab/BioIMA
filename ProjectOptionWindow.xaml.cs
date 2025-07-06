@@ -1,4 +1,4 @@
-﻿using wpf522.Models;
+using wpf522.Models;
 using MahApps.Metro.Controls;
 using System;
 using System.Collections.Generic;
@@ -17,18 +17,18 @@ using System.Windows.Shapes;
 
 namespace wpf522
 {
-    /// <summary>
-    /// ProjectOptionWindow.xaml 的交互逻辑
-    /// </summary>
+
+
+
     public partial class ProjectOptionWindow : MoveWindow
     {
-        /// <summary>
-        /// 项目管理
-        /// </summary>
+
+
+
         public ProjectManager ProjectManager { get; set; }
-        /// <summary>
-        /// 实例
-        /// </summary>
+
+
+
         public static ProjectOptionWindow Instance { get; set; }
 
         public ProjectOptionWindow()
@@ -65,11 +65,11 @@ namespace wpf522
         }
 
         private DateTime PrivouseTime = DateTime.Now;
-        /// <summary>
-        /// 行点击事件
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+
+
+
+
+
         private void RowClickEvent(object sender, MouseButtonEventArgs e)
         {
             if ((DateTime.Now - PrivouseTime).TotalMilliseconds < 300)
@@ -80,3 +80,4 @@ namespace wpf522
         }
     }
 }
+

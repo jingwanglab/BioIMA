@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -20,7 +20,7 @@ namespace wpf522
             if (selectedItem != null)
             {
                 SelectedModel = selectedItem.Content.ToString();
-                if (SelectedModel == "Load Custom Model......") // 和ListBoxItem的内容保持一致
+                if (SelectedModel == "Load Custom Model......") 
                 {
                     var dialog = new OpenFileDialog();
                     dialog.Filter = "ONNX Files (*.onnx)|*.onnx|YAML Files (*.yaml)|*.yaml|All Files (*.*)|*.*";
@@ -50,7 +50,7 @@ namespace wpf522
 
         private string GetPredefinedModelPath(string modelName)
         {
-            // 返回预定义模型路径
+
             switch (modelName)
             {
                 case "MobileSAM":
@@ -75,29 +75,29 @@ namespace wpf522
                 switch (selectedItem.Content.ToString())
                 {
                     case "SAM":
-                        // 打开SAMSegWindow窗口
+
                         SAMSegWindow samWindow = new SAMSegWindow();
                         samWindow.Show();
-                        this.Close(); // 可选，关闭当前窗口
+                        this.Close(); 
                         break;
                     case "Segmentanything (ViT-B)":
-                        // 在这里添加操作，例如打开其他窗口或执行任务
+
                         MessageBox.Show("Selected: Segmentanything (ViT-B)");
                         break;
                     case "Segmentanything (ViT-L)":
-                        // 在这里添加操作
+
                         MessageBox.Show("Selected: Segmentanything (ViT-L)");
                         break;
                     case "Segmentanything (ViT-H)":
-                        // 在这里添加操作
+
                         MessageBox.Show("Selected: Segmentanything (ViT-H)");
                         break;
                     case "Yolov5s":
-                        // 在这里添加操作
+
                         MessageBox.Show("Selected: Yolov5s");
                         break;
                     case "Load Custom Model......":
-                        // 在这里添加操作
+
                         MessageBox.Show("Selected: Load Custom Model");
                         break;
                     default:
@@ -107,4 +107,5 @@ namespace wpf522
         }
     }
 }
+
 

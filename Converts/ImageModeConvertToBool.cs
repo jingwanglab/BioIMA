@@ -1,4 +1,4 @@
-﻿using wpf522.Models.Enums;
+using wpf522.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -26,8 +26,9 @@ namespace wpf522.Converts
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            //return ShapeType.None;
+
             throw new NotImplementedException();
         }
     }
 }
+

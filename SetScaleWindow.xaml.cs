@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -16,9 +16,9 @@ using wpf522.CustomControls;
 
 namespace wpf522
 {
-    /// <summary>
-    /// SetScaleWindow.xaml 的交互逻辑
-    /// </summary>
+
+
+
     public partial class SetScaleWindow : Window
     {
         private CanvasOption CanvasOption; 
@@ -29,14 +29,12 @@ namespace wpf522
             CanvasOption = CanvasOptionInstance;
         }
 
-        // ObservableCollection 用于绑定 ListView
         private ObservableCollection<ScaleItem> scaleItems;
 
         public SetScaleWindow()
         {
             InitializeComponent();
 
-            // 初始化 ObservableCollection
             scaleItems = new ObservableCollection<ScaleItem>();
             ListView1.ItemsSource = scaleItems;
         }
@@ -45,28 +43,25 @@ namespace wpf522
         {
             try
             {
-                // 获取用户输入的数据
+
                 string title = TitleTextBox.Text;
                 double distanceInPixels = double.Parse(WidthinpixelTextBox.Text);
                 double knownDistance = double.Parse(TextBox4.Text);
-                double ratio = double.Parse(RatioTextBox.Text); // 此处需要根据实际情况获取
+                double ratio = double.Parse(RatioTextBox.Text); 
                 string unit = ((ComboBoxItem)UnitComboBox.SelectedItem).Content.ToString();
-                double size = double.Parse(TextBox2.Text); // 此处需要根据实际情况获取
-                // 计算标尺的实际长度
+                double size = double.Parse(TextBox2.Text); 
+
                 double actualDistance = knownDistance * ratio;
                 double pixelsPerUnit = distanceInPixels / actualDistance;
                 double scaleLength = size * pixelsPerUnit;
 
-                // 更新 CanvasOption 中的标尺属性
-                CanvasOption.ScaleStartPoint = new Point(10, 10);  // 标尺线的起点
-                CanvasOption.ScaleEndPoint = new Point(10 + scaleLength, 10); // 标尺线的终点
-                CanvasOption.ScaleText = $"{size} {unit}"; // 标尺文本内容
-                CanvasOption.ScaleVisibility = Visibility.Visible; // 显示标尺
+                CanvasOption.ScaleStartPoint = new Point(10, 10);  
+                CanvasOption.ScaleEndPoint = new Point(10 + scaleLength, 10); 
+                CanvasOption.ScaleText = $"{size} {unit}"; 
+                CanvasOption.ScaleVisibility = Visibility.Visible; 
 
-                // 添加新的 ScaleItem 到 ObservableCollection
                 scaleItems.Add(new ScaleItem(title, distanceInPixels, knownDistance, unit, size, ratio));
 
-                // 清空输入框
                 ResetInputs();
             }
             catch (Exception ex)
@@ -82,7 +77,7 @@ namespace wpf522
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            // 可选：保存用户设置到持久存储，例如数据库
+
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)
@@ -92,17 +87,16 @@ namespace wpf522
 
         private void ResetInputs()
         {
-            // 重置输入框和控件状态
+
             TitleTextBox.Text = "";
             WidthinpixelTextBox.Text = "";
-            TextBox4.Text = "10"; // 恢复默认值
-            RatioTextBox.Text = "1"; // 恢复默认值
-            UnitComboBox.SelectedIndex = 0; // 恢复默认选择
+            TextBox4.Text = "10"; 
+            RatioTextBox.Text = "1"; 
+            UnitComboBox.SelectedIndex = 0; 
             TextBox2.Text = "";
         }
     }
 
-    // 数据项类，用于绑定 ListView 的每一行
     public class ScaleItem
     {
         public string Title { get; set; }
@@ -123,3 +117,4 @@ namespace wpf522
         }
     }
 }
+

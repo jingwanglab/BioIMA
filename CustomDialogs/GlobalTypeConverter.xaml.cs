@@ -1,4 +1,4 @@
-﻿using wpf522.Expends;
+using wpf522.Expends;
 using wpf522.Models;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
@@ -21,22 +21,22 @@ using System.Windows.Shapes;
 
 namespace wpf522.CustomDialogs
 {
-    /// <summary>
-    /// GlobalTypeConverter.xaml 的交互逻辑
-    /// </summary>
+
+
+
     public partial class GlobalTypeConverter : CustomDialog, INotifyPropertyChanged
     {
-        /// <summary>
-        /// 转换的数据源
-        /// </summary>
+
+
+
         public List<ShapeArea> TypeFroms { get; set; } = new List<ShapeArea>();
-        /// <summary>
-        /// 目标类型
-        /// </summary>
+
+
+
         public List<ShapeTypeColorStruct> TypeTargets { get; set; } = new List<ShapeTypeColorStruct>();
-        /// <summary>
-        /// 是否确认转换
-        /// </summary>
+
+
+
         public bool? IsSure { get; set; } = null;
 
 
@@ -62,11 +62,10 @@ namespace wpf522.CustomDialogs
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        /// <summary>
-        /// 加载事件
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+
+
+
+
         private void GlobalTypeConverter_Loaded(object sender, RoutedEventArgs e)
         {
 
@@ -94,3 +93,4 @@ namespace wpf522.CustomDialogs
         }
     }
 }
+

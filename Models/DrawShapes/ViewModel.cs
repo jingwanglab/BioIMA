@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Windows.Ink;
 
 namespace agmeasure
@@ -77,4 +77,5 @@ namespace agmeasure
 
     }
 }
+
 

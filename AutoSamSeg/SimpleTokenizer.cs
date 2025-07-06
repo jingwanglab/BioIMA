@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace wpf522
 {
-    /// <summary>
-    /// BPE
-    /// </summary>
+
+
+
     class SimpleTokenizer
     {
         static SimpleTokenizer theSingleton = null;
@@ -36,15 +36,15 @@ namespace wpf522
         {
             this.Init();
         }
-        /// <summary>
-        /// 初始化
-        /// </summary>
+
+
+
         void Init()
         {
             this.byte_encoder = this.BytesToUnicode();
             this.byte_decoder = this.byte_encoder.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
 
-            List<(string, string)> merges = LoadBPEMerges(default_bpe());//加载BPE
+            List<(string, string)> merges = LoadBPEMerges(default_bpe());
             List<string> vocab = this.byte_encoder.Values.ToList();
             foreach (var v in this.byte_encoder.Values.ToList())
             {
@@ -73,11 +73,11 @@ namespace wpf522
 
             this.pat = new Regex(@" <\| startoftext\|>|<\| endoftext\|>| 's|'t | 're|'ve | 'm|'ll | 'd|[\p{L}]+|[\p{N}]|[^\s\p{L}\p{N}]+", RegexOptions.IgnoreCase);
         }
-        /// <summary>
-        /// 将字符串转换为Token
-        /// </summary>
-        /// <param name="textpromot"></param>
-        /// <returns></returns>
+
+
+
+
+
         public List<Int64> tolikenlize(string textpromot)
         {
             int sot_token = this.encoder["<|startoftext|>"];
@@ -103,9 +103,9 @@ namespace wpf522
 
             return allTokens;
         }
-        /// <summary>
-        /// 对字符串进行编码
-        /// </summary>
+
+
+
         List<Int64> Encode(string text)
         {
             List<Int64> bpeTokens = new List<Int64>();
@@ -121,9 +121,9 @@ namespace wpf522
             }
             return bpeTokens;
         }
-        /// <summary>
-        /// 将tokens解码成字符串解码
-        /// </summary>
+
+
+
         string Decode(List<int> tokens)
         {
             StringBuilder textBuilder = new StringBuilder();
@@ -155,7 +155,7 @@ namespace wpf522
                 word.Add(token[i].ToString());
             }
             word.Add(token[token.Length - 1].ToString() + "</w>");
-            //Tuple<string, string> word = Tuple.Create( token[token.Length - 1] + "</w>", token.Substring(0, token.Length - 1));
+
             HashSet<(string, string)> pairs = this.GetPairs(word);
 
             if (pairs.Count == 0)
@@ -253,13 +253,13 @@ namespace wpf522
                 cs.Add(b);
             }
 
-            for (int b = (int)'¡'; b <= (int)'¬'; b++)
+            for (int b = (int)'?'; b <= (int)'?'; b++)
             {
                 bs.Add(b);
                 cs.Add(b);
             }
 
-            for (int b = (int)'®'; b <= (int)'ÿ'; b++)
+            for (int b = (int)'?'; b <= (int)'?'; b++)
             {
                 bs.Add(b);
                 cs.Add(b);
@@ -299,7 +299,7 @@ namespace wpf522
 
         string HtmlDecode(string text)
         {
-            // 还原 HTML 转义字符
+
             return System.Net.WebUtility.HtmlDecode(text);
         }
         string basic_clean(string text)
@@ -315,3 +315,4 @@ namespace wpf522
         }
     }
 }
+

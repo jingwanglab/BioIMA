@@ -1,4 +1,4 @@
-﻿using wpf522.Models.DrawShapes;
+using wpf522.Models.DrawShapes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +11,11 @@ namespace wpf522.Expends
 {
     public static class ShapeExpend
     {
-        /// <summary>
-        /// 绑定
-        /// </summary>
-        /// <param name="box"></param>
-        /// <param name="rectangle"></param>
+
+
+
+
+
         public static void ShapeBindingRectangle(this ShapeBox box, System.Windows.Shapes.Rectangle rectangle)
         {
             box.BindingEx("Width", rectangle, Rectangle.WidthProperty);
@@ -29,3 +29,4 @@ namespace wpf522.Expends
  
     }
 }
+

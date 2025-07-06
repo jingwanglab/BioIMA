@@ -1,4 +1,4 @@
-﻿using Emgu.CV;
+using Emgu.CV;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using OpenCvSharp;
@@ -35,30 +35,27 @@ namespace wpf522
             }
             return theSingleton;
         }
-        /// <summary>
-        /// 加载Segment Anything模型
-        /// </summary>
+
+
+
         public void LoadONNXModel()
         {
-            // 清理旧的模型会话
+
             if (this.mEncoder != null)
                 this.mEncoder.Dispose();
 
             if (this.mDecoder != null)
                 this.mDecoder.Dispose();
 
-            // 设置 ONNX Runtime 的 Session 选项
             var options = new SessionOptions
             {
                 EnableMemoryPattern = false,
                 EnableCpuMemArena = false
             };
 
-            // 获取可执行文件的目录
-            string exePath = AppDomain.CurrentDomain.BaseDirectory;  // 确保路径正确
-            string modelFolder = Path.Combine(exePath, "SAMmodel");  // 拼接模型文件夹路径
+            string exePath = AppDomain.CurrentDomain.BaseDirectory;  
+            string modelFolder = Path.Combine(exePath, "SAMmodel");  
 
-            // 定义编码器模型的路径
             string encodeModelPath = Path.Combine(modelFolder, "encoder-quant.onnx");
             if (!File.Exists(encodeModelPath))
             {
@@ -67,7 +64,6 @@ namespace wpf522
             }
             this.mEncoder = new InferenceSession(encodeModelPath, options);
 
-            // 定义解码器模型的路径
             string decodeModelPath = Path.Combine(modelFolder, "decoder-quant.onnx");
             if (!File.Exists(decodeModelPath))
             {
@@ -77,9 +73,8 @@ namespace wpf522
             this.mDecoder = new InferenceSession(decodeModelPath, options);
         }
 
-        /// <summary>
-        /// Segment Anything对图像进行编码
-        /// </summary>
+
+
         public float[] Encode(OpenCvSharp.Mat image, int orgWid, int orgHei)
         {
             Transforms tranform = new Transforms(1024);
@@ -98,9 +93,8 @@ namespace wpf522
             return embedding;
         }
 
-        /// <summary>
-        /// Segment Anything提示信息解码
-        /// </summary>
+
+
         public MaskData Decode(List<Promotion> promotions, float[] embedding, int orgWid, int orgHei)
         {
             if (this.mReady == false)

@@ -1,4 +1,4 @@
-﻿using wpf522.Expends;
+using wpf522.Expends;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,39 +12,38 @@ namespace wpf522.Dependencites
 {
     public class CanvasDragMoveDependency : DependencyObject
     {
-        /// <summary>
-        /// 拖拽参数
-        /// </summary>
+
+
+
         public class DragParams
         {
             public bool IsDrag { get; set; }
-            /// <summary>
-            /// 布局
-            /// </summary>
+
+
+
             public Canvas Layout { get; set; }
-            /// <summary>
-            /// 按压的点
-            /// </summary>
+
+
+
             public Point PressPoint { get; set; }
         }
 
 
         public static readonly DependencyProperty CanDragMoveProperty = DependencyProperty.RegisterAttached("CanDragMove", typeof(bool), typeof(CanvasDragMoveDependency), new PropertyMetadata(PropertyChangedCallBackHadle));
-        /// <summary>
-        /// 鼠标类型
-        /// </summary>
+
+
+
         public static readonly DependencyProperty MouseButtonProperty = DependencyProperty.RegisterAttached("MouseButton", typeof(MouseButton), typeof(CanvasDragMoveDependency), new PropertyMetadata(MouseButton.Left));
-        /// <summary>
-        /// UI元素和参数
-        /// </summary>
+
+
+
         public static readonly Dictionary<FrameworkElement, DragParams> Elements = new Dictionary<FrameworkElement, DragParams>(); 
 
-        /// <summary>
-        /// 属性变更事件
-        /// </summary>
-        /// <param name="d"></param>
-        /// <param name="e"></param>
-        /// <exception cref="NotImplementedException"></exception>
+
+
+
+
+
         private static void PropertyChangedCallBackHadle(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             FrameworkElement element = (FrameworkElement)d;
@@ -149,3 +148,4 @@ namespace wpf522.Dependencites
         }
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using wpf522.Expends;
+using wpf522.Expends;
 using MahApps.Metro.Controls;
 using System;
 using System.Collections.Generic;
@@ -10,19 +10,19 @@ using System.Windows;
 
 namespace wpf522
 {
-    /// <summary>
-    /// 可以移动的窗口
-    /// </summary>
+
+
+
     public class MoveWindow : MetroWindow
     {
-        #region 移动
-        /// <summary>
-        /// 用于移动的元素
-        /// </summary>
+        #region �ƶ�
+
+
+
         private UIElement element = null;
-        /// <summary>
-        /// 用于移动的元素
-        /// </summary>
+
+
+
         public UIElement MoveUIElement
         {
             get => element;
@@ -36,18 +36,18 @@ namespace wpf522
                 element.MouseLeave += Mouse_Leave;
             }
         }
-        /// <summary>
-        /// 是否拖动
-        /// </summary>
+
+
+
         private bool isDrag = false;
-        /// 之前的点
-        /// </summary>
+
+
         private Point forntPoint = new Point();
-        /// <summary>
-        /// 按下
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+
+
+
+
+
         private void Move_Down(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
@@ -57,11 +57,11 @@ namespace wpf522
                 forntPoint = e.GetPosition(this);
             }
         }
-        /// <summary>
-        /// 移动
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+
+
+
+
+
         private void Move_Move(object sender, MouseEventArgs e)
         {
             Point current = e.GetPosition(this);
@@ -70,24 +70,24 @@ namespace wpf522
                 Point movep = new Point(current.X - forntPoint.X, current.Y - forntPoint.Y);
                 this.Left += movep.X;
                 this.Top += movep.Y;
-                //forntPoint = e.GetPosition(this);
+
             }
         }
-        /// <summary>
-        /// 抬起
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+
+
+
+
+
         private void Move_Up(object sender, MouseButtonEventArgs e)
         {
             isDrag = false;
             this.Cursor = Cursors.Arrow;
         }
-        /// <summary>
-        /// 离开
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+
+
+
+
+
         private void Mouse_Leave(object sender, MouseEventArgs e)
         {
             isDrag = false;
@@ -96,3 +96,4 @@ namespace wpf522
         #endregion
     }
 }
+

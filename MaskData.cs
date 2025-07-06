@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace wpf522
 {
-    /// <summary>
-    /// A structure for storing masks and their related data in batched format.
-    /// Implements basic filtering and concatenation.
-    /// </summary>
+
+
+
+
     class MaskData
     {
         public int[] mShape;
@@ -41,7 +41,7 @@ namespace wpf522
                 if (this.mIoU[j] > pred_iou_thresh && this.mStalibility[j] > stability_score_thresh)
                 {
                     this.mfinalMask.Add(this.mMask.GetRange(j * this.mShape[2] * this.mShape[3], this.mShape[2] * this.mShape[3]));
-                    //m.AddRange(this.mMask.GetRange(j * this.mShape[2] * this.mShape[3], this.mShape[2] * this.mShape[3]));
+
                     i.Add(this.mIoU[j]);
                     s.Add(this.mStalibility[j]);
                     batch++;
@@ -51,7 +51,7 @@ namespace wpf522
             this.mStalibility.Clear();
             this.mMask.Clear();
             this.mIoU.Clear();
-            //this.mMask.AddRange(m);
+
             this.mIoU.AddRange(i);
             this.mStalibility.AddRange(s);
         }
@@ -160,8 +160,8 @@ namespace wpf522
                 {
                     for (int j = 0; j < height; j++)
                     {
-                        //int index = c * width * height + j * width + i;
-                        //if (this.mMask[index] > 0)
+
+
                         int index = j * width + i;
                         if (this.mfinalMask[c][index] > 0)
                         {
@@ -194,3 +194,4 @@ namespace wpf522
         }
     }
 }
+

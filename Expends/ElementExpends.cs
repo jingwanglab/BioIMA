@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,12 +11,11 @@ namespace wpf522.Expends
     public static class ElementExpends
     {
 
-        /// <summary>
-        /// 查找元素
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="element"></param>
-        /// <returns></returns>
+
+
+
+
+
         public static T SearchElement<T>(this DependencyObject element) where T : DependencyObject
         {
             var pa = VisualTreeHelper.GetParent(element) as DependencyObject;
@@ -30,3 +29,4 @@ namespace wpf522.Expends
 
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using wpf522.CustomCommand;
+using wpf522.CustomCommand;
 using wpf522.CustomDialogs;
 using wpf522.Expends;
 using wpf522.Models.DrawShapes;
@@ -24,123 +24,119 @@ namespace wpf522.Models
 {
     public partial class MainModel
     {
-        /// <summary>
-        /// 打开文件夹
-        /// </summary>
+
+
+
         public ICommand OpenFolderCommand { get; set; }
-        /// <summary>
-        /// 框选box命令
-        /// </summary>
+
+
+
         public ICommand SetDrawBoxCommand { get; set; }
-        /// <summary>
-        /// 进入选中模式
-        /// </summary>
+
+
+
         public ICommand SetDrawSelectedCommand { get; set; }
-        /// <summary>
-        /// 绘制直线命令
-        /// </summary>
+
+
+
         public ICommand SetDrawLinesCommand { get; set; }
-        /// <summary>
-        /// 框选多边形命令
-        /// </summary>
-        /// 
+
+
+
+
         public ICommand SetDrawPolygonCommand { get; set; }
-        /// <summary>
-        /// 不进行任何操作模式
-        /// </summary>
+
+
+
         public ICommand SetDrawNoneCommand { get; set; }
-        /// <summary>
-        /// 打开左边漂浮
-        /// </summary>
+
+
+
         public ICommand OpenInputKeySetsCommand { get; set; }
-        /// <summary>
-        /// 保存配置命令
-        /// </summary>
+
+
+
         public ICommand SaveConfigCommand { get; set; }
-        /// <summary>
-        /// 删除选中的命令
-        /// </summary>
+
+
+
         public ICommand RemoveSelectedShapesCommand { get; set; }
-        /// <summary>
-        /// 图片切换命令
-        /// </summary>
+
+
+
         public ICommand ImageMoveCommand { get; set; }
-        /// <summary>
-        /// 创建类型命令
-        /// </summary>
+
+
+
         public ICommand CreateTypeCommand { get; set; }
-        /// <summary>
-        /// 确认创建类型命令
-        /// </summary>
+
+
+
         public ICommand SureCreateTypeCommand { get; set; }
-        /// <summary>
-        /// 导出为voc的数据集
-        /// </summary>
+
+
+
         public ICommand ExportYoloListCommand { get; set; }
-        /// <summary>
-        /// 删除选中的类型结构
-        /// </summary>
+
+
+
         public ICommand RemoveSelectedShapeTypeColorStructCommand { get; set; }
-        /// <summary>
-        /// 删除选中的类型区域
-        /// </summary>
+
+
+
         public ICommand RemoveSelectedShapeAreaCommand { get; set; }
-        /// <summary>
-        /// 打开修改类型名称的对话框
-        /// </summary>
+
+
+
         public ICommand OpenModifyShapeTypeNameCommand { get; set; }
-        /// <summary>
-        /// 打开当前选中的类型颜色结构的名称修改弹出框
-        /// </summary>
+
+
+
         public ICommand OpenModifyShapeTypeColorPopupCommand { get; set; }
-        /// <summary>
-        /// 修改保存目录命令
-        /// </summary>
+
+
+
         public ICommand ModifySaveDirCommand { get; set; }
-        /// <summary>
-        /// 删除文件命令
-        /// </summary>
+
+
+
         public ICommand RemoveFileCommand { get; set; }
-        /// <summary>
-        /// 保存全部命令
-        /// </summary>
+
+
+
         public ICommand SaveAllCommand { get; set; }
-        /// <summary>
-        /// 转多边形项目到矩形项目
-        /// </summary>
+
+
+
         public ICommand ConvertPolygonToRectCommand { get; set; }
-        /// <summary>
-        /// 打开对应图片的输出配置文件
-        /// </summary>
+
+
+
         public ICommand OpenImageConfigFileCommand { get; set; }
-        /// <summary>
-        /// 转换类型命令
-        /// </summary>
+
+
+
         public ICommand ConvertTypesCommand { get; set; }
 
-        /// <summary>
-        /// 命令初始化
-        /// </summary>
+
+
         public ICommand SetAngleMeasureCommand { get; set; }
 
-        /// <summary>
-        /// 角度测量命令
-        /// </summary>
+
+
         public ICommand ColorButtonCommand { get; set; }
 
-        /// <summary>
-        /// 颜色测量命令
-        /// </summary>
-        /// 
+
+
+
         public ICommand SetRulerCommand { get; set; }
 
-        /// <summary>
-        /// 标尺设置命令
-        /// </summary>
+
+
         private MainModel()
         {
             PropertyChanged += MainModel_PropertyChanged;
-            //打开文件夹
+
             OpenFolderCommand = new SampleCommand(o => true, async o => {
 
                 try
@@ -160,33 +156,33 @@ namespace wpf522.Models
             });
             SetDrawBoxCommand = new SampleCommand(o => true, o => {
                 ToolConfig.CurrentShapType = ShapeType.Box;
-                ToolConfig.IsColorPicking = false; // 关闭颜色拾取模式
+                ToolConfig.IsColorPicking = false; 
             });
             SetDrawPolygonCommand = new SampleCommand(o => true, o => {
                 ToolConfig.CurrentShapType = ShapeType.Polygon;
-                ToolConfig.IsColorPicking = false; // 关闭颜色拾取模式
+                ToolConfig.IsColorPicking = false; 
             });
             SetDrawLinesCommand = new SampleCommand(o => true, o => {
                 ToolConfig.CurrentShapType = ShapeType.Lines;
-                ToolConfig.IsColorPicking = false; // 关闭颜色拾取模式
+                ToolConfig.IsColorPicking = false; 
             });
             SetDrawSelectedCommand = new SampleCommand(o => true, o =>
             {
                 ToolConfig.CurrentShapType = ShapeType.Selected;
-                ToolConfig.IsColorPicking = false; //  关闭颜色拾取模式
+                ToolConfig.IsColorPicking = false; 
             });
             SetDrawNoneCommand = new SampleCommand(o => true, o => { ToolConfig.CurrentShapType = ShapeType.None; });
 
             SetAngleMeasureCommand = new SampleCommand(o => true, o => 
             {
                 ToolConfig.CurrentShapType = ShapeType.Angle;
-                ToolConfig.IsColorPicking = false; //  关闭颜色拾取模式
+                ToolConfig.IsColorPicking = false; 
             });
 
             ColorButtonCommand = new SampleCommand(o => true, o =>
             {
                 ToolConfig.CurrentShapType = ShapeType.ColorPicker;
-                ToolConfig.IsColorPicking = true; //  开启颜色拾取模式
+                ToolConfig.IsColorPicking = true; 
             });
 
             OpenInputKeySetsCommand = new SampleCommand(o => true, o =>
@@ -208,7 +204,7 @@ namespace wpf522.Models
                         }
                     }
                     this.SaveConfig();
-                    // 必须已经经过框选了
+
                     if (this.CurrentImageModel is not null && this.CurrentImageModel.Shapes.Count > 0)
                         this.CurrentImageModel?.SaveConfig(ToolConfig);
                 }
@@ -246,7 +242,7 @@ namespace wpf522.Models
                     MainWindow.Instance.CloseWait();
                 }
             });
-            // 删除选中命令
+
             RemoveSelectedShapesCommand = new SampleCommand(o => true, o => {
                 try
                 {
@@ -269,19 +265,19 @@ namespace wpf522.Models
                     MainWindow.Instance.ShowMessageAsync("Error!", "Delete failed: " + ex.Message); ;
                 }
             });
-            //图片移动命令
+
             ImageMoveCommand = new SampleCommand(o => true, o => {
                 try
                 {
                     int move = o.To<int>();
-                    // 列表视图
+
                     if (TabViewSelectedIndex == 0)
                     {
                         SelectedIndex += move;
                         if (SelectedIndex < 0) SelectedIndex = 0;
                         if (SelectedIndex >= this.ImageModels.Count) SelectedIndex = ImageModels.Count - 1;
                     }
-                    // 文件夹视图
+
                     else
                     {
                         if (CurrentImageModel is null) return;
@@ -303,7 +299,7 @@ namespace wpf522.Models
                 catch (Exception)
                 { }
             });
-            // 创建命令
+
             CreateTypeCommand = new SampleCommand(o => true, o => {
                 Popup p = MainWindow.Instance.CreateTypePopup;
                 string name = "label1";
@@ -312,7 +308,7 @@ namespace wpf522.Models
                     NameIndex++;
 
                 }
-                //创建类型 
+
                 CreateTypeStruct = new ShapeTypeColorStruct()
                 {
                     TypeName = name + NameIndex,
@@ -382,7 +378,7 @@ namespace wpf522.Models
                         try
                         {
                             this.SaveConfig();
-                            //保存全部
+
                             foreach (var item in ImageModels)
                             {
                                 if (item.Shapes.Count > 0 || withNotBoard)
@@ -418,7 +414,6 @@ namespace wpf522.Models
                 }
             });
 
-            // 导出voc数据
             ExportYoloListCommand = new SampleCommand(o => ToolConfig.SaveFileConfigHistory != null, async o => {
                 try
                 {
@@ -472,7 +467,7 @@ namespace wpf522.Models
                     await MainWindow.Instance.ShowMessageAsync("Error!", ex.Message);
                 }
             });
-            // 删除文件
+
             RemoveFileCommand = new SampleCommand(o => CurrentImageModel != null, async o => {
                 try
                 {
@@ -521,7 +516,7 @@ namespace wpf522.Models
                                 model.FilePath = item.FilePath;
                                 model.ImageUri = item.ImageUri;
                                 model.ConvertPolygonToRect();
-                                // 修改配置文件路径
+
                                 model.ConfigFilePath = Path.Combine(dir, Path.GetFileNameWithoutExtension(model.FilePath) + ".json");
                                 model.MaskFilePath = null;
                                 model.SaveConfig(ToolConfig, false);
@@ -548,7 +543,6 @@ namespace wpf522.Models
                 }
             });
 
-            // 转换类型
             ConvertTypesCommand = new SampleCommand(o => true, async o => {
                 try
                 {
@@ -561,14 +555,13 @@ namespace wpf522.Models
             });
         }
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="toolConfigPath"></param>
+
+
+
         public MainModel(ProjectHistoryItem history) : this()
         {
             ConfigSavePath = history.ProjectPath;
-            // 加载
+
             if (File.Exists(ConfigSavePath))
             {
                 this.LoadConfig();
@@ -580,21 +573,21 @@ namespace wpf522.Models
                 ToolConfig.ProjectName = history.ProjectName;
             }
         }
-        /// <summary>
-        /// 根据项目配置文件创建
-        /// </summary>
-        /// <param name="configPath"></param>
+
+
+
+
         public MainModel(string configPath) : base()
         {
             if (!File.Exists(configPath)) throw new Exception("Project file does not exist");
             this.ConfigSavePath = configPath;
             this.LoadConfig();
         }
-        /// <summary>
-        /// 根据文件夹创建项目
-        /// </summary>
-        /// <param name="dir"></param>
-        /// <returns></returns>
+
+
+
+
+
         public static MainModel CreateMainModelByFolder(string dir)
         {
             if (Directory.Exists(dir) == false) throw new Exception("Directory does not exist...");
@@ -605,10 +598,9 @@ namespace wpf522.Models
             return model;
         }
 
-        /// <summary>
-        /// 更新当前的配置文件信息
-        /// </summary>
-        /// <param name="dir"></param>
+
+
+
         private async Task UpdateNewSaveConfigPathConfigData(string dir)
         {
             await Task.Factory.StartNew(async root => {
@@ -625,7 +617,7 @@ namespace wpf522.Models
                             continue;
                         }
                         var nowConfig = find.FirstOrDefault();
-                        // 拷贝数据
+
                         nowConfig?.CopyFrom(config);
                     }
 
@@ -644,3 +636,4 @@ namespace wpf522.Models
     
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -22,13 +22,12 @@ using Newtonsoft.Json;
 
 namespace wpf522
 {
-    /// <summary>
-    /// SAMSegWindow.xaml 的交互逻辑
-    /// </summary>
+
+
+
     public partial class SAMSegWindow : Window
     {
 
-        // 图像文件路径
         private string mImagePath = string.Empty;
         private int _maskPixelCount;
 
@@ -40,7 +39,7 @@ namespace wpf522
         private Point _startPoint;
         int mOrgwid;
         int mOrghei;
-        //undo and redo
+
         private Stack<Promotion> mUndoStack = new Stack<Promotion>();
         private Stack<Promotion> mRedoStack = new Stack<Promotion>();
         Dispatcher UI;
@@ -54,16 +53,16 @@ namespace wpf522
         private Line _rulerLine;
         private TextBlock _rulerText;
         private Ellipse _startPointEllipse, _endPointEllipse;
-        private double _pixelToRealRatio = 1.0; // 像素与实际单位的比例
+        private double _pixelToRealRatio = 1.0; 
         public event Action<double> SaveArea;
         public ObservableCollection<LabelItem> Labels { get; set; } = new ObservableCollection<LabelItem>();
         public LabelItem SelectedLabel { get; set; }
 
         public ObservableCollection<DataModel> DataCollection { get; set; } = new ObservableCollection<DataModel>();
 
-        private int _currentId = 1; // 用于生成唯一的ID
+        private int _currentId = 1; 
 
-        private string _unit = "cm"; // 用于保存用户设定的单位这里假设默认单位是 "cm"，实际情况会在用户输入后更新
+        private string _unit = "cm"; 
         private string _currentFileName;
 
         public LabelViewModel LabelVM { get; set; }
@@ -78,7 +77,6 @@ namespace wpf522
             public double Pixels { get; set; }
         }
 
-        //MaskData maskData = new MaskData(); // 在方法内部初始化
         public enum Mode
         {
             None,
@@ -86,83 +84,70 @@ namespace wpf522
             CreatingHints
         }
         private Mode currentMode = Mode.None;
-        // 构造函数
-        //public SAMSegWindow()
-        //{
-        //    InitializeComponent();
-
-        //    this.mImage.Width = this.Width;
-        //    this.mImage.Height = this.Height;
-
-        //    this.mMask.Width = this.Width;
-        //    this.mMask.Height = this.Height;
-
-        //    this.UI = Dispatcher.CurrentDispatcher;
-        //    this.mCurOp = Operation.None;
-        //    // 设置初始操作模式为 None
-        //    this.currentMode = Mode.None;
-        //    //// 初始化操作类型为无效状态
-        //    //this.mCurOp = Operation.None;
-        //    //this.mOpType = (OpType)SamOpType.None;
-        //}
-        //public SAMSegWindow()
-        //{
-        //    InitializeComponent();
-
-        //    // 将 Image 和 Mask 的 Stretch 设置为 Uniform 确保等比例缩放
-        //    this.mImage.Stretch = Stretch.Uniform;
-        //    this.mMask.Stretch = Stretch.Uniform;
-
-        //    this.UI = Dispatcher.CurrentDispatcher;
-        //    this.mCurOp = Operation.None;
-        //    this.currentMode = Mode.None;
-        //}
 
 
-        ///// <summary>
-        /////// 加载图像
-        /////// </summary>
-        //void LoadImage(string imgpath)
-        //{
-        //    BitmapImage bitmap = new BitmapImage(new Uri(imgpath));
-        //    this.mOrgwid = (int)bitmap.Width;
-        //    this.mOrghei = (int)bitmap.Height;
-        //    this.mImage.Source = bitmap;//显示图像
 
 
-        //}这里开始是原始方法aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-        //public SAMSegWindow()
-        //{
-        //    InitializeComponent();
 
-        //    this.mImage.Width = 1f * this.Width;
-        //    this.mImage.Height = this.Height;
 
-        //    this.mMask.Width = 1f * this.Width;
-        //    this.mMask.Height = this.Height;
 
-        //    this.UI = Dispatcher.CurrentDispatcher;
-        //    this.mCurOp = Operation.None;
-        //    // 设置初始操作模式为 None
-        //    this.currentMode = Mode.None;
-        //    //// 初始化操作类型为无效状态
-        //    //this.mCurOp = Operation.None;
-        //    //this.mOpType = (OpType)SamOpType.None;
-        //}
-        //void LoadImage(string imgpath)
-        //{
-        //    // 加载原始图像以获取其宽度和高度
-        //    BitmapImage bitmap = new BitmapImage(new Uri(imgpath));
-        //    this.mOrgwid = (int)bitmap.Width;
-        //    this.mOrghei = (int)bitmap.Height;
 
-        //    this.mImage.Source = bitmap;
-        //}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public SAMSegWindow()
         {
             InitializeComponent();
             this.MouseUp += SAMSegWindow_MouseUp;
-            // 将 Image 和 Mask 的 Stretch 设置为 Uniform 确保等比例缩放
+
             this.mImage.Stretch = Stretch.Uniform;
             this.mMask.Stretch = Stretch.Uniform;
 
@@ -170,114 +155,100 @@ namespace wpf522
             this.mCurOp = Operation.None;
             this.currentMode = Mode.None;
 
-            //// 添加鼠标事件处理
-            //this.mImage.MouseRightButtonDown += Image_MouseRightButtonDown;
-            //this.mImage.MouseMove += Image_MouseMove;
-            //this.mImage.MouseRightButtonUp += Image_MouseRightButtonUp;
 
-            // 初始化 ViewModel 并绑定到 DataContext
+
+
+
             LabelVM = new LabelViewModel();
             this.DataContext = LabelVM;
         }
 
         private Point _lastMousePosition;
         private bool _isDragging = false;
-        private bool isLabelingMode = false; // 标记模式标志
+        private bool isLabelingMode = false; 
 
         private void SAMSegWindow_MouseUp(object sender, MouseButtonEventArgs e)
         {
             if (_isDragging)
             {
                 _isDragging = false;
-                this.mImage.ReleaseMouseCapture(); // 防止意外未释放
+                this.mImage.ReleaseMouseCapture(); 
             }
         }
-        //// 鼠标右键按下事件处理
-        //private void Image_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        //{
-        //    _lastMousePosition = e.GetPosition(this.ImgCanvas);
-        //    _isDragging = true;
-        //    this.mImage.CaptureMouse(); // 捕获鼠标事件
-        //}
 
-        //// 鼠标移动事件处理
-        //private void Image_MouseMove(object sender, MouseEventArgs e)
-        //{
-        //    if (_isDragging)
-        //    {
-        //        Point currentMousePosition = e.GetPosition(this.ImgCanvas);
-        //        Vector offset = currentMousePosition - _lastMousePosition;
 
-        //        // 更新图像的平移变换
-        //        UpdateTranslateTransform(this.mImage, offset);
-        //        UpdateTranslateTransform(this.mMask, offset);
 
-        //        _lastMousePosition = currentMousePosition; // 更新上次鼠标位置
-        //    }
-        //}
 
-        //// 鼠标右键抬起事件处理
-        //private void Image_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
-        //{
-        //    _isDragging = false;
-        //    this.mImage.ReleaseMouseCapture();
-        //    e.Handled = true; // 阻止事件继续传播
-        //}
-        //// 更新平移变换
-        //private void UpdateTranslateTransform(Image imageControl, Vector offset)
-        //{
-        //    if (imageControl.RenderTransform is TransformGroup transformGroup)
-        //    {
-        //        if (transformGroup.Children.Count > 1 && transformGroup.Children[1] is TranslateTransform translateTransform)
-        //        {
-        //            translateTransform.X += offset.X;
-        //            translateTransform.Y += offset.Y;
-        //        }
-        //    }
-        //}
 
-        // 加载图像
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         void LoadImage(string imgpath)
         {
 
             if (this.ImgCanvas.ActualWidth == 0 || this.ImgCanvas.ActualHeight == 0)
             {
-                this.ImgCanvas.UpdateLayout(); // 强制更新布局
+                this.ImgCanvas.UpdateLayout(); 
             }
             BitmapImage bitmap = new BitmapImage(new Uri(imgpath));
             this.mOrgwid = (int)bitmap.Width;
             this.mOrghei = (int)bitmap.Height;
 
-            // 重置图像的变换
             ResetTransform(this.mImage);
             ResetTransform(this.mMask);
 
-            // 计算适应屏幕的比例
             double scaleX = this.ImgCanvas.ActualWidth / bitmap.Width;
             double scaleY = this.ImgCanvas.ActualHeight / bitmap.Height;
-            double scale = Math.Min(scaleX, scaleY); // 等比例缩放
+            double scale = Math.Min(scaleX, scaleY); 
 
-            // 应用缩放
             SetScaleTransform(this.mImage, scale);
             SetScaleTransform(this.mMask, scale);
 
-            // 更新图像源
-            this.mImage.Source = bitmap;  // 显示图像
+            this.mImage.Source = bitmap;  
 
-            // 重新设置掩膜的源
-            // this.mMask.Source = ...; // 根据需要加载掩膜图像
+
         }
 
-        // 重置变换
         private void ResetTransform(Image imageControl)
         {
             var transformGroup = new TransformGroup();
-            transformGroup.Children.Add(new ScaleTransform()); // 用于缩放
-            transformGroup.Children.Add(new TranslateTransform()); // 用于拖曳
+            transformGroup.Children.Add(new ScaleTransform()); 
+            transformGroup.Children.Add(new TranslateTransform()); 
             imageControl.RenderTransform = transformGroup;
         }
 
-        // 设置缩放变换
         private void SetScaleTransform(Image imageControl, double scale)
         {
             if (imageControl.RenderTransform is TransformGroup transformGroup && transformGroup.Children.Count > 0)
@@ -290,57 +261,51 @@ namespace wpf522
             }
         }
 
-        // 将显示坐标映射到原始图像的坐标
         private Point DisplayToImageCoords(Point displayPoint)
         {
             if (this.mImage.RenderTransform is TransformGroup transformGroup &&
                 transformGroup.Children[0] is ScaleTransform scaleTransform)
             {
-                double scale = scaleTransform.ScaleX; // X和Y使用同样的比例缩放
+                double scale = scaleTransform.ScaleX; 
 
-                // 计算在原始图像中的对应坐标
                 double xInOriginal = displayPoint.X / scale;
                 double yInOriginal = displayPoint.Y / scale;
 
                 return new Point(xInOriginal, yInOriginal);
             }
 
-            return displayPoint; // 如果没有缩放，直接返回原始点
+            return displayPoint; 
         }
 
-
-
-        // 设置当前操作类型的方法
         private void SetOperationType(SAMSegWindow.SamOpType type)
         {
             SolidColorBrush brush = type == SamOpType.ADD ? Brushes.Red : Brushes.Black;
 
         }
-        // 定义 OpType 枚举
+
         public enum SamOpType
         {
-            None,   // 无效状态
+            None,   
             ADD,
             REMOVE
         }
 
-        // 定义 mOpType 属性
         public OpType mOpType { get; set; }
-        // 鼠标左键按下事件处理提示点程序
+
         private void image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            // 如果当前模式是 None，不执行任何操作
+
             if (this.currentMode == Mode.None) return;
-            // 检查点击是否发生在 ImgCanvas 区域内
+
             if (!this.ImgCanvas.IsMouseOver)
             {
-                // 如果点击不在 ImgCanvas 区域，直接返回，不执行任何操作
+
                 return;
             }
-            // 根据 currentMode 判断执行什么操作
+
             if (this.currentMode == Mode.SettingRuler)
             {
-                // 在标尺模式下，执行标尺设置的逻辑
+
                 SetRulerPoints(sender, e);
             }
             else if (this.currentMode == Mode.CreatingHints && this.mCurOp != Operation.None)
@@ -393,10 +358,9 @@ namespace wpf522
             }
         }
 
-        // 鼠标移动事件处理程序
         private void image_MouseMove(object sender, MouseEventArgs e)
         {
-            // 如果当前有选中的标注，处理拖动和调整大小操作
+
             if (e.LeftButton == MouseButtonState.Pressed && this.mCurRectAnno != null)
             {
                 var currentPoint = e.GetPosition(this.ImgCanvas);
@@ -439,9 +403,8 @@ namespace wpf522
             this.mCurRectAnno = null;
         }
 
-        /// <summary>
-        /// 图像路径选择
-        /// </summary>
+
+
         private async void SelectFileButton_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
@@ -462,28 +425,25 @@ namespace wpf522
                 this.ImgCanvas.Visibility = Visibility.Visible;
                 this.LoadImage(this.mImagePath);
 
-                // **✅ 确保状态文本和进度条可见**
                 this.StatusTxt.Visibility = Visibility.Visible;
                 this.ProgressBarStatus.Visibility = Visibility.Visible;
 
-                ShowStatus("Image Loaded", 10); // 10%
+                ShowStatus("Image Loaded", 10); 
 
-                // 清除之前绘制的元素
                 ClearDrawnElements(this.ImgCanvas);
 
                 await Task.Run(() =>
                 {
-                    // 1️⃣ 加载 ONNX 模型
+
                     Dispatcher.BeginInvoke(new Action(() => ShowStatus("Loading ONNX Model...", 30)));
                     this.mSam.LoadONNXModel();
 
-                    Dispatcher.BeginInvoke(new Action(() => ShowStatus("ONNX Model Loaded ✔", 50))); // 50%
+                    Dispatcher.BeginInvoke(new Action(() => ShowStatus("ONNX Model Loaded ?", 50))); 
 
-                    // 2️⃣ 读取图像并处理
-                    Dispatcher.BeginInvoke(new Action(() => ShowStatus("Processing Image...", 70))); // 70%
+                    Dispatcher.BeginInvoke(new Action(() => ShowStatus("Processing Image...", 70))); 
                     OpenCvSharp.Mat image = OpenCvSharp.Cv2.ImRead(this.mImagePath, OpenCvSharp.ImreadModes.Color);
 
-                    Dispatcher.BeginInvoke(new Action(() => ShowStatus("Encoding Image...", 80))); // 80%
+                    Dispatcher.BeginInvoke(new Action(() => ShowStatus("Encoding Image...", 80))); 
                     this.mImgEmbedding = this.mSam.Encode(image, this.mOrgwid, this.mOrghei);
 
                     this.mAutoMask = new SAMAutoMask();
@@ -491,12 +451,12 @@ namespace wpf522
                     this.mAutoMask.mSAM = this.mSam;
                     image.Dispose();
 
-                    Dispatcher.BeginInvoke(new Action(() => ShowStatus("Image Embedding ✔", 100))); // 100%
+                    Dispatcher.BeginInvoke(new Action(() => ShowStatus("Image Embedding ?", 100))); 
                 });
-                // 任务完成后，让 UI 再停留 0.1 秒**
+
                 await Task.Delay(100);
                 this.ProgressBarStatus.Visibility = Visibility.Collapsed;
-                this.StatusTxt.Visibility = Visibility.Collapsed; // **隐藏状态文本**
+                this.StatusTxt.Visibility = Visibility.Collapsed; 
             
         }
         }
@@ -506,7 +466,7 @@ namespace wpf522
         private void BReLoad_Click(object sender, RoutedEventArgs e)
         {
             _isDragging = false;
-            this.mImage.ReleaseMouseCapture(); // 确保状态重置
+            this.mImage.ReleaseMouseCapture(); 
             this.Reset();
             this.LoadImgGrid.Visibility = Visibility.Visible;
             this.ImgCanvas.Visibility = Visibility.Hidden;
@@ -534,9 +494,9 @@ namespace wpf522
         {
             return Math.Sqrt(vector.Select(x => x * x).Sum());
         }
-        /// <summary>
-        /// 撤销
-        /// </summary>
+
+
+
         private void BUndo_Click(object sender, RoutedEventArgs e)
         {
             if (this.mUndoStack.Count > 0)
@@ -559,9 +519,9 @@ namespace wpf522
                 MessageBox.Show("No Undo Promot");
             }
         }
-        /// <summary>
-        /// 重做
-        /// </summary>
+
+
+
         private void BRedo_Click(object sender, RoutedEventArgs e)
         {
             if (this.mRedoStack.Count > 0)
@@ -583,27 +543,25 @@ namespace wpf522
                 MessageBox.Show("No Redo Promot");
             }
         }
-        /// <summary>
-        /// 复位
-        /// </summary>
+
+
+
         private void BReset_Click(object sender, RoutedEventArgs e)
         {
             this.Reset();
 
-            // 重新进入分割模式
             this.currentMode = Mode.CreatingHints;
-            this.mCurOp = Operation.Point; // 或者 Operation.Box，根据需要选择操作
-            this.mOpType = OpType.ADD; // 可选，设置当前操作类型（添加/移除）
+            this.mCurOp = Operation.Point; 
+            this.mOpType = OpType.ADD; 
         }
 
-        /// <summary>
-        /// 显示分割结果
-        /// </summary>
-        private float[] mMaskData; // 新增用于存储掩膜数据
+
+
+        private float[] mMaskData; 
 
         void ShowMask(float[] mask, Color color)
         {
-            this.mMaskData = mask; // 存储掩膜数据以便后续使用
+            this.mMaskData = mask; 
             UI.Invoke(new Action(delegate
             {
                 WriteableBitmap bp = new WriteableBitmap(this.mOrgwid, this.mOrghei, 96, 96, PixelFormats.Pbgra32, null);
@@ -619,13 +577,13 @@ namespace wpf522
                         int ind = y * this.mOrgwid + x;
                         if (mask[ind] > this.mSam.mask_threshold)
                         {
-                            // 计算掩膜覆盖区域下的原图部分的像素数量
+
                             pixelData[4 * ind] = color.B;
                             pixelData[4 * ind + 1] = color.G;
                             pixelData[4 * ind + 2] = color.R;
-                            pixelData[4 * ind + 3] = 100; // Alpha 通道值
+                            pixelData[4 * ind + 3] = 100; 
 
-                            _maskPixelCount++; // 每次掩膜覆盖时增加像素计数
+                            _maskPixelCount++; 
                         }
                     }
                 }
@@ -636,9 +594,7 @@ namespace wpf522
         }
 
 
-        /// <summary>
-        /// 显示分割结果
-        /// </summary>
+
         void ShowMask(MaskData mask)
         {
             UI.Invoke(new Action(delegate
@@ -650,7 +606,7 @@ namespace wpf522
                 byte[] pixelData = new byte[this.mOrgwid * this.mOrghei * 4];
                 Array.Clear(pixelData, 0, pixelData.Length);
 
-                _maskPixelCount = 0; // 初始化掩膜像素计数
+                _maskPixelCount = 0; 
 
                 for (int i = 0; i < mask.mShape[1]; i++)
                 {
@@ -663,18 +619,17 @@ namespace wpf522
                             int indpixel = y * this.mOrgwid + x;
                             if (mask.mfinalMask[i][indpixel] > this.mSam.mask_threshold)
                             {
-                                // 计算掩膜覆盖区域下的原图部分的像素数量
+
                                 pixelData[4 * indpixel] = randomColor.B;
                                 pixelData[4 * indpixel + 1] = randomColor.G;
                                 pixelData[4 * indpixel + 2] = randomColor.R;
-                                pixelData[4 * indpixel + 3] = 100; // Alpha 通道值
+                                pixelData[4 * indpixel + 3] = 100; 
 
-                                _maskPixelCount++; // 每次掩膜覆盖时增加像素计数
+                                _maskPixelCount++; 
                             }
                         }
                     }
 
-                    // 绘制掩膜框
                     Point leftup = this.Image2Window(new Point(mask.mBox[4 * i], mask.mBox[4 * i + 1]));
                     Point rightdown = this.Image2Window(new Point(mask.mBox[4 * i + 2], mask.mBox[4 * i + 3]));
                     RectAnnotation box = new RectAnnotation();
@@ -691,9 +646,7 @@ namespace wpf522
         }
 
 
-        /// <summary>
-        /// 窗口坐标转图像坐标
-        /// </summary>
+
         Point Window2Image(Point clickPoint)
         {
             double imageWidth = this.mImage.ActualWidth;
@@ -728,9 +681,9 @@ namespace wpf522
 
             return p;
         }
-        /// <summary>
-        /// 清空
-        /// </summary>
+
+
+
         void ClearAnation()
         {
             List<UserControl> todel = new List<UserControl>();
@@ -742,32 +695,32 @@ namespace wpf522
 
             todel.ForEach(e => { this.ImgCanvas.Children.Remove(e); });
         }
-        /// <summary>
-        /// 删除
-        /// </summary>
+
+
+
         void RemoveAnation(Promotion pt)
         {
             if (this.ImgCanvas.Children.Contains(pt.mAnation))
                 this.ImgCanvas.Children.Remove(pt.mAnation);
         }
-        /// <summary>
-        /// 添加
-        /// </summary>
+
+
+
         void AddAnation(Promotion pt)
         {
             if (!this.ImgCanvas.Children.Contains(pt.mAnation))
                 this.ImgCanvas.Children.Add(pt.mAnation);
 
         }
-        /// <summary>
-        /// 显示状态信息
-        /// </summary>
+
+
+
         void ShowStatus(string message, int progress = -1)
         {
             Dispatcher.Invoke(() =>
             {
-                this.StatusTxt.Text = message; // 更新状态文本
-                if (progress >= 0) // 只更新有效的进度
+                this.StatusTxt.Text = message; 
+                if (progress >= 0) 
                 {
                     this.ProgressBarStatus.Visibility = Visibility.Visible;
                     this.ProgressBarStatus.Value = progress;
@@ -782,66 +735,59 @@ namespace wpf522
             this.mPromotionList.Clear();
             this.mMask.Source = null;
         }
-        //private void Startseg_Click(object sender, RoutedEventArgs e)
-        //{
-        //    this.currentMode = Mode.CreatingHints; // 切换到提示点模式
-        //    this.mCurOp = Operation.Point;  // 设置为点操作
-        //    this.mOpType = OpType.ADD;      // 设置为增加点
-        //}
+
+
+
+
+
+
         private void Startseg_Click(object sender, RoutedEventArgs e)
         {
-            //if (!isLabelingMode)
-            //{
-            //    MessageBox.Show("请先生成标签并完成标记！");
-            //    return;
-            //}
 
-            // 启动分割
+
+
+
+
+
             this.currentMode = Mode.CreatingHints;
             this.mCurOp = Operation.Point;
             this.mOpType = OpType.ADD;
 
-            // 退出标记模式
             isLabelingMode = false;
             StartsegButton.IsEnabled = true;
             MessageBox.Show("Try clicking the image to perform segmentation!");
         }
 
-        // 加点操作
         private void AddPoint_Click(object sender, RoutedEventArgs e)
         {
             this.mCurOp = Operation.Point;
             this.mOpType = OpType.ADD;
         }
 
-        // 减点操作
         private void RemovePoint_Click(object sender, RoutedEventArgs e)
         {
             this.mCurOp = Operation.Point;
             this.mOpType = OpType.REMOVE;
         }
 
-        // 画框操作
         private void DrawBox_Click(object sender, RoutedEventArgs e)
         {
             this.mCurOp = Operation.Box;
         }
 
 
-        //private void mAutoSeg_Click(object sender, RoutedEventArgs e)
-        //{
-        //    this.mAutoMask.points_per_side = int.Parse(this.mPoints_per_side.Text);
-        //    this.mAutoMask.pred_iou_thresh = float.Parse(this.mPred_iou_thresh.Text);
-        //    this.mAutoMask.stability_score_thresh = float.Parse(this.mStability_score_thresh.Text);
-        //    this.ShowStatus("Auto Segment......");
-        //    Thread thread = new Thread(() =>
-        //    {
-        //        this.mCurOp = Operation.Everything;
-        //        this.mAutoMaskData = this.mAutoMask.Generate(this.mImagePath);
-        //        this.ShowMask(this.mAutoMaskData);
-        //    });
-        //    thread.Start();
-        //}
+
+
+
+
+
+
+
+
+
+
+
+
         MaskData MatchTextAndImage(string txt)
         {
             var txtEmbedding = this.mCLIP.TxtEncoder(txt);
@@ -851,15 +797,14 @@ namespace wpf522
             MaskData final = new MaskData();
             for (int i = 0; i < this.mAutoMaskData.mShape[1]; i++)
             {
-                // Define the coordinates of the ROI
-                int x = this.mAutoMaskData.mBox[4 * i];  // Top-left x coordinate
-                int y = this.mAutoMaskData.mBox[4 * i + 1];// Top-left y coordinate
-                int width = this.mAutoMaskData.mBox[4 * i + 2] - this.mAutoMaskData.mBox[4 * i];  // Width of the ROI
-                int height = this.mAutoMaskData.mBox[4 * i + 3] - this.mAutoMaskData.mBox[4 * i + 1];  // Height of the ROI
 
-                // Create a Rect object for the ROI
+                int x = this.mAutoMaskData.mBox[4 * i];  
+                int y = this.mAutoMaskData.mBox[4 * i + 1];
+                int width = this.mAutoMaskData.mBox[4 * i + 2] - this.mAutoMaskData.mBox[4 * i];  
+                int height = this.mAutoMaskData.mBox[4 * i + 3] - this.mAutoMaskData.mBox[4 * i + 1];  
+
                 OpenCvSharp.Rect roiRect = new OpenCvSharp.Rect(x, y, width, height);
-                // Extract the ROI from the image
+
                 OpenCvSharp.Mat roi = new OpenCvSharp.Mat(image, roiRect);
                 int neww = 0;
                 int newh = 0;
@@ -872,23 +817,20 @@ namespace wpf522
 
                 OpenCvSharp.Mat resizedImage = new OpenCvSharp.Mat();
                 OpenCvSharp.Cv2.Resize(roi, resizedImage, new OpenCvSharp.Size(neww, newh));
-                // 创建大的Mat
+
                 OpenCvSharp.Mat largeMat = new OpenCvSharp.Mat(new OpenCvSharp.Size(224, 224), OpenCvSharp.MatType.CV_8UC3, OpenCvSharp.Scalar.Black);
 
-                // 计算小的Mat放置的位置
                 int xoffset = (largeMat.Width - resizedImage.Width) / 2;
                 int yoffset = (largeMat.Height - resizedImage.Height) / 2;
 
-                // 将小的Mat放置到大的Mat的中心位置
                 resizedImage.CopyTo(largeMat[new OpenCvSharp.Rect(xoffset, yoffset, resizedImage.Width, resizedImage.Height)]);
 
-                //将图像转换为浮点型
                 OpenCvSharp.Mat floatImage = new OpenCvSharp.Mat();
                 largeMat.ConvertTo(floatImage, OpenCvSharp.MatType.CV_32FC3);
-                // 计算均值和标准差
+
                 OpenCvSharp.Scalar mean = new OpenCvSharp.Scalar(0.48145466, 0.4578275, 0.40821073);
                 OpenCvSharp.Scalar std = new OpenCvSharp.Scalar(0.26862954, 0.26130258, 0.27577711);
-                // 归一化
+
                 OpenCvSharp.Cv2.Normalize(floatImage, floatImage, 0, 255, OpenCvSharp.NormTypes.MinMax);
                 OpenCvSharp.Cv2.Subtract(floatImage, mean, floatImage);
                 OpenCvSharp.Cv2.Divide(floatImage, std, floatImage);
@@ -924,7 +866,7 @@ namespace wpf522
             final.mBox.AddRange(this.mAutoMaskData.mBox.GetRange(maxindex * 4, 4));
             final.mIoU.AddRange(this.mAutoMaskData.mIoU.GetRange(maxindex, 1));
             final.mStalibility.AddRange(this.mAutoMaskData.mStalibility.GetRange(maxindex, 1));
-            //.GetRange(maxindex * final.mShape[2] * final.mShape[3], final.mShape[2] * final.mShape[3])
+
             final.mfinalMask.Add(this.mAutoMaskData.mfinalMask[maxindex]);
 
 
@@ -934,27 +876,22 @@ namespace wpf522
 
             return final;
         }
-        // 点击设定标尺的按钮事件
 
-        // 设置标尺两端点
+
         private void SetRuler_Click(object sender, RoutedEventArgs e)
         {
 
-            ResetRuler(); // 先重置标尺
+            ResetRuler(); 
 
             MessageBox.Show("Please select the start and end points of the ruler on the image.");
 
-            // 重置标尺起点
             _rulerStartPoint = null;
 
-            // 设置当前模式为 SettingRuler
             this.currentMode = Mode.SettingRuler;
 
-            // 注册鼠标左键点击事件，选择起点和终点
             ImgCanvas.MouseLeftButtonDown += SetRulerPoints;
         }
 
-        // 设置标尺两端点
         private void SetRulerPoints(object sender, MouseButtonEventArgs e)
         {
             if (this.currentMode != Mode.SettingRuler)
@@ -962,18 +899,14 @@ namespace wpf522
                 return;
             }
 
-            // 获取显示坐标上的点击位置
             Point clickedPointInDisplay = e.GetPosition(this.ImgCanvas);
 
-            // 将显示坐标转换为原始图像的坐标（用于计算）
             Point clickedPointInOriginal = DisplayToImageCoords(clickedPointInDisplay);
 
-            // 如果没有起点，则设置起点并绘制
             if (_rulerStartPoint == null)
             {
-                _rulerStartPoint = clickedPointInOriginal; // 存储原始坐标
+                _rulerStartPoint = clickedPointInOriginal; 
 
-                // 在Canvas上绘制起点（使用显示坐标）
                 _startPointEllipse = new Ellipse
                 {
                     Width = 5,
@@ -988,7 +921,7 @@ namespace wpf522
             }
             else
             {
-                // 设置终点并绘制线段
+
                 _endPointEllipse = new Ellipse
                 {
                     Width = 5,
@@ -999,7 +932,6 @@ namespace wpf522
                 Canvas.SetTop(_endPointEllipse, clickedPointInDisplay.Y - 2.5);
                 ImgCanvas.Children.Add(_endPointEllipse);
 
-                // 在Canvas上绘制线段（使用显示坐标）
                 _rulerLine = new Line
                 {
                     Stroke = Brushes.Green,
@@ -1011,13 +943,11 @@ namespace wpf522
                 };
                 ImgCanvas.Children.Add(_rulerLine);
 
-                // 计算原始图像中的距离
                 double pixelDistance = Math.Sqrt(
                     Math.Pow(clickedPointInOriginal.X - _rulerStartPoint.Value.X, 2) +
                     Math.Pow(clickedPointInOriginal.Y - _rulerStartPoint.Value.Y, 2)
                 );
 
-                // 提示用户输入实际长度和单位
                 string input = Microsoft.VisualBasic.Interaction.InputBox(
                       "Please enter the actual length of the ruler (e.g., 10.0):", "Set Ruler Length", "1.0");
 
@@ -1031,7 +961,6 @@ namespace wpf522
                     _unit = unit;
                     MessageBox.Show($"Ruler set successfully: 1 pixel = {_pixelToRealRatio} {unit}");
 
-                    // 在中点显示标尺的长度
                     TextBlock rulerText = new TextBlock
                     {
                         Text = $"{actualLength} {unit}",
@@ -1044,7 +973,6 @@ namespace wpf522
                     Canvas.SetTop(rulerText, (_rulerLine.Y1 + _rulerLine.Y2) / 2);
                     ImgCanvas.Children.Add(rulerText);
 
-                    // 完成后解绑鼠标事件
                     ImgCanvas.MouseLeftButtonDown -= SetRulerPoints;
                 }
                 else
@@ -1055,14 +983,10 @@ namespace wpf522
             }
         }
 
-
-
-        // 重置标尺设置
         private void ResetRuler()
         {
             _rulerStartPoint = null;
 
-            // 移除线和端点
             if (_rulerLine != null) ImgCanvas.Children.Remove(_rulerLine);
             if (_startPointEllipse != null) ImgCanvas.Children.Remove(_startPointEllipse);
             if (_endPointEllipse != null) ImgCanvas.Children.Remove(_endPointEllipse);
@@ -1077,44 +1001,36 @@ namespace wpf522
                 return;
             }
 
-            // 计算掩码下原图区域的实际面积
             double maskAreaInRealUnits = _maskPixelCount * Math.Pow(_pixelToRealRatio, 2);
 
-            // 更新 TextBlock 来显示掩码的实际面积
             string pixelAreaTextBlock = $"Mask Area: {_maskPixelCount} pixels";
-            string realAreaTextBlock = $"Real Area: {maskAreaInRealUnits:F2} {_unit}²";
+            string realAreaTextBlock = $"Real Area: {maskAreaInRealUnits:F2} {_unit}2";
 
-            // 创建并显示结果窗口
             autoResultWindow resultWindow = new autoResultWindow(pixelAreaTextBlock, realAreaTextBlock);
 
-            // 订阅保存事件
             resultWindow.SaveArea += (pixelArea, realArea) =>
             {
-                // 解析传递的像素面积和实际面积为 double
+
                 if (double.TryParse(pixelArea, out double pixelAreaValue) && double.TryParse(realArea, out double realAreaValue))
                 {
                     DataCollection.Add(new DataModel
                     {
                         ID = _currentId.ToString(),
-                        Area = realAreaValue,  // 将实际面积存储为 double
-                        Pixels = pixelAreaValue,  // 将像素面积存储为 double
-                        Length = 0,  // 长度默认为 0
+                        Area = realAreaValue,  
+                        Pixels = pixelAreaValue,  
+                        Length = 0,  
                     });
 
-                    _currentId++; // 增加 ID
+                    _currentId++; 
                 }
 
             };
 
-            // 显示窗口
             resultWindow.Show();
 
-            // 处理删除事件（此处不作处理）
 
-            // 获取鼠标位置
             Point mousePosition = Mouse.GetPosition(this);
 
-            // 设置新窗口的位置
             resultWindow.Left = this.Left + mousePosition.X;
             resultWindow.Top = this.Top + mousePosition.Y;
 
@@ -1142,25 +1058,24 @@ namespace wpf522
             return perimeter;
         }
 
-        // 检查像素是否位于边缘的辅助方法
         private bool IsEdgePixel(float[] mask, int x, int y)
         {
-            // 检查相邻像素来检测边缘（处理边界情况）
+
             int width = this.mOrgwid;
             int height = this.mOrghei;
 
             bool isEdge =
-                (x > 0 && mask[y * width + (x - 1)] <= this.mSam.mask_threshold) ||  // Left
-                (x < width - 1 && mask[y * width + (x + 1)] <= this.mSam.mask_threshold) ||  // Right
-                (y > 0 && mask[(y - 1) * width + x] <= this.mSam.mask_threshold) ||  // Top
-                (y < height - 1 && mask[(y + 1) * width + x] <= this.mSam.mask_threshold);  // Bottom
+                (x > 0 && mask[y * width + (x - 1)] <= this.mSam.mask_threshold) ||  
+                (x < width - 1 && mask[y * width + (x + 1)] <= this.mSam.mask_threshold) ||  
+                (y > 0 && mask[(y - 1) * width + x] <= this.mSam.mask_threshold) ||  
+                (y < height - 1 && mask[(y + 1) * width + x] <= this.mSam.mask_threshold);  
 
             return isEdge;
         }
 
         private void Bperimeter_Click(object sender, RoutedEventArgs e)
         {
-            // 禁用分割功能
+
             this.currentMode = Mode.None;
 
             if (_pixelToRealRatio <= 0)
@@ -1169,27 +1084,21 @@ namespace wpf522
                 return;
             }
 
-            // 确保 mask 数据存在
             if (this.mMask == null)
             {
                 MessageBox.Show("Mask data not found!");
                 return;
             }
 
-            // 计算掩膜下区域的像素周长
             double maskPerimeterInPixels = CalculateMaskPerimeter(this.mMaskData);
 
-            // 根据比例转换为实际单位
             double perimeterInRealUnits = maskPerimeterInPixels * _pixelToRealRatio;
 
-            // 更新 TextBlock 来显示周长信息
             string pixelPerimeterTextBlock = $"Perimeter: {maskPerimeterInPixels} pixels";
             string realPerimeterTextBlock = $"Real Perimeter: {perimeterInRealUnits:F2} {_unit}";
 
-            // 创建并显示结果窗口
             autoResultWindow resultWindow = new autoResultWindow(pixelPerimeterTextBlock, realPerimeterTextBlock);
 
-            // 订阅保存事件
             resultWindow.SaveArea += (pixelPerimeter, realPerimeter) =>
             {
                 if (double.TryParse(pixelPerimeter, out double pixelPerimeterValue) &&
@@ -1198,72 +1107,64 @@ namespace wpf522
                     DataCollection.Add(new DataModel
                     {
                         ID = _currentId.ToString(),
-                        Area = 0,  // 面积默认为 0
-                        Pixels = 0,  // 像素面积默认为 0
-                        Length = realPerimeterValue,  // 存储实际周长
+                        Area = 0,  
+                        Pixels = 0,  
+                        Length = realPerimeterValue,  
                     });
 
-                    _currentId++; // 增加 ID
+                    _currentId++; 
                 }
             };
 
-            // 获取鼠标位置并设置弹出窗口的位置
             Point mousePosition = Mouse.GetPosition(this);
             resultWindow.Left = this.Left + mousePosition.X;
             resultWindow.Top = this.Top + mousePosition.Y;
 
-            // 显示窗口
             resultWindow.Show();
         }
 
-        // 计算最小外接圆的中心和半径
 
 
         private (Point center, double radius) CalculateEnclosingCircle(float[] mask)
         {
             List<Point> edgePoints = new List<Point>();
 
-            // 获取所有边缘点
             for (int y = 0; y < mOrghei; y++)
             {
                 for (int x = 0; x < mOrgwid; x++)
                 {
                     int index = y * mOrgwid + x;
-                    if (mask[index] > 0.5 && IsEdgePixel(mask, x, y)) // 使用阈值检查
+                    if (mask[index] > 0.5 && IsEdgePixel(mask, x, y)) 
                     {
                         edgePoints.Add(new Point(x, y));
                     }
                 }
             }
 
-            // 计算最小外接圆
             var center = new Point(mOrgwid / 2, mOrghei / 2);
             double radius = 0;
 
             if (edgePoints.Count > 0)
             {
-                // 简单计算中心，假设为边缘点的平均值（近似）
+
                 center = new Point(edgePoints.Average(p => p.X), edgePoints.Average(p => p.Y));
 
-                // 计算最远的边缘点距离，作为半径
                 radius = edgePoints.Max(p => Distance(center, p));
             }
 
             return (center, radius);
         }
 
-        // 计算最大内部距离的两个端点
         private (Point point1, Point point2) CalculateMaxInternalDistancePoints(float[] mask)
         {
             List<Point> edgePoints = new List<Point>();
 
-            // 获取所有边缘点
             for (int y = 0; y < mOrghei; y++)
             {
                 for (int x = 0; x < mOrgwid; x++)
                 {
                     int index = y * mOrgwid + x;
-                    if (mask[index] > 0.5 && IsEdgePixel(mask, x, y)) // 使用阈值检查
+                    if (mask[index] > 0.5 && IsEdgePixel(mask, x, y)) 
                     {
                         edgePoints.Add(new Point(x, y));
                     }
@@ -1274,7 +1175,6 @@ namespace wpf522
             Point maxPoint1 = new Point();
             Point maxPoint2 = new Point();
 
-            // 计算边缘点之间的最大距离
             for (int i = 0; i < edgePoints.Count; i++)
             {
                 for (int j = i + 1; j < edgePoints.Count; j++)
@@ -1291,58 +1191,51 @@ namespace wpf522
 
             return (maxPoint1, maxPoint2);
         }
-        /// <summary>
-        /// 计算直径咯------------------------------------------------
-        /// </summary>
-        /// <param name="canvas"></param>
-        /// <param name="mask"></param>
-        /// 
-        // 用于存储绘制的线条和文本
+
+
+
+
+
+
+
         private List<UIElement> _drawnElements = new List<UIElement>();
 
-        // 清除之前绘制的元素
         private void ClearDrawnElements(Canvas canvas)
         {
             foreach (var element in _drawnElements)
             {
                 canvas.Children.Remove(element);
             }
-            _drawnElements.Clear(); // 清空列表
+            _drawnElements.Clear(); 
         }
 
-        // 绘制线段到 Canvas
         private void DrawLinesOnCanvas(Canvas canvas, float[] mask)
         {
-            // 获取当前图像的缩放比例
+
             double scaleX = this.ImgCanvas.ActualWidth / this.mOrgwid;
             double scaleY = this.ImgCanvas.ActualHeight / this.mOrghei;
             double scale = Math.Min(scaleX, scaleY);
 
-            //// 计算最小外接圆
-            //var (center, radius) = CalculateEnclosingCircle(mask);
-            //Point point1Circle = new Point((center.X - radius) * scale, center.Y * scale); // 左边的直径端点
-            //Point point2Circle = new Point((center.X + radius) * scale, center.Y * scale); // 右边的直径端点
 
-            // 计算最小外接圆
+
+
+
             var (center, radius) = CalculateEnclosingCircle(mask);
-            Point point1Circle = new Point((center.X - radius) * scale, center.Y * scale); // 左边的直径端点
-            Point point2Circle = new Point((center.X + radius) * scale, center.Y * scale); // 右边的直径端点
-            // 计算最大内部距离的两个端点
+            Point point1Circle = new Point((center.X - radius) * scale, center.Y * scale); 
+            Point point2Circle = new Point((center.X + radius) * scale, center.Y * scale); 
+
             var (maxPoint1, maxPoint2) = CalculateMaxInternalDistancePoints(mask);
             Point scaledMaxPoint1 = new Point(maxPoint1.X * scale, maxPoint1.Y * scale);
             Point scaledMaxPoint2 = new Point(maxPoint2.X * scale, maxPoint2.Y * scale);
 
-            // 计算真实长度
-            double diameterInRealUnits = 2 * radius * _pixelToRealRatio; // 最小外接圆直径的真实长度
-            double maxInternalDistanceInRealUnits = Distance(maxPoint1, maxPoint2) * _pixelToRealRatio; // 最大内部距离的真实长度
+            double diameterInRealUnits = 2 * radius * _pixelToRealRatio; 
+            double maxInternalDistanceInRealUnits = Distance(maxPoint1, maxPoint2) * _pixelToRealRatio; 
 
-            // 在 Canvas 上绘制最小外接圆直径 (红色)
             DrawLineOnCanvas(canvas, point1Circle, point2Circle, Brushes.Red, diameterInRealUnits);
 
-            // 在 Canvas 上绘制最大内部距离 (蓝色)
             DrawLineOnCanvas(canvas, scaledMaxPoint1, scaledMaxPoint2, Brushes.Blue, maxInternalDistanceInRealUnits);
         }
-        // 在 Canvas 上绘制一条线段
+
         private void DrawLineOnCanvas(Canvas canvas, Point point1, Point point2, Brush brush, double lengthInRealUnits)
         {
             Line line = new Line
@@ -1356,60 +1249,50 @@ namespace wpf522
                 SnapsToDevicePixels = true
             };
             canvas.Children.Add(line);
-            _drawnElements.Add(line); // 将线条添加到列表中
+            _drawnElements.Add(line); 
 
-            // 创建可复制的 TextBox
             TextBox lengthText = new TextBox
             {
                 Text = $"{lengthInRealUnits:F2} {_unit}",
                 Foreground = brush,
                 FontSize = 12,
-                Background = Brushes.Transparent, // 透明背景
-                BorderThickness = new Thickness(0), // 无边框
-                IsReadOnly = true, // 只读
-                AcceptsReturn = false, // 单行文本
-                Padding = new Thickness(2, 0, 2, 0) // 避免文本贴边
+                Background = Brushes.Transparent, 
+                BorderThickness = new Thickness(0), 
+                IsReadOnly = true, 
+                AcceptsReturn = false, 
+                Padding = new Thickness(2, 0, 2, 0) 
             };
 
-            // 设置位置
             Canvas.SetLeft(lengthText, point1.X);
             Canvas.SetTop(lengthText, point1.Y);
 
-            // 右键菜单
             ContextMenu contextMenu = new ContextMenu();
             MenuItem copyMenuItem = new MenuItem { Header = "Copy" };
             copyMenuItem.Click += (s, e) => Clipboard.SetText(lengthText.Text);
             contextMenu.Items.Add(copyMenuItem);
             lengthText.ContextMenu = contextMenu;
 
-            // 阻止右键点击触发其他功能
             lengthText.PreviewMouseRightButtonDown += (s, e) => e.Handled = true;
 
-            // 添加到 Canvas
             canvas.Children.Add(lengthText);
             _drawnElements.Add(lengthText);
         }
 
-
-
-
-        // 计算两个点之间的距离
         private double Distance(Point p1, Point p2)
         {
             return Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));
         }
 
-        // 检查像素是否位于边缘
         private bool IsEdgePixel2(float[] mask, int x, int y)
         {
             int width = this.mOrgwid;
             int height = this.mOrghei;
 
             bool isEdge =
-                (x > 0 && mask[y * width + (x - 1)] <= 0.5) ||  // 左
-                (x < width - 1 && mask[y * width + (x + 1)] <= 0.5) ||  // 右
-                (y > 0 && mask[(y - 1) * width + x] <= 0.5) ||  // 上
-                (y < height - 1 && mask[(y + 1) * width + x] <= 0.5);  // 下
+                (x > 0 && mask[y * width + (x - 1)] <= 0.5) ||  
+                (x < width - 1 && mask[y * width + (x + 1)] <= 0.5) ||  
+                (y > 0 && mask[(y - 1) * width + x] <= 0.5) ||  
+                (y < height - 1 && mask[(y + 1) * width + x] <= 0.5);  
 
             return isEdge;
         }
@@ -1418,8 +1301,8 @@ namespace wpf522
             public string Name { get; set; }
             public Color Color { get; set; }
             public bool IsChecked { get; set; } = true;
-            public float[] MaskData { get; set; } // 掩膜数据
-            public string JsonPath { get; set; } // 保存的JSON路径
+            public float[] MaskData { get; set; } 
+            public string JsonPath { get; set; } 
     }
 
 
@@ -1429,17 +1312,16 @@ namespace wpf522
 
             public LabelViewModel()
             {
-                // 示例数据
+
                 Labels.Add(new LabelItem { Name = "Label 1", Color = ((SolidColorBrush)Brushes.Red).Color });
                 Labels.Add(new LabelItem { Name = "Label 2", Color = ((SolidColorBrush)Brushes.Blue).Color });
 
             }
         }
 
-        //private void BLabel_Click(object sender, RoutedEventArgs e)
-        //{
-        //    LabelVM.Labels.Add(new LabelItem { Name = "New Label", Color = Brushes.Green });
-        //}
+
+
+
         private void BLabel_Click(object sender, RoutedEventArgs e)
         {
             if (mMaskData == null)
@@ -1455,17 +1337,16 @@ namespace wpf522
                 return;
             }
 
-            // 用户选择保存路径
             Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog
             {
                 Title = "Save Label File",
-                Filter = "JSON 文件 (*.json)|*.json",
+                Filter = "JSON �ļ� (*.json)|*.json",
                 FileName = $"{selectedLabel.Name}.json"
             };
 
             if (saveFileDialog.ShowDialog() == true)
             {
-                // 生成JSON
+
                 string jsonPath = saveFileDialog.FileName;
                 var jsonData = new
                 {
@@ -1476,26 +1357,24 @@ namespace wpf522
 
                 try
                 {
-                    // 保存JSON文件
+
                     File.WriteAllText(jsonPath, JsonConvert.SerializeObject(jsonData, Formatting.Indented));
                     selectedLabel.JsonPath = jsonPath;
 
-                    // 生成轮廓
                     DisplayContour(selectedLabel.MaskData, selectedLabel.Color);
 
-                    // 进入标记模式，禁用Startseg_Click
                     isLabelingMode = true;
                     StartsegButton.IsEnabled = false;
-                    MessageBox.Show($"标签 '{selectedLabel.Name}' 已生成并保存至：\n{jsonPath}\n请进行标记，然后点击“启动分割”继续。");
+                    MessageBox.Show($"��ǩ '{selectedLabel.Name}' �����ɲ���������\n{jsonPath}\n����б�ǣ�Ȼ�����������ָ������");
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"保存文件失败：{ex.Message}");
+                    MessageBox.Show($"�����ļ�ʧ�ܣ�{ex.Message}");
                 }
             }
             else
             {
-                MessageBox.Show("保存操作已取消。");
+                MessageBox.Show("���������ȡ����");
             }
         }
 
@@ -1519,7 +1398,7 @@ namespace wpf522
                             pixelData[4 * ind] = label.Color.B;
                             pixelData[4 * ind + 1] = label.Color.G;
                             pixelData[4 * ind + 2] = label.Color.R;
-                            pixelData[4 * ind + 3] = 150; // 透明度
+                            pixelData[4 * ind + 3] = 150; 
                         }
                     }
                 }
@@ -1554,7 +1433,7 @@ namespace wpf522
         {
             if (SelectedLabel != null)
             {
-                var currentColor = SelectedLabel.Color; // 使用 Color 代替 SolidColorBrush
+                var currentColor = SelectedLabel.Color; 
                 var colorDialog = new System.Windows.Forms.ColorDialog
                 {
                     Color = System.Drawing.Color.FromArgb(currentColor.A, currentColor.R, currentColor.G, currentColor.B)
@@ -1571,13 +1450,13 @@ namespace wpf522
         {
             if (Labels.Count == 0)
             {
-                MessageBox.Show("没有标签可保存！");
+                MessageBox.Show("û�б�ǩ�ɱ��棡");
                 return;
             }
 
             var saveDialog = new Microsoft.Win32.SaveFileDialog
             {
-                Filter = "PNG 图像 (*.png)|*.png|JPEG 图像 (*.jpg)|*.jpg"
+                Filter = "PNG ͼ�� (*.png)|*.png|JPEG ͼ�� (*.jpg)|*.jpg"
             };
 
             if (saveDialog.ShowDialog() == true)
@@ -1593,7 +1472,7 @@ namespace wpf522
                     encoder.Save(fs);
                 }
 
-                MessageBox.Show($"图像已保存至: {saveDialog.FileName}");
+                MessageBox.Show($"ͼ���ѱ�����: {saveDialog.FileName}");
             }
         }
         private void AddLabel_Click(object sender, RoutedEventArgs e)
@@ -1606,25 +1485,25 @@ namespace wpf522
                 Name = $"Label {Labels.Count + 1}",
                 Color = randomColor,
                 IsChecked = true,
-                MaskData = new float[mOrgwid * mOrghei] // 空掩膜
+                MaskData = new float[mOrgwid * mOrghei] 
             };
 
             Labels.Add(newLabel);
-            MessageBox.Show("新标签已添加！");
+            MessageBox.Show("�±�ǩ�����ӣ�");
         }
         private void RenameLabel_Click(object sender, RoutedEventArgs e)
         {
             if (SelectedLabel == null)
             {
-                MessageBox.Show("请选择要重命名的标签！");
+                MessageBox.Show("��ѡ��Ҫ�������ı�ǩ��");
                 return;
             }
 
-            string newName = Microsoft.VisualBasic.Interaction.InputBox("输入新的标签名称：", "重命名标签", SelectedLabel.Name);
+            string newName = Microsoft.VisualBasic.Interaction.InputBox("�����µı�ǩ���ƣ�", "��������ǩ", SelectedLabel.Name);
             if (!string.IsNullOrWhiteSpace(newName))
             {
                 SelectedLabel.Name = newName;
-                MessageBox.Show("标签已重命名！");
+                MessageBox.Show("��ǩ����������");
             }
         }
         private void DisplayContour(float[] maskData, Color color)
@@ -1639,7 +1518,7 @@ namespace wpf522
                     int index = y * mOrgwid + x;
                     if (maskData[index] > mSam.mask_threshold)
                     {
-                        // 检查边缘
+
                         if (maskData[index - 1] <= mSam.mask_threshold || maskData[index + 1] <= mSam.mask_threshold ||
                             maskData[index - mOrgwid] <= mSam.mask_threshold || maskData[index + mOrgwid] <= mSam.mask_threshold)
                         {
@@ -1656,11 +1535,9 @@ namespace wpf522
             mMask.Source = contourBitmap;
         }
 
-
-        // 按钮点击事件，显示直径和最大内部距离
         private void Bdiameter_Click(object sender, RoutedEventArgs e)
         {
-            // 禁用分割功能
+
             this.currentMode = Mode.None;
             if (_pixelToRealRatio <= 0)
             {
@@ -1668,21 +1545,18 @@ namespace wpf522
                 return;
             }
 
-            // 确保掩膜数据存在
             if (this.mMaskData == null)
             {
                 MessageBox.Show("Mask data not found!");
                 return;
             }
-          
-            // 获取 Canvas 控件
+
             var canvas = this.ImgCanvas;
-            // 清除之前的绘制元素
+
             ClearDrawnElements(canvas);
-            // 在 Canvas 上绘制最小外接圆和最大内部距离线段
+
             DrawLinesOnCanvas(canvas, this.mMaskData);
 
-            // 计算直径和最大内部距离
             var (center, radius) = CalculateEnclosingCircle(this.mMaskData);
             double maskDiameterInPixels = radius * 2;
             double diameterInRealUnits = maskDiameterInPixels * _pixelToRealRatio;
@@ -1690,77 +1564,54 @@ namespace wpf522
             var (maxPoint1, maxPoint2) = CalculateMaxInternalDistancePoints(this.mMaskData);
             double maxInternalDistanceInPixels = Distance(maxPoint1, maxPoint2);
             double maxInternalDistanceInRealUnits = maxInternalDistanceInPixels * _pixelToRealRatio;
-          
-            // 显示结果窗口
-            /*
-            string pixelDiameterTextBlock = $"Enclosing Circle Diameter: {maskDiameterInPixels:F2} pixels";
-            string realDiameterTextBlock = $"Real Enclosing Circle Diameter: {diameterInRealUnits:F2} {_unit}";
 
-            string pixelMaxDistanceTextBlock = $"Max Internal Distance: {maxInternalDistanceInPixels:F2} pixels";
-            string realMaxDistanceTextBlock = $"Real Max Internal Distance: {maxInternalDistanceInRealUnits:F2} {_unit}";
-
-            // 创建窗口
-            autoResultWindow resultWindow = new autoResultWindow(
-                pixelDiameterTextBlock + "\n" + realDiameterTextBlock,
-                pixelMaxDistanceTextBlock + "\n" + realMaxDistanceTextBlock
-            );
-            resultWindow.Show();
-
-            */
+            
 
         }
 
     }
 }
 
-        //private void mText_Click(object sender, RoutedEventArgs e)
-        //{
-        //    this.mCurOp = Operation.Text;
-        //    this.ShowStatus("Image And Text Matching......");
-        //    string txt = this.mTextinput.Text;
-        //    Thread thread = new Thread(() =>
-        //    {
-        //        MaskData matches = this.MatchTextAndImage(txt);
-        //        this.ShowMask(matches);
-        //    });
-        //    thread.Start();
-        //}
-
-        //private void Expanded(object sender, RoutedEventArgs e)
-        //{
-        //    if (this.mPointexp == null || this.mBoxexp == null || this.mEverythingExp == null || this.mTextExp == null)
-        //        return;
-
-        //    Expander exp = sender as Expander;
-        //    if (exp.IsExpanded == true)
-        //    {
-        //        this.mPointexp.IsExpanded = this.mPointexp == exp;
-        //        this.mBoxexp.IsExpanded = this.mBoxexp == exp;
-        //        this.mEverythingExp.IsExpanded = this.mEverythingExp == exp;
-        //        this.mTextExp.IsExpanded = this.mTextExp == exp;
-        //    }
-
-        //    //}
-        //}
-        //private void Expanded(object sender, RoutedEventArgs e)
-        //{
-        //    if ( this.mEverythingExp == null || this.mTextExp == null)
-        //        return;
-
-        //    Expander exp = sender as Expander;
-        //    if (exp.IsExpanded == true)
-        //    {
-
-        //        this.mEverythingExp.IsExpanded = this.mEverythingExp == exp;
-        //        this.mTextExp.IsExpanded = this.mTextExp == exp;
-        //    }
 
 
-        //}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         enum Operation
         {
-            None,   // 无效状态
+            None,   
             Point,
             Box,
             Everything,

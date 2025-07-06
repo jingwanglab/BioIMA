@@ -1,4 +1,4 @@
-﻿using wpf522.Adorners;
+using wpf522.Adorners;
 using wpf522.CustomDialogs;
 using wpf522.Models;
 using wpf522.Models.DrawShapes;
@@ -33,28 +33,27 @@ using wpf522.Models.Enums;
 
 namespace wpf522
 {
-    /// <summary>
-    ///  MainWindow.xaml交互逻辑
-    /// </summary>
-    public partial class MainWindow : MetroWindow//主模型labeling
+
+
+
+    public partial class MainWindow : MetroWindow
     {
-        /// <summary>
-        /// 主模型
-        /// </summary>
-        /// 
-        private CanvasOption canvasOption; // 声明 CanvasOption
+
+
+
+
+        private CanvasOption canvasOption; 
         public MainModel MainModel { get; set; }
-        /// <summary>
-        /// 单例
-        /// </summary>
+
+
+
         public static MainWindow Instance { get; set; } = null;
 
         public ObservableCollection<MeasureData> MeasureDataCollection { get; set; }
 
-        //public PointViewModel PointViewModel { get; }
 
-        private int currentImageIndex = 0; // 用于跟踪当前显示的图片索引
-        private List<string> imagePaths; // 保存图片的路径列表
+        private int currentImageIndex = 0; 
+        private List<string> imagePaths; 
         private string selectedModel;
         private string selectedModelPath;
 
@@ -68,25 +67,20 @@ namespace wpf522
             this.Closing += MainWindow_Closing;
             ProjectOptionWindow projectOptionWindow = new ProjectOptionWindow();
             projectOptionWindow.ShowDialog();
-            // 保存一次
+
             ProjectManager.SaveProjectManager();
             Instance = this;
             MainModel = ProjectManager.Instance.MainModel;
             if (MainModel == null) this.Close();
             this.Loaded += MainWindow_Loaded;
 
-            //PointViewModel = new PointViewModel();
-            //DataContext = PointViewModel;
+
         }
 
 
 
 
-        /// <summary>
-        /// 关闭事件
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+
         private void MainWindow_Closing(object? sender, CancelEventArgs e)
         {
             if (MainModel != null)
@@ -101,26 +95,25 @@ namespace wpf522
             this.DataContext = MainModel;
         }
 
-        /// <summary>
-        /// 显示等待窗口
-        /// </summary>
+
+
 
         public void ShowWait()
         {
             BkMask.Visibility = Visibility.Collapsed;
         }
-        /// <summary>
-        /// 关闭等待窗口
-        /// </summary>
+
+
+
         public void CloseWait()
         {
             BkMask.Visibility = Visibility.Collapsed;
         }
-        /// <summary>
-        /// 图片树结构的选项改变事件
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+
+
+
+
+
         private void TreeImageListSelectChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             var imageInfo = e.NewValue as ImageContentInfoModel;
@@ -164,36 +157,30 @@ namespace wpf522
 
         private void OpenProjectOptionsWindow(object sender, RoutedEventArgs e)
         {
-            // 创建 ProjectOptionWindow 实例
+
             ProjectOptionWindow optionsWindow = new ProjectOptionWindow();
 
-            // 隐藏当前窗口
             this.Hide();
 
-            // 显示 ProjectOptionWindow
             optionsWindow.Show();
 
-            // 在 ProjectOptionWindow 关闭时显示 MainWindow
             optionsWindow.Closed += (s, args) => this.Show();
         }
 
 
         private void RunModelOnCurrentImage(string modelPath)
         {
-            // 获取CanvasOption控件实例
+
             var CanvasOption = FindVisualChild<CanvasOption>(this);
 
-            // 检查CanvasOption控件及其DataContext
             if (CanvasOption == null || CanvasOption.ImageModel == null || string.IsNullOrEmpty(CanvasOption.ImageModel.ImagePath))
             {
                 MessageBox.Show("Please open an image first.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
-            // 获取图像路径
             string imagePath = CanvasOption.ImageModel.ImagePath;
 
-            // 使用MobileSAM模型进行分割
             Task.Run(() =>
             {
                 using (var session = new InferenceSession(modelPath))
@@ -210,7 +197,7 @@ namespace wpf522
                         using (var results = session.Run(inputs))
                         {
                             var output = results.First().AsTensor<float>();
-                            // 处理输出张量并更新UI
+
                             this.Dispatcher.Invoke(() => DisplaySegmentationResult(output, image.Width, image.Height));
                         }
                     }
@@ -265,23 +252,22 @@ namespace wpf522
                     int index = (y * width + x) * 4;
                     float value = output[0, 0, y, x];
 
-                    // Example of thresholding to create a binary mask
                     byte intensity = (byte)(value > 0.5f ? 255 : 0);
-                    pixels[index] = intensity; // Blue
-                    pixels[index + 1] = intensity; // Green
-                    pixels[index + 2] = intensity; // Red
-                    pixels[index + 3] = 255; // Alpha
+                    pixels[index] = intensity; 
+                    pixels[index + 1] = intensity; 
+                    pixels[index + 2] = intensity; 
+                    pixels[index + 3] = 255; 
                 }
             }
 
             bitmap.WritePixels(new Int32Rect(0, 0, width, height), pixels, width * 4, 0);
-            //MainModel.CurrentImageModel.ImageSource = bitmap;
+
         }
 
         
         private BitmapSource ConvertTo8BitGrayscale(BitmapSource original)
         {
-            // Create a new format converted bitmap
+
             FormatConvertedBitmap grayBitmap = new FormatConvertedBitmap();
             grayBitmap.BeginInit();
             grayBitmap.Source = original;
@@ -293,7 +279,7 @@ namespace wpf522
 
     private string GetPredefinedModelPath(string modelName)
         {
-            // Return the path based on the model name
+
             switch (modelName)
             {
                 case "MobileSAM":
@@ -316,10 +302,10 @@ namespace wpf522
             throw new NotImplementedException();
         }
 
-        // 设置标尺点击事件
-        //private void SetRuler_Click(object sender, RoutedEventArgs e)
-        //{
-        //    canvasOption.SetRuler_Click(sender, e); // 调用 CanvasOption 中的 SetRuler_Click 方法
-        //}
+
+
+
+
     }
 }
+

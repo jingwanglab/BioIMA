@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 
@@ -15,8 +15,8 @@ public class GridLinesAdorner : Adorner
         var adornedElement = AdornedElement as FrameworkElement;
         if (adornedElement == null) return;
 
-        // 获取单元格的边界
         var cellBounds = new Rect(0, 0, adornedElement.ActualWidth, adornedElement.ActualHeight);
         drawingContext.DrawRectangle(null, new Pen(Brushes.LightGray, 1), cellBounds);
     }
 }
+

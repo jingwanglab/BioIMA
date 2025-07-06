@@ -1,4 +1,4 @@
-﻿using Microsoft.ML.OnnxRuntime;
+using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using OpenCvSharp;
 using System;
@@ -13,9 +13,9 @@ using System.Windows.Media.Imaging;
 
 namespace wpf522
 {
-    /// <summary>
-    /// 自动分割Everything
-    /// </summary>
+
+
+
     class SAMAutoMask
     {
         public int points_per_side = 4;
@@ -77,13 +77,13 @@ namespace wpf522
                 crop_n_points_downscale_factor);
             }
         }
-        /// <summary>
-        /// 创建网格
-        /// </summary>
-        /// <param name="n_per_side"></param>
-        /// <param name="n_layers"></param>
-        /// <param name="scale_per_layer"></param>
-        /// <returns></returns>
+
+
+
+
+
+
+
         List<double[,]> build_all_layer_point_grids(int n_per_side, int n_layers, int scale_per_layer)
         {
             List<double[,]> points_by_layer = new List<double[,]>();
@@ -118,10 +118,8 @@ namespace wpf522
         }
 
 
-        /// <summary>
-        ///  Generates a list of crop boxes of different sizes. Each layer
-        ///  has(2**i)**2 boxes for the ith layer.
-        /// </summary>
+
+
         void generateCropBoxes(int orgWid, int orgHei, int n_layers, float overlap_ratio,
             ref List<List<int>> crop_boxes, ref List<int> layer_idxs)
         {
@@ -129,7 +127,7 @@ namespace wpf522
             int im_w = orgWid;
 
             int short_side = Math.Min(im_h, im_w);
-            //Original image
+
             crop_boxes.Add(new List<int> { 0, 0, im_w, im_h });
             layer_idxs.Add(0);
 
@@ -233,12 +231,12 @@ namespace wpf522
         {
             MaskData masks = new MaskData();
             int x0 = crop_box[0], y0 = crop_box[1], x1 = crop_box[2], y1 = crop_box[3];
-            // 定义ROI的矩形区域
-            OpenCvSharp.Rect roiRect = new OpenCvSharp.Rect(x0, y0, x1, y1); // (x, y, width, height)
-            // 提取ROI区域
+
+            OpenCvSharp.Rect roiRect = new OpenCvSharp.Rect(x0, y0, x1, y1); 
+
             Mat roiImage = new Mat(this.mImage, roiRect);
-            //图像编码
-            //this.mImgEmbedding = this.mSAM.Encode(roiImage, roiImage.Cols, roiImage.Rows);
+
+
 
             double[,] gps = this.point_grids[crop_layer_idx];
             PointPromotion[] points_for_image = new PointPromotion[gps.GetLength(0)];
@@ -285,3 +283,4 @@ namespace wpf522
 
     }
 }
+

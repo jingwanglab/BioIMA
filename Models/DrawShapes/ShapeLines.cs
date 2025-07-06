@@ -1,4 +1,4 @@
-﻿using wpf522.Models.Enums;
+using wpf522.Models.Enums;
 using System.Windows;
 using System.Windows.Media;
 
@@ -20,3 +20,4 @@ namespace wpf522.Models.DrawShapes
         }
     }
 }
+

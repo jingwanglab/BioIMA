@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -40,3 +40,4 @@ namespace wpf522
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
+

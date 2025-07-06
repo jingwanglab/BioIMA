@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,17 +15,17 @@ namespace wpf522.Adorners
 {
     public class RectangleAdorner : Adorner
     {
-        //边
+
         Thumb _leftThumb, _topThumb, _rightThumb, _bottomThumb;
-        //角
+
         Thumb _lefTopThumb, _rightTopThumb, _rightBottomThumb, _leftbottomThumb;
-        //布局容器
+
         Grid _grid;
         UIElement _adornedElement;
         public RectangleAdorner(UIElement adornedElement) : base(adornedElement)
         {
             _adornedElement = adornedElement;
-            //初始化thumb
+
             _leftThumb = new Thumb();
             _leftThumb.HorizontalAlignment = HorizontalAlignment.Left;
             _leftThumb.VerticalAlignment = VerticalAlignment.Center;
@@ -93,12 +93,12 @@ namespace wpf522.Adorners
         }
         protected override Size ArrangeOverride(Size finalSize)
         {
-            //直接给grid布局，grid内部的thumb会自动布局。
+
             var rect = new Rect(new Point(-_leftThumb.Width / 2, -_leftThumb.Height / 2), new Size(finalSize.Width + _leftThumb.Width, finalSize.Height + _leftThumb.Height));
             _grid.Arrange(rect);
             return finalSize;
         }
-        //拖动逻辑
+
         private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
             var c = _adornedElement as FrameworkElement;
@@ -142,7 +142,7 @@ namespace wpf522.Adorners
                 }
             }
         }
-        //thumb的样式
+
         FrameworkElementFactory GetFactory(Brush back)
         {
             var fef = new FrameworkElementFactory(typeof(Ellipse));
@@ -154,3 +154,4 @@ namespace wpf522.Adorners
     }
 
 }
+

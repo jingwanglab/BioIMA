@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -6,7 +6,7 @@ using System.Windows.Shapes;
 
 namespace wpf522
 {
-    // 点标注控件
+
     public class PointAnnotation : UserControl
     {
         private const int DefaultSize = 10;
@@ -55,32 +55,29 @@ namespace wpf522
             set { _textBlock.Text = value; }
         }
 
-        //protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
-        //{
-        //    base.OnMouseLeftButtonDown(e);
-        //    CaptureMouse();
-        //}
 
-        //protected override void OnMouseLeftButtonUp(System.Windows.Input.MouseButtonEventArgs e)
-        //{
-        //    base.OnMouseLeftButtonUp(e);
-        //    ReleaseMouseCapture();
-        //}
 
-        //protected override void OnMouseMove(System.Windows.Input.MouseEventArgs e)
-        //{
-        //    base.OnMouseMove(e);
-        //    if (IsMouseCaptured)
-        //    {
-        //        var newPosition = e.GetPosition(Parent as UIElement);
-        //        Canvas.SetLeft(this, newPosition.X - _shape.Width / 2);
-        //        Canvas.SetTop(this, newPosition.Y - _shape.Height / 2);
-        //    }
-        //}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
-    /// <summary>
-    /// 四边形标注
-    /// </summary>
+
+
+
     public class RectAnnotation : UserControl
     {
         private readonly Shape _shape;
@@ -108,7 +105,7 @@ namespace wpf522
 
             var grid = new Grid();
             grid.Children.Add(_shape);
-            //grid.Children.Add(_textBlock);
+
 
             Content = grid;
         }
@@ -147,24 +144,24 @@ namespace wpf522
         protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
         {
             base.OnMouseLeftButtonDown(e);
-            //CaptureMouse();           
+
         }
 
         protected override void OnMouseLeftButtonUp(System.Windows.Input.MouseButtonEventArgs e)
         {
             base.OnMouseLeftButtonUp(e);
-            //ReleaseMouseCapture();
+
         }
 
-        //protected override void OnMouseMove(System.Windows.Input.MouseEventArgs e)
-        //{
-        //    base.OnMouseMove(e);
-        //    if (IsMouseCaptured)
-        //    {
-        //        var newPosition = e.GetPosition(Parent as UIElement);
-        //        Canvas.SetLeft(this, newPosition.X - _shape.Width / 2);
-        //        Canvas.SetTop(this, newPosition.Y - _shape.Height / 2);
-        //    }
-        //}
+
+
+
+
+
+
+
+
+
     }
 }
+

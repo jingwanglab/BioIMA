@@ -1,4 +1,4 @@
-ï»¿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -10,9 +10,9 @@ namespace wpf522.Models.Enums
 
     public enum EnumMeasureTools
     {
-        [Description("æµ‹é‡è·ç¦»")]
+        [Description("²âÁ¿¾àÀë")]
         distance = 0,
-        [Description("æµ‹é‡è§’åº¦")]
+        [Description("²âÁ¿½Ç¶È")]
         angle,
     }
 }

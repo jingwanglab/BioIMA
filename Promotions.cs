@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +20,9 @@ namespace wpf522
         public abstract float[] GetLable();
         public PromotionType mType;
     }
-    /// <summary>
-    /// 提示点
-    /// </summary>
+
+
+
     public class PointPromotion : Promotion
     {
 
@@ -56,9 +56,9 @@ namespace wpf522
         ADD,
         REMOVE
     }
-    /// <summary>
-    /// 提示框
-    /// </summary>
+
+
+
     class BoxPromotion : Promotion
     {
         public BoxPromotion()
@@ -78,13 +78,13 @@ namespace wpf522
         {
             return new float[2] { 2, 3 };
         }
-        public PointPromotion mLeftUp { get; set; }//左上角点
-        public PointPromotion mRightBottom { get; set; }//左上角点
+        public PointPromotion mLeftUp { get; set; }
+        public PointPromotion mRightBottom { get; set; }
 
     }
-    /// <summary>
-    /// 提示蒙版
-    /// </summary>
+
+
+
     class MaskPromotion
     {
         public MaskPromotion(int wid, int hei)
@@ -94,15 +94,16 @@ namespace wpf522
             this.mMask = new float[this.mWidth, this.mHeight];
         }
 
-        float[,] mMask { get; set; }//蒙版
-        public int mWidth { get; set; }//长度
-        public int mHeight { get; set; }//高度
+        float[,] mMask { get; set; }
+        public int mWidth { get; set; }
+        public int mHeight { get; set; }
     }
-    /// <summary>
-    /// 提示文本
-    /// </summary>
+
+
+
     class TextPromotion
     {
         public string mText { get; set; }
     }
 }
+

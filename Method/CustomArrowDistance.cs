@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Windows.Ink;
 using System.Windows.Input;
@@ -15,7 +15,7 @@ namespace wpf522.Method
 
         protected override void DrawCore(DrawingContext drawingContext, DrawingAttributes drawingAttributes)
         {
-            // 箭头 -->
+
             double x1 = StylusPoints[0].X;
             double y1 = StylusPoints[0].Y;
             double x2 = StylusPoints[1].X;
@@ -23,14 +23,14 @@ namespace wpf522.Method
             double dist = Math.Sqrt(((x1 - x2) * (x1 - x2)) + ((y1 - y2) * (y1 - y2)));
             double arrowLength = Math.Min(20, dist);
             double arrowAngle = Math.PI / 12;
-            // 起始点线段夹角
+
             double angleOri = Math.Atan((y2 - y1) / (x2 - x1));
-            // 箭头扩张角度
+
             double angleDown = angleOri - arrowAngle;
             double angleUp = angleOri + arrowAngle;
-            // 方向标识
+
             int directionFlag = (x2 > x1) ? -1 : 1;
-            // 箭头两侧点坐标
+
             double x3 = x2 + (directionFlag * arrowLength * Math.Cos(angleDown));
             double y3 = y2 + (directionFlag * arrowLength * Math.Sin(angleDown));
             double x4 = x2 + (directionFlag * arrowLength * Math.Cos(angleUp));
@@ -47,7 +47,7 @@ namespace wpf522.Method
             };
             figure.Segments.Add(new LineSegment((Point)StylusPoints[1], true));
             geometry.Figures.Add(figure);
-            // 实线 缩放时大小变化
+
             drawingContext.DrawGeometry(null, InkCanvasMethod.SetPenSolid(), geometry);
 
             geometry = new PathGeometry();
@@ -59,7 +59,7 @@ namespace wpf522.Method
             };
             figure.Segments.Add(new LineSegment(pt3, true));
             geometry.Figures.Add(figure);
-            // 实线 缩放时大小不变
+
             drawingContext.DrawGeometry(null, InkCanvasMethod.SetPenSolid(), geometry);
 
             geometry = new PathGeometry();
@@ -71,16 +71,14 @@ namespace wpf522.Method
             };
             figure.Segments.Add(new LineSegment(pt4, true));
             geometry.Figures.Add(figure);
-            // 实线 缩放时大小不变
+
             drawingContext.DrawGeometry(null, InkCanvasMethod.SetPenSolid(), geometry);
 
-            // Point 缩放时大小不变
             for (int i = 0; i < StylusPoints.Count; i++)
             {
                 drawingContext.DrawEllipse(null, InkCanvasMethod.SetPenPoint(), (Point)StylusPoints[i], 1, 1);
             }
 
-            // 两条垂线
             double len = 50;
             for (int i = 0; i < 2; i++)
             {
@@ -130,9 +128,10 @@ namespace wpf522.Method
                 };
                 figure.Segments.Add(new LineSegment(pt4, true));
                 geometry.Figures.Add(figure);
-                // 实线 缩放时大小不变
+
                 drawingContext.DrawGeometry(null, InkCanvasMethod.SetPenSolid(), geometry);
             }
         }
     }
 }
+

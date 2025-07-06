@@ -1,4 +1,4 @@
-﻿using wpf522.Models;
+using wpf522.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -31,3 +31,4 @@ namespace wpf522.Converts
         }
     }
 }
+

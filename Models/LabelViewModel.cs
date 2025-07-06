@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
@@ -18,11 +18,10 @@ namespace YourNamespace.ViewModels
         }
         public LabelItem SelectedLabel { get; set; }
 
-        //public LabelItem SelectedLabel
-        //{
-        //    get => _selectedLabel;
-        //    set { _selectedLabel = value; OnPropertyChanged(); }
-        //}
+
+
+
+
 
         public LabelViewModel()
         {
@@ -41,3 +40,4 @@ namespace YourNamespace.ViewModels
         }
     }
 }
+

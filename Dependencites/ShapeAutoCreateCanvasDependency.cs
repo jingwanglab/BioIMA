@@ -1,4 +1,4 @@
-﻿using wpf522.Adorners;
+using wpf522.Adorners;
 using wpf522.Converts;
 using wpf522.Dependencites.DataStructs;
 using wpf522.Expends;
@@ -24,65 +24,65 @@ namespace wpf522.Dependencites
 
         public class CanvasSelectedInfo
         {
-            /// <summary>
-            /// 矩形框
-            /// </summary>
+
+
+
             public Rectangle Rectangle { get; set; } = new Rectangle();
-            /// <summary>
-            /// 是否开始绘制
-            /// </summary>
+
+
+
             public bool IsStartSelectedDraw { get; set; } = false;
-            /// <summary>
-            /// 所有被选中的形状
-            /// </summary>
+
+
+
             public List<Shape> SelectedShapes { get; set; } = new List<Shape>();
-            /// <summary>
-            /// 所有被选中的形状区域
-            /// </summary>
+
+
+
             public List<ShapeArea> SelectedShapeAreas { get; set; } = new List<ShapeArea>();
-            /// <summary>
-            /// 选择的区域
-            /// </summary>
+
+
+
             public Rect SelectedRect { get; set; } = new Rect();
         }
-        /// <summary>
-        /// 列表数据源变更事件
-        /// </summary>
+
+
+
         public static readonly DependencyProperty ShapeCollectionSourceProperty = DependencyProperty.RegisterAttached("ShapeCollectionSource", typeof(ObservableCollection<ShapeArea>), typeof(ShapeAutoCreateCanvasDependency), new PropertyMetadata(new PropertyChangedCallback(ShapeCollectionPropertyChanged)));
-        /// <summary>
-        /// 多边形点移动事件
-        /// </summary>
+
+
+
         public static readonly DependencyProperty PolygonShapePointMoveEventProperty = DependencyProperty.RegisterAttached("PolygonShapePointMoveEvent", 
             typeof(Action<PolygonPointChange>), typeof(ShapeAutoCreateCanvasDependency));
-        /// <summary>
-        /// 笔触
-        /// </summary>
+
+
+
         public static readonly DependencyProperty ShapeStrokeProperty = DependencyProperty.RegisterAttached("ShapeStroke", typeof(System.Windows.Media.Brush), typeof(ShapeAutoCreateCanvasDependency));
-        /// <summary>
-        /// 笔触 粗细
-        /// </summary>
+
+
+
         public static readonly DependencyProperty ShapeStrokeThicknessProperty = DependencyProperty.RegisterAttached("ShapeStrokeThickness", typeof(int), typeof(ShapeAutoCreateCanvasDependency));
-        /// <summary>
-        /// 是否进入选择模式
-        /// </summary>
+
+
+
         public static readonly DependencyProperty IsSelectedModeProperty = DependencyProperty.RegisterAttached("IsSelectedMode", typeof(bool), typeof(ShapeAutoCreateCanvasDependency), new PropertyMetadata(false)); 
-        /// <summary>
-        /// 已经注册的集合
-        /// </summary>
+
+
+
         private static Dictionary<ObservableCollection<ShapeArea>, Canvas> ShapeCollectionRegisters = new Dictionary<ObservableCollection<ShapeArea>, Canvas>();
-        /// <summary>
-        /// 选择专用矩形框
-        /// </summary>
+
+
+
         private static Dictionary<Canvas, CanvasSelectedInfo> CanvasSelectedRect = new Dictionary<Canvas, CanvasSelectedInfo>();
-        /// <summary>
-        /// 已经注册的集合 对应的canvas中所包含的 形状
-        /// </summary>
+
+
+
         private static Dictionary<ObservableCollection<ShapeArea>, Dictionary<ShapeArea, Shape>> ShapeCollectionShapesRegisters = new Dictionary<ObservableCollection<ShapeArea>, Dictionary<ShapeArea, System.Windows.Shapes.Shape>>();
-        /// <summary>
-        /// 形状数据源变更
-        /// </summary>
-        /// <param name="d"></param>
-        /// <param name="e"></param>
+
+
+
+
+
         private static void ShapeCollectionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Canvas canvas = (Canvas)d;
@@ -147,11 +147,11 @@ namespace wpf522.Dependencites
             if(canvas.Children.Contains(info.Rectangle))
                 canvas.Children.Remove(info.Rectangle);
         }
-        /// <summary>
-        /// 鼠标移动
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+
+
+
+
+
         private static void Canvas_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
             var canvas = sender as Canvas;
@@ -170,19 +170,19 @@ namespace wpf522.Dependencites
                 info.Rectangle.Height = Math.Abs(old.Y - point.Y);
             }
         }
-        /// <summary>
-        /// 鼠标按下
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+
+
+
+
+
         private static void Canvas_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             var canvas = sender as Canvas;
             var info = CanvasSelectedRect[canvas];
             var point = e.GetPosition(canvas);
-            //强制捕获鼠标
+
             canvas.CaptureMouse();
-            //如果是选中模式下
+
             if (GetIsSelectedMode(canvas))
             {
                 canvas.Children.Add(info.Rectangle);
@@ -195,10 +195,10 @@ namespace wpf522.Dependencites
                 info.Rectangle.Height = 0;
             }
         }
-        /// <summary>
-        /// 设置被选中的形状
-        /// </summary>
-        /// <param name="canvas"></param>
+
+
+
+
         private static void SetSelectedShapes(Canvas canvas)
         {
             var info = CanvasSelectedRect[canvas];
@@ -235,10 +235,10 @@ namespace wpf522.Dependencites
                 }
             }
         }
-        /// <summary>
-        /// 取消选中效果
-        /// </summary>
-        /// <param name="canvas"></param>
+
+
+
+
         private static void CancleSelectedShapes(Canvas canvas)
         {
             var info = CanvasSelectedRect[canvas];
@@ -250,10 +250,9 @@ namespace wpf522.Dependencites
             info.SelectedShapeAreas.Clear();
         }
 
-        /// <summary>
-        /// 删除所有被选中的shape
-        /// </summary>
-        /// <param name="canvas"></param>
+
+
+
         private static void RemoveSelectedShapes(Canvas canvas)
         {
             var info = CanvasSelectedRect[canvas];
@@ -281,24 +280,24 @@ namespace wpf522.Dependencites
             }
             info.SelectedShapes.Clear();
         }
-        /// <summary>
-        /// 集合变更事件
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <exception cref="NotImplementedException"></exception>
+
+
+
+
+
+
         private static void Collection_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (sender != null && ShapeCollectionRegisters.ContainsKey(sender as ObservableCollection<ShapeArea>))
             {
                 var canvas = ShapeCollectionRegisters[sender as ObservableCollection<ShapeArea>];
                 var collection = ShapeCollectionShapesRegisters[sender as ObservableCollection<ShapeArea>];
-                //如果是新增
+
                 if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add && e.NewItems is not null)
                 {
                     AddShapeAreaToCanvas(canvas, e.NewItems, collection);
                 }
-                //如果是删除
+
                 else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove && e.OldItems is not null)
                 {
                     foreach (ShapeArea item in e.OldItems)
@@ -310,18 +309,18 @@ namespace wpf522.Dependencites
                 }
             }
         }
-        /// <summary>
-        /// 添加areas 到布局中
-        /// </summary>
-        /// <param name="canvas"></param>
-        /// <param name="areas"></param>
-        /// <param name="collection"></param>
+
+
+
+
+
+
         public static void AddShapeAreaToCanvas(Canvas canvas, IEnumerable areas, Dictionary<ShapeArea, Shape> collection)
         {
             foreach(ShapeArea item in areas)
             {
                 Shape shape = null;
-                //如果是矩形框
+
                 if (item is ShapeBox)
                 {
                     System.Windows.Shapes.Rectangle rectangle = new Rectangle();
@@ -331,7 +330,7 @@ namespace wpf522.Dependencites
                     (item as ShapeBox).ShapeBindingRectangle(rectangle);
                     collection.Add(item, rectangle);
                     shape = rectangle;
-                    //添加控制装饰器  允许控件可以拖动
+
                     var layout = AdornerLayer.GetAdornerLayer(rectangle);
                     layout.Add(new RectangleAdorner(rectangle));
                 }
@@ -340,31 +339,31 @@ namespace wpf522.Dependencites
                     System.Windows.Shapes.Polygon polygon = new Polygon();
                     polygon.Stroke = GetShapeStroke(canvas);
                     polygon.StrokeThickness = GetShapeStrokeThickness(canvas);
-                    //polygon.Fill = GetShapeStroke(canvas);
+
                     canvas.Children.Add(polygon);
                     polygon.Points.AppendRange((item as ShapePolygon).Points);
-                    //polygon.SizeChanged += Polygon_SizeChanged;
-                    //记录变更事件
+
+
                     SetPolygonShapePointMoveEvent(polygon, Polygon_SizeChanged);
                     shape = polygon;
-                    //绑定偏移
+
                     (item as ShapePolygon).BindingEx("StartX", polygon, Canvas.LeftProperty);
                     (item as ShapePolygon).BindingEx("StartY", polygon, Canvas.TopProperty);
                     collection.Add(item, polygon);
-                    //添加控制装饰器  允许控件可以拖动
+
                     var polygonLayer = AdornerLayer.GetAdornerLayer(polygon);
                     polygonLayer.Add(new PolygonAdorner(polygon));
 
                 }
-                //绑定选中效果
+
                 item.BindingEx("IsSelected", shape, ShapeSelectDependency.ShapeSelectEffectProperty);
-                //绑定类型和颜色
+
                 item.BindingEx("TypeName", shape, Shape.StrokeProperty, converter: new TypeNameConvertToColorBrushConverter()); 
                 shape.Fill = new SolidColorBrush(new Color() { A = 0, });
                 ShapeSelectDependency.SetDependencyObject(shape, item);
-                //鼠标抬起
+
                 shape.MouseUp += (o, e) => {
-                    //设置选中
+
                     ShapeSelectDependency.SetShapeSelectEffect(o as Shape, true);
                     e.Handled = true;
                     (o as Shape).ReleaseMouseCapture();
@@ -375,19 +374,19 @@ namespace wpf522.Dependencites
                 };
             }
         }
-        /// <summary>
-        /// 当多边形变更大小的时候
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <exception cref="NotImplementedException"></exception>
+
+
+
+
+
+
         private static void Polygon_SizeChanged(PolygonPointChange e)
         {
             var sender = e.Polygon;
             if (sender is null || sender is not Polygon) return;
             var polygon = ShapeSelectDependency.GetDependencyObject(sender) as ShapePolygon;
-            //polygon.Points.Clear();
-            //polygon.Points.AppendRange((sender as Polygon).Points);
+
+
             polygon.Points[e.Index] = e.NewValue;
         }
 
@@ -443,3 +442,4 @@ namespace wpf522.Dependencites
         }
     }
 }
+

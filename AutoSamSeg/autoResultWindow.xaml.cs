@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,32 +15,32 @@ using wpf522.Models;
 
 namespace wpf522.AutoSamSeg
 {
-    /// <summary>
-    /// autoResultWindow.xaml 的交互逻辑
-    /// 
-    /// </summary>
+
+
+
+
 
     public partial class autoResultWindow : Window
     {
         public string PixelAreaTextBlock { get; set; }
         public string RealAreaTextBlock { get; set; }
 
-        public event Action<string, string> SaveArea; // 保存事件
+        public event Action<string, string> SaveArea; 
 
         public autoResultWindow(string pixelAreaTextBlock, string realAreaTextBlock)
         {
             InitializeComponent();
             PixelAreaTextBlock = pixelAreaTextBlock;
             RealAreaTextBlock = realAreaTextBlock;
-            DataContext = this;  // 设置数据上下文以绑定窗口中的 TextBlock
+            DataContext = this;  
         }
 
 
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            SaveArea?.Invoke(PixelAreaTextBlock, RealAreaTextBlock); // 触发保存事件
-            this.Close(); // 关闭窗口
+            SaveArea?.Invoke(PixelAreaTextBlock, RealAreaTextBlock); 
+            this.Close(); 
         }
 
 
@@ -51,3 +51,4 @@ namespace wpf522.AutoSamSeg
         }
     }
 }
+

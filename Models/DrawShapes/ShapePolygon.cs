@@ -1,4 +1,4 @@
-﻿using wpf522.Models.Enums;
+using wpf522.Models.Enums;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,17 +12,17 @@ namespace wpf522.Models.DrawShapes
 {
     public class ShapePolygon : ShapeArea
     {
-        /// <summary>
-        /// 多点
-        /// </summary>
+
+
+
         public ObservableCollection<Point> Points { get; set; } = new ObservableCollection<Point>();
-        /// <summary>
-        /// 起始点的X
-        /// </summary>
+
+
+
         public double StartX { get; set; }
-        /// <summary>
-        /// 起始点的Y
-        /// </summary>
+
+
+
         public double StartY { get; set; }
 
         public ShapePolygon()
@@ -30,10 +30,9 @@ namespace wpf522.Models.DrawShapes
             ShapeType = ShapeType.Polygon;
         }
 
-        /// <summary>
-        /// 转换到box
-        /// </summary>
-        /// <returns></returns>
+
+
+
         public ShapeBox ConvertToBox()
         {
             
@@ -46,3 +45,4 @@ namespace wpf522.Models.DrawShapes
         }
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,12 +13,11 @@ namespace wpf522.Expends
     public static class WindowStructExpend
     {
 
-        /// <summary>
-        /// 碰撞检测，是否包含
-        /// </summary>
-        /// <param name="rect"></param>
-        /// <param name="other"></param>
-        /// <returns></returns>
+
+
+
+
+
         public static bool IsContains(this Rect rect, Rect other)
         {
             return Math.Min(rect.X, other.X) == rect.X &&
@@ -26,31 +25,31 @@ namespace wpf522.Expends
                 Math.Max(rect.X + rect.Width, other.X + other.Width) == rect.X + rect.Width &&
                 Math.Max(rect.Y + rect.Height, other.Y + other.Height) == rect.Y + rect.Height;
         }
-        /// <summary>
-        /// 矩阵是否包含多边形
-        /// </summary>
-        /// <param name="rect"></param>
-        /// <param name="polygon"></param>
-        /// <returns></returns>
+
+
+
+
+
+
         public static bool IsContains(this Rect rect, Polygon polygon)
         {
             return rect.IsContains(polygon.GetPolygonWithRect());
         }
-        /// <summary>
-        /// 是否选中了矩形
-        /// </summary>
-        /// <param name="rect"></param>
-        /// <param name="rectangle"></param>
-        /// <returns></returns>
+
+
+
+
+
+
         public static bool IsContains(this Rect rect, Rectangle rectangle)
         {
             return rect.IsContains(new Rect(Canvas.GetLeft(rectangle), Canvas.GetTop(rectangle), rectangle.Width, rectangle.Height));
         }
-        /// <summary>
-        /// 求出外接矩阵
-        /// </summary>
-        /// <param name="polygon"></param>
-        /// <returns></returns>
+
+
+
+
+
         public static Rect GetPolygonWithRect(this Polygon polygon)
         {
             var point = new Point(Canvas.GetLeft(polygon), Canvas.GetTop(polygon));
@@ -73,10 +72,10 @@ namespace wpf522.Expends
              
             return new Rect(point.X, point.Y, maxx - point.X, maxy - point.Y);
         }
-        /// <summary>
-        /// 是否包含了直线段
-        /// </summary>
-        /// <returns></returns>
+
+
+
+
         public static bool IsContains(this Rect rect, Line line)
         {
             var p1 = new Point(line.X1, line.Y1);
@@ -85,7 +84,7 @@ namespace wpf522.Expends
         }
         private static bool LineIntersectsRect(Point p1, Point p2, Rect rect)
         {
-            // Check if the line intersects any edge of the rectangle
+
             var rectPoints = new[]
             {
         new Point(rect.Left, rect.Top), new Point(rect.Right, rect.Top),
@@ -115,14 +114,12 @@ namespace wpf522.Expends
 
 
 
-        /// <summary>
-        /// 转换到arbg
-        /// </summary>
-        /// <param name="color"></param>
-        /// <returns></returns>
+
+
         public static string ColorToHexARGB(this Color color)
         {
             return color.ToString();
         }
     }
 }
+

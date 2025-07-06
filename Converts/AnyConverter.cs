@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -10,13 +10,13 @@ namespace wpf522.Converts
 {
     public class AnyConverter : IValueConverter
     {
-        /// <summary>
-        /// 任一项转换器
-        /// </summary>
+
+
+
         public List<AnyItem> AnyConverts { get; set; } = new List<AnyItem>();
-        /// <summary>
-        /// 否则
-        /// </summary>
+
+
+
         public AnyOtherItem AnyOther { get; set; } = null;
 
 
@@ -60,3 +60,4 @@ namespace wpf522.Converts
         }
     }
 }
+

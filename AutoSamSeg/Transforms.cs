@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -8,39 +8,36 @@ using System.Windows;
 using OpenCvSharp;
 
 namespace wpf522
-{/// <summary>
- ///  Resizes images to the longest side 'target_length', as well as provides
- ///  methods for resizing coordinates and boxes. Provides methods for
- ///  transforming both numpy array and batched torch tensors.
- /// </summary>
+{
+
+
+
+
     class Transforms
     {
         public Transforms(int target_length)
         {
             this.mTargetLength = target_length;
         }
-        /// <summary>
-        /// 变换图像，将原始图像变换大小
-        /// </summary>
-        /// <returns></returns>
+
+
+
+
         public float[] ApplyImage(Mat image, int orgw, int orgh)
         {
             int neww = 0;
             int newh = 0;
             this.GetPreprocessShape(orgw, orgh, this.mTargetLength, ref neww, ref newh);
 
-            // 缩放图像
             Mat resizedImage = new Mat();
             Cv2.Resize(image, resizedImage, new OpenCvSharp.Size(neww, newh));
-            //将图像转换为浮点型
+
             Mat floatImage = new Mat();
             resizedImage.ConvertTo(floatImage, MatType.CV_32FC3);
 
-            // 计算均值和标准差
             Scalar mean, stddev;
             Cv2.MeanStdDev(floatImage, out mean, out stddev);
 
-            // 标准化图像
             Mat normalizedImage = new Mat();
             Cv2.Subtract(floatImage, mean, normalizedImage);
             Cv2.Divide(normalizedImage, stddev, normalizedImage);
@@ -98,8 +95,9 @@ namespace wpf522
             newh = (int)(newht + 0.5);
         }
 
-        int mTargetLength;//目标图像大小（宽=高）
+        int mTargetLength;
 
 
     }
 }
+

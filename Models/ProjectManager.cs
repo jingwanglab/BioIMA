@@ -1,4 +1,4 @@
-﻿using wpf522.CustomCommand;
+using wpf522.CustomCommand;
 using wpf522.Expends;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
@@ -15,9 +15,9 @@ using System.Windows.Input;
 
 namespace wpf522.Models
 {
-    /// <summary>
-    /// 项目管理
-    /// </summary>
+
+
+
     public class ProjectManager : INotifyPropertyChanged
     {
 
@@ -39,97 +39,95 @@ namespace wpf522.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        /// <summary>
-        /// 项目管理单例
-        /// </summary>
+
+
         [JsonIgnore]
         public static ProjectManager Instance = null;
-        /// <summary>
-        /// 配置文件路径
-        /// </summary>
+
+
+
         public static string ProjectManagerConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "project.json");
-        /// <summary>
-        /// 项目配置文件默认名称
-        /// </summary>
+
+
+
         public static string ProjectConfigDefaultFileExName = ".ai";
-        /// <summary>
-        /// 项目历史
-        /// </summary>
+
+
+
         public ObservableCollection<ProjectHistoryItem> ProjectHistory { get; set; } = new ObservableCollection<ProjectHistoryItem>();
 
-        /// <summary>
-        /// 项目历史
-        /// </summary>
+
+
         [JsonIgnore]
         public ObservableCollection<ProjectHistoryItem> ProjectHistoryView { get; set; } = new ObservableCollection<ProjectHistoryItem>();
-        /// <summary>
-        /// 查询命令
-        /// </summary>
+
+
+
         [JsonIgnore]
         public ICommand SearchProjectCommand { get; set; }
-        /// <summary>
-        /// 打开项目命令
-        /// </summary>
+
+
+
         [JsonIgnore]
         public ICommand OpenProjectCommand { get; set; }
-        /// <summary>
-        /// 创建项目命令
-        /// </summary>
+
+
+
         [JsonIgnore]
         public ICommand CreateProjectCommand { get; set; }
-        /// <summary>
-        /// 上一步命令
-        /// </summary>
+
+
+
         [JsonIgnore]
         public ICommand PreviousStepCommand { get; set; }
-        /// <summary>
-        /// 确定创建项目
-        /// </summary>
+
+
+
         [JsonIgnore]
         public ICommand SureCreateProjectCommand { get; set; }
-        /// <summary>
-        /// 打开目录命令
-        /// </summary>
+
+
+
         [JsonIgnore]
         public ICommand OpenDirCommand { get; set; }
-        /// <summary>
-        /// 关闭窗口
-        /// </summary>
+
+
+
         [JsonIgnore]
         public ICommand CloseWindowCommand { get; set; }
-        /// <summary>
-        /// 打开外部项目文件命令
-        /// </summary>
+
+
+
         [JsonIgnore]
         public ICommand OpenOtherProjectFileCommand { get; set; }
-        /// <summary>
-        /// 单独打开一个文件夹 (当没有 项目文件的时候使用)
-        /// </summary>
+
+
+
         [JsonIgnore]
         public ICommand OpenOtherProjectFolderCommand { get; set; }
-        /// <summary>
-        /// 选中的项
-        /// </summary>
+
+
+
         [JsonIgnore]
         public ProjectHistoryItem SelectedItem { get; set; }
-        /// <summary>
-        /// 正在创建的对象
-        /// </summary>
+
+
+
         [JsonIgnore]
         public ProjectHistoryItem CreateProjectItem { get; set; } = new ProjectHistoryItem();
-        /// <summary>
-        /// 主模型
-        /// </summary>
+
+
+
         [JsonIgnore]
         public MainModel MainModel { get; set; }
-        /// <summary>
-        /// 页面序号
-        /// </summary>
+
+
+
         [JsonIgnore]
         public int PageIndex { get; set; } = 0;
-        /// <summary>
-        /// 当前输入的名称
-        /// </summary>
+
+
+
         [JsonIgnore]
         public string InputName { get; set; }
 
@@ -160,7 +158,7 @@ namespace wpf522.Models
 
                 }
             });
-            // 打开项目
+
             OpenProjectCommand = new SampleCommand(o => true, async o => {
                 try
                 {
@@ -170,7 +168,7 @@ namespace wpf522.Models
                     }
                     if (!File.Exists(SelectedItem.ProjectPath))
                     {
-                        var res = await ProjectOptionWindow.Instance.ShowMessageAsync("错误", "该路径下项目已经不存在，确认后将自动删除这条记录..");
+                        var res = await ProjectOptionWindow.Instance.ShowMessageAsync("����", "��·������Ŀ�Ѿ������ڣ�ȷ�Ϻ��Զ�ɾ��������¼..");
                         ProjectHistory.Remove(SelectedItem);
                         if (ProjectHistoryView.Contains(SelectedItem))
                             ProjectHistoryView.Remove(SelectedItem);
@@ -181,11 +179,10 @@ namespace wpf522.Models
                 }
                 catch (Exception ex)
                 {
-                    await ProjectOptionWindow.Instance.ShowMessageAsync("打开异常!", ex.ToString());
+                    await ProjectOptionWindow.Instance.ShowMessageAsync("���쳣!", ex.ToString());
                 }
             });
 
-            // 创建新项目
             CreateProjectCommand = new SampleCommand(o => true, async o => {
                 try
                 {
@@ -193,27 +190,25 @@ namespace wpf522.Models
                 }
                 catch (Exception ex)
                 {
-                    await ProjectOptionWindow.Instance.ShowMessageAsync("错误!", ex.ToString());
+                    await ProjectOptionWindow.Instance.ShowMessageAsync("����!", ex.ToString());
                 }
             });
 
-            // 上一步
             PreviousStepCommand = new SampleCommand(o => true, o => {
                 PageIndex = 0;
             });
 
-            // 确认创建项目
             SureCreateProjectCommand = new SampleCommand(o => CreateProjectItem.ProjectName != null, async o => {
                 try
                 {
                     if (!Directory.Exists(CreateProjectItem.ProjectDir))
                     {
-                        await ProjectOptionWindow.Instance.ShowMessageAsync("错误!", "项目目录不存在");
+                        await ProjectOptionWindow.Instance.ShowMessageAsync("����!", "��ĿĿ¼������");
                         return;
                     }
                     if (!Directory.Exists(CreateProjectItem.SaveTargetDataDir))
                     {
-                        await ProjectOptionWindow.Instance.ShowMessageAsync("错误!", "保存目录不存在");
+                        await ProjectOptionWindow.Instance.ShowMessageAsync("����!", "����Ŀ¼������");
                         return;
                     }
                     CreateProjectItem.ProjectPath = System.IO.Path.Combine(CreateProjectItem.ProjectDir, CreateProjectItem.ProjectName + ProjectConfigDefaultFileExName);
@@ -222,11 +217,10 @@ namespace wpf522.Models
                 }
                 catch (Exception ex)
                 {
-                    await ProjectOptionWindow.Instance.ShowMessageAsync("错误!", ex.Message);
+                    await ProjectOptionWindow.Instance.ShowMessageAsync("����!", ex.Message);
                 }
             });
 
-            // 打开目录命令
             OpenDirCommand = new SampleCommand(o => true, async o => {
                 try
                 {
@@ -243,11 +237,10 @@ namespace wpf522.Models
                 }
                 catch (Exception ex)
                 {
-                    await ProjectOptionWindow.Instance.ShowMessageAsync("错误!", ex.ToString());
+                    await ProjectOptionWindow.Instance.ShowMessageAsync("����!", ex.ToString());
                 }
             });
 
-            // 关闭窗口
             CloseWindowCommand = new SampleCommand(o => true, o => {
                 try
                 {
@@ -255,16 +248,15 @@ namespace wpf522.Models
                 }
                 catch (Exception)
                 {
-                    // Handle exception
+
                 }
             });
 
-            // 打开其他项目文件命令
             OpenOtherProjectFileCommand = new SampleCommand(o => true, async o => {
                 try
                 {
                     OpenFileDialog open = new OpenFileDialog();
-                    open.Filter = "项目文件|*.ai";
+                    open.Filter = "��Ŀ�ļ�|*.ai";
                     if(open.ShowDialog() == true)
                     {
                         MainModel = new MainModel(open.FileName);
@@ -282,11 +274,10 @@ namespace wpf522.Models
                 }
                 catch (Exception ex)
                 {
-                    await ProjectOptionWindow.Instance.ShowMessageAsync("错误!", ex.ToString());
+                    await ProjectOptionWindow.Instance.ShowMessageAsync("����!", ex.ToString());
                 }
             });
 
-            // 打开其他项目文件夹
             OpenOtherProjectFolderCommand = new SampleCommand(o => true, async o => {
                 try
                 {
@@ -308,15 +299,15 @@ namespace wpf522.Models
                 }
                 catch (Exception ex)
                 {
-                    await ProjectOptionWindow.Instance.ShowMessageAsync("错误!", ex.ToString());
+                    await ProjectOptionWindow.Instance.ShowMessageAsync("����!", ex.ToString());
                 }
             });
 
             SearchProjectCommand.Execute(null);
         }
-        /// <summary>
-        /// 加载单例
-        /// </summary>
+
+
+
         public static void LoadProjectManager()
         {
             try
@@ -336,9 +327,9 @@ namespace wpf522.Models
                 Instance = new ProjectManager();
             }
         }
-        /// <summary>
-        /// 保存到本地配置
-        /// </summary>
+
+
+
         public static async Task SaveProjectManager()
         {
             try
@@ -348,8 +339,9 @@ namespace wpf522.Models
             }
             catch (Exception ex)
             {
-                await ProjectOptionWindow.Instance.ShowMessageAsync("错误!", ex.ToString());
+                await ProjectOptionWindow.Instance.ShowMessageAsync("����!", ex.ToString());
             }
         }
     }
 }
+

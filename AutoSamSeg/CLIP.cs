@@ -1,4 +1,4 @@
-﻿                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           using Microsoft.ML.OnnxRuntime;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using System;
 using System.Collections.Generic;
@@ -11,9 +11,9 @@ using System.Windows;
 
 namespace wpf522
 {
-    /// <summary>
-    /// Image And Text Encoder
-    /// </summary>
+
+
+
     class CLIP
     {
 
@@ -38,9 +38,8 @@ namespace wpf522
             return theSingleton;
         }
 
-        /// <summary>
-        /// 加载CLIP模型
-        /// </summary>
+
+
         void LoadONNXModel()
         {
             try
@@ -78,9 +77,6 @@ namespace wpf522
 
 
 
-        /// <summary>
-        /// CLIP对文本进行编码
-        /// </summary>
         public List<float> TxtEncoder(string txt)
         {
             List<Int64> token = SimpleTokenizer.Instance().tolikenlize(txt);
@@ -96,9 +92,8 @@ namespace wpf522
             return result.ToList();
         }
 
-        /// <summary>
-        /// CLIP对图像进行编码
-        /// </summary>
+
+
         public List<float> ImgEncoder(float[] img)
         {
             var tensor = new DenseTensor<float>(img, new[] { 1, 3, 224, 224 });
@@ -114,3 +109,4 @@ namespace wpf522
         }
     }
 }
+

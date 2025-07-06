@@ -1,4 +1,4 @@
-﻿using SkiaSharp;
+using SkiaSharp;
 using Svg.Skia;
 using System;
 using System.Windows.Media;
@@ -13,7 +13,7 @@ public static class SvgHelper
             using var svg = new SKSvg();
             svg.Load(path);
 
-            var bitmap = new SKBitmap(100, 100);  // 设置输出大小
+            var bitmap = new SKBitmap(100, 100);  
             using var canvas = new SKCanvas(bitmap);
             canvas.DrawPicture(svg.Picture);
 
@@ -21,14 +21,13 @@ public static class SvgHelper
         }
         catch (Exception ex)
         {
-            // 可选：处理异常情况，避免程序崩溃
-            System.Windows.MessageBox.Show($"加载SVG失败: {ex.Message}");
+
+            System.Windows.MessageBox.Show($"����SVGʧ��: {ex.Message}");
             return null;
         }
     }
 }
 
-// 扩展方法：将 SKBitmap 转换为 ImageSource
 public static class BitmapExtensions
 {
     public static ImageSource ToImageSource(this SKBitmap bitmap)
@@ -42,3 +41,4 @@ public static class BitmapExtensions
         return image;
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using wpf522.Expends;
+using wpf522.Expends;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,32 +16,32 @@ namespace wpf522.Dependencites
     {
 
         public static readonly DependencyProperty IsAutoZoomProperty = DependencyProperty.RegisterAttached("IsAutoZoom", typeof(bool), typeof(ElementZoomDependecy), new PropertyMetadata(IsZoomValueChangedCallBackHandle));
-        /// <summary>
-        /// 缩放步长
-        /// </summary>
+
+
+
         public static readonly DependencyProperty ScaleTrickProperty = DependencyProperty.RegisterAttached("ScaleTrick", typeof(double), typeof(ElementZoomDependecy), new PropertyMetadata(0.2));
-        /// <summary>
-        /// 最小缩放倍数
-        /// </summary>
+
+
+
         public static readonly DependencyProperty MinScaleValueProperty = DependencyProperty.RegisterAttached("MinScaleValue", typeof(double), typeof(ElementZoomDependecy), new PropertyMetadata(0.2));
-        /// <summary>
-        /// 最大缩放倍数
-        /// </summary>
+
+
+
         public static readonly DependencyProperty MaxScaleValueProperty = DependencyProperty.RegisterAttached("MaxScaleValue", typeof(double), typeof(ElementZoomDependecy), new PropertyMetadata(5.0));
-        /// <summary>
-        /// 是否需要ctrl按键
-        /// </summary>
+
+
+
         public static readonly DependencyProperty IsCtrlKeyProperty = DependencyProperty.RegisterAttached("IsCtrlKey", typeof(bool), typeof(ElementZoomDependecy), new PropertyMetadata(true));
-        /// <summary>
-        /// 元素是否按下按键
-        /// </summary>
+
+
+
         public static Dictionary<FrameworkElement, bool> ElementCtrlKey = new Dictionary<FrameworkElement, bool>();
-        /// <summary>
-        /// 缩放值改变事件
-        /// </summary>
-        /// <param name="d"></param>
-        /// <param name="e"></param>
-        /// <exception cref="NotImplementedException"></exception>
+
+
+
+
+
+
         private static void IsZoomValueChangedCallBackHandle(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var element = d as FrameworkElement;
@@ -64,11 +64,11 @@ namespace wpf522.Dependencites
             }
 
         }
-        /// <summary>
-        /// 鼠标按下
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+
+
+
+
+
         private static void Element_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
@@ -89,11 +89,10 @@ namespace wpf522.Dependencites
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+
+
+
+
         private static void Element_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             var element = sender as FrameworkElement;
@@ -120,11 +119,10 @@ namespace wpf522.Dependencites
             }
         }
 
-        /// <summary>
-        /// 滚轮事件
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+
+
+
+
         private static void Element_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
         {
             var element = sender as FrameworkElement;
@@ -136,7 +134,7 @@ namespace wpf522.Dependencites
             {
                 return;
             }
-            Console.WriteLine("滚轮的值 : {0}", e.Delta);
+            Console.WriteLine("���ֵ�ֵ : {0}", e.Delta);
 
             TransformGroup group = null;
             ScaleTransform scale = null;
@@ -246,3 +244,4 @@ namespace wpf522.Dependencites
         }
     }
 }
+

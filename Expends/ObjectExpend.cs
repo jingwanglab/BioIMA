@@ -1,4 +1,4 @@
-﻿using wpf522.CustomDialogs;
+using wpf522.CustomDialogs;
 using wpf522.Models;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
@@ -17,14 +17,13 @@ namespace wpf522.Expends
     public static class ObjectExpend
     {
 
-        /// <summary>
-        /// 深度拷贝
-        /// </summary>
-        /// <typeparam name="V"></typeparam>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="v"></param>
-        /// <param name="t"></param>
-        /// <returns></returns>
+
+
+
+
+
+
+
         public static T CopyTo<V, T>(this V v, T t)
         {
             PropertyInfo[] properties = typeof(T).GetProperties();
@@ -39,11 +38,10 @@ namespace wpf522.Expends
             }
             return t;
         }
-    
-        /// <summary>
-        /// 检测路径是否都存在，如果不存在则创建
-        /// </summary>
-        /// <param name="path"></param>
+
+
+
+
         public static string CheckPath(this string path)
         {
             var dir = "";
@@ -62,11 +60,11 @@ namespace wpf522.Expends
             }
             return path;
         }
-        /// <summary>
-        /// 打开文件夹对话框
-        /// </summary>
-        /// <param name="instance"></param>
-        /// <returns></returns>
+
+
+
+
+
         public static async Task<string> OpenFolderDialogAsync(this MetroWindow instance)
         {
             FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog(MainWindow.Instance, DirectoryItem.Dir);
@@ -87,12 +85,10 @@ namespace wpf522.Expends
         }
 
 
-        /// <summary>
-        /// 打开类型转换对话框
-        /// </summary>
-        /// <param name="instance"></param>
-        /// <param name="model"></param>
-        /// <returns></returns>
+
+
+
+
         public static async Task<bool> OpenConverterTypesDialogAsync(this MetroWindow instance, MainModel model)
         {
             GlobalTypeConverter convertDialog = new GlobalTypeConverter(MainWindow.Instance, model);
@@ -124,25 +120,25 @@ namespace wpf522.Expends
                             }
                         }
                     }
-                    await MainWindow.Instance.ShowMessageAsync("修改", String.Format("一共修改 : {0}个", modifys));
+                    await MainWindow.Instance.ShowMessageAsync("�޸�", String.Format("һ���޸� : {0}��", modifys));
                 }
                 catch (Exception ex)
                 {
-                    await MainWindow.Instance.ShowMessageAsync("异常!", ex.ToString());
+                    await MainWindow.Instance.ShowMessageAsync("�쳣!", ex.ToString());
                 }
                 return true;
             }
             return false;
         }
 
-        /// <summary>
-        /// 是否是绝对路径
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
+
+
+
+
         public static bool IsAbsolutePath(this string path)
         {
             return path.Contains(":");
         }
     }
 }
+
