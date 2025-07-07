@@ -11,7 +11,7 @@ BioIMA 通过直观友好的界面简化了图像分析流程，使研究人员�
 
 > **🎥 Youtube Demo:** [Watch here](https://youtu.be/JkhzFHLE4dc)
 
-🗂️ ** Documentation 文档中心 **  
+🗂️ **Documentation 文档中心**  
 🟪 中文操作手册 ➔ [点击下载](你的中文PDF链接)  
 🟪 English Manual ➔ [Download Here](你的英文PDF链接)
 
