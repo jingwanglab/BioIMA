@@ -8,7 +8,17 @@ BioIMA simplifies the image analysis workflow through an intuitive interface, en
 BioIMA 通过直观友好的界面简化了图像分析流程，使研究人员无需掌握编程或深度学习知识，也能轻松进行感兴趣区域（ROI）标注，长度、角度、多边形面积等形态测量，以及大规模表型评估。BioIMA 以轻量级独立应用程序的形式发布，无需复杂的环境配置或模型参数设置。
 
 <img src="https://github.com/jingwanglab/BioIMA/blob/public/assets/f1.png" >
+
 > **🎥 Youtube Demo:** [Watch here](https://www.youtube.com/watch?v=5qVJiYNX5Kk)
 
+🗂️ ** Documentation 文档中心 **  
+🟪 中文操作手册 ➔ [点击下载](你的中文PDF链接)  
+🟪 English Manual ➔ [Download Here](你的英文PDF链接)
+
+> **📦  Download and run executable 安装包下载**  
+> 🪟 [Windows 安装程序包](你的Windows链接)  
+> 🍏 [macOS 应用程序包](你的Mac链接)  
+>
+> 
 <img src="https://github.com/jingwanglab/BioIMA/blob/public/assets/knotdatamea.gif" >
 <img src="https://github.com/jingwanglab/BioIMA/blob/public/assets/scale1.gif" >
