@@ -9,7 +9,7 @@ BioIMA 通过直观友好的界面简化了图像分析流程，使研究人员�
 
 <img src="https://github.com/jingwanglab/BioIMA/blob/public/assets/f1.png" >
 
-> **🎥 Youtube Demo:** [Watch here](https://www.youtube.com/watch?v=5qVJiYNX5Kk)
+> **🎥 Youtube Demo:** [Watch here](https://youtu.be/JkhzFHLE4dc)
 
 🗂️ ** Documentation 文档中心 **  
 🟪 中文操作手册 ➔ [点击下载](你的中文PDF链接)  
