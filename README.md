@@ -22,3 +22,5 @@ BioIMA 通过直观友好的界面简化了图像分析流程，使研究人员�
 > 
 <img src="https://github.com/jingwanglab/BioIMA/blob/public/assets/knotdatamea.gif" >
 <img src="https://github.com/jingwanglab/BioIMA/blob/public/assets/scale1.gif" >
+<img src="https://github.com/jingwanglab/BioIMA/blob/main/assets/colors.gif" >
+<img src="https://github.com/jingwanglab/BioIMA/blob/main/assets/angle3leaf.gif" >
