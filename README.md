@@ -12,12 +12,12 @@ BioIMA 通过直观友好的界面简化了图像分析流程，使研究人员�
 > **🎥 Youtube Demo:** [Watch here](https://youtu.be/JkhzFHLE4dc)
 
 🗂️ **Documentation 文档中心**  
-🟪 中文操作手册 ➔ [点击下载](你的中文PDF链接)  
-🟪 English Manual ➔ [Download Here](你的英文PDF链接)
+🟪 中文操作手册 ➔ [点击下载](https://github.com/jingwanglab/BioIMA/blob/main/User%20Manual/BioIMA%20User%20Manual_zh_CN.pdf)  
+🟪 English Manual ➔ [Download Here](https://github.com/jingwanglab/BioIMA/blob/main/User%20Manual/BioIMA%20User%20Manual_en.pdf)
 
 > **📦  Download and run executable 安装包下载**  
-> 🪟 [Windows 安装程序包](你的Windows链接)  
-> 🍏 [macOS 应用程序包](你的Mac链接)  
+> 🪟 [Windows 安装程序包](Windows链接)  
+> 🍏 [macOS 应用程序包](Mac链接)  
 >
 > 
 <img src="https://github.com/jingwanglab/BioIMA/blob/public/assets/knotdatamea.gif" >
