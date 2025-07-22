@@ -16,7 +16,7 @@ BioIMA 通过直观友好的界面简化了图像分析流程，使研究人员�
 🟪 English Manual ➔ [Download Here](https://github.com/jingwanglab/BioIMA/blob/main/User%20Manual/BioIMA%20User%20Manual_en.pdf)
 
 > **📦  Download and run executable 安装包下载**  
-> 🪟 [Windows 安装程序包](https://drive.google.com/file/d/1VnWMQWlffEAKGKCCHaf604ih5J1oMFp-/view?usp=drive_link)  
+> 🪟 [Windows 安装程序包](https://drive.google.com/file/d/1FmRL21Fq473HxLQG7dZDPcAvYIn5AAYm/view?usp=drive_link)  
  
 >
 > 
