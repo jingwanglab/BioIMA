@@ -1,0 +1,45 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="BioIMA.Avalonia.Views.SetScaleWindow"
+        Width="360"
+        Height="280"
+        CanResize="False"
+        Title="Set Scale">
+
+    <StackPanel Margin="16" Spacing="12">
+
+        <TextBlock Text="Set Global Scale"
+                   FontSize="18"
+                   FontWeight="Bold"/>
+
+        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="10" ColumnSpacing="10">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Pixel Length:" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Name="PixelLengthTextBlock" VerticalAlignment="Center"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Known Length:" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Name="KnownLengthTextBox" Watermark="e.g. 5.0"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Unit:" VerticalAlignment="Center"/>
+            <ComboBox Grid.Row="2" Grid.Column="1" Name="UnitComboBox" SelectedIndex="0">
+                <ComboBoxItem Content="mm"/>
+                <ComboBoxItem Content="cm"/>
+                <ComboBoxItem Content="μm"/>
+                <ComboBoxItem Content="nm"/>
+                <ComboBoxItem Content="inch"/>
+                <ComboBoxItem Content="custom"/>
+            </ComboBox>
+        </Grid>
+
+        <TextBlock Name="HintTextBlock"
+                   Foreground="Gray"
+                   Text="Scale will be applied globally to this image."/>
+
+        <Separator/>
+
+        <WrapPanel HorizontalAlignment="Right">
+            <Button Name="OkButton" Content="OK" Margin="4"/>
+            <Button Name="CancelButton" Content="Cancel" Margin="4"/>
+        </WrapPanel>
+
+    </StackPanel>
+</Window>

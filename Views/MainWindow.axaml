@@ -1,0 +1,617 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:BioIMA.Avalonia.ViewModels"
+        xmlns:models="using:BioIMA.Avalonia.Models"
+        xmlns:conv="using:BioIMA.Avalonia.Converters"
+        x:Class="BioIMA.Avalonia.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Width="1600" Height="950"
+        MinWidth="1200" MinHeight="750"
+        Title="BioIMA">
+
+    <Window.Resources>
+        <conv:ShapeTypeEqualsConverter x:Key="ShapeTypeEqualsConverter"/>
+    </Window.Resources>
+    
+    <DockPanel>
+
+        <!-- Top menu -->
+        <Border DockPanel.Dock="Top" Background="#2C7DA0" Padding="8">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button Content="Save"     Command="{Binding SaveCommand}"     />
+                <Button Content="Option"   Command="{Binding OptionCommand}"   />
+                <Button Content="Settings" Command="{Binding SettingsCommand}" />
+                <Button Content="Tools"    Command="{Binding ToolsCommand}"    />
+                <Button Content="Image"    Command="{Binding ImageCommand}"    />
+                <Button Content="Measure" Command="{Binding MeasureCommand}"   />
+            </StackPanel>
+        </Border>
+
+        <!-- Bottom status bar -->
+        <Border DockPanel.Dock="Bottom" Background="#EAEAEA" Padding="6">
+            <TextBlock Text="{Binding StatusText}" />
+        </Border>
+
+        <!-- Main area -->
+        <Grid ColumnDefinitions="70,220,*,300">
+
+            <!-- ── 1. Left toolbar ─────────────────────────────────────── -->
+            <Border Grid.Column="0" Background="#FFFFFF" Padding="6">
+    <StackPanel Spacing="10">
+
+        <Button Command="{Binding OpenImageCommand}" Height="40" Width="40">
+            <Image Source="avares://BioIMA.Avalonia/Images/openfile.png"
+                   Width="22" Height="22" Stretch="Uniform"/>
+        </Button>
+
+        <Button Command="{Binding OpenFolderCommand}" Height="40" Width="40">
+            <Image Source="avares://BioIMA.Avalonia/Images/openfile.png"
+                   Width="22" Height="22" Stretch="Uniform"/>
+        </Button>
+
+        <Button Command="{Binding UndoCommand}" Height="40" Width="40">
+            <Image Source="avares://BioIMA.Avalonia/Images/previous.png"
+                   Width="22" Height="22" Stretch="Uniform"/>
+        </Button>
+
+        <Button Command="{Binding RedoCommand}" Height="40" Width="40">
+            <Image Source="avares://BioIMA.Avalonia/Images/next.png"
+                   Width="22" Height="22" Stretch="Uniform"/>
+        </Button>
+
+        <Button Command="{Binding DrawPointCommand}" Height="40" Width="40">
+            <Image Source="avares://BioIMA.Avalonia/Images/edit.png"
+                   Width="22" Height="22" Stretch="Uniform"/>
+        </Button>
+
+        <Button Command="{Binding RulerCommand}" Height="40" Width="40">
+            <Image Source="avares://BioIMA.Avalonia/Images/ruler.png"
+                   Width="22" Height="22" Stretch="Uniform"/>
+        </Button>
+
+        <Button Command="{Binding RectangleCommand}" Height="40" Width="40">
+            <Image Source="avares://BioIMA.Avalonia/Images/rectangle.png"
+                   Width="22" Height="22" Stretch="Uniform"/>
+        </Button>
+
+        <Button Command="{Binding DeleteBoxCommand}" Height="40" Width="40">
+            <Image Source="avares://BioIMA.Avalonia/Images/delete.png"
+                   Width="22" Height="22" Stretch="Uniform"/>
+        </Button>
+
+        <Button Command="{Binding SegmentCommand}" Height="40" Width="40">
+            <Image Source="avares://BioIMA.Avalonia/Images/brain.png"
+                   Width="22" Height="22" Stretch="Uniform"/>
+        </Button>
+
+        <Button Command="{Binding ColorBoxCommand}" Height="40" Width="40">
+            <Image Source="avares://BioIMA.Avalonia/Images/colors.png"
+                   Width="22" Height="22" Stretch="Uniform"/>
+        </Button>
+
+        <Button Command="{Binding LineCommand}" Height="40" Width="40">
+            <Image Source="avares://BioIMA.Avalonia/Images/line.png"
+                   Width="22" Height="22" Stretch="Uniform"/>
+        </Button>
+
+        <Button Command="{Binding AngleCommand}" Height="40" Width="40">
+            <Image Source="avares://BioIMA.Avalonia/Images/angle.png"
+                   Width="22" Height="22" Stretch="Uniform"/>
+        </Button>
+
+        <Button Command="{Binding ZoomInCommand}" Height="40" Width="40">
+            <Image Source="avares://BioIMA.Avalonia/Images/zoom-out.png"
+                   Width="22" Height="22" Stretch="Uniform"/>
+        </Button>
+
+        <Button Command="{Binding ZoomOutCommand}" Height="40" Width="40">
+            <Image Source="avares://BioIMA.Avalonia/Images/zoom-in.png"
+                   Width="22" Height="22" Stretch="Uniform"/>
+        </Button>
+
+    </StackPanel>
+</Border>
+               
+
+            <!-- ── 2. File panel ───────────────────────────────────────── -->
+            <Border Grid.Column="1"
+                    Background="#F4F4F4"
+                    BorderBrush="#D0D0D0"
+                    BorderThickness="0,0,1,0"
+                    Padding="8">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Files" FontSize="20" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding CurrentFolderText}"
+                               TextWrapping="Wrap"
+                               FontSize="12"
+                               Foreground="Gray"/>
+                    <ListBox ItemsSource="{Binding ImageFiles}"
+                             SelectedItem="{Binding SelectedImageFile}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayName}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+            </Border>
+
+            <!-- ── 3. Image display ────────────────────────────────────── -->
+ 
+            <Border Grid.Column="2" Background="#202020" Margin="4">
+                <Grid ClipToBounds="True">
+
+                    <!-- 共同缩放层：图片和 overlay 一起缩放 -->
+                    <Grid Name="ZoomHost"
+                        RenderTransformOrigin="0.5,0.5">
+                        <Grid.RenderTransform>
+                            <ScaleTransform ScaleX="{Binding ViewZoom}"
+                                            ScaleY="{Binding ViewZoom}"/>
+                        </Grid.RenderTransform>
+
+                      
+                        <!-- Segmentation floating panel -->
+                        <Border IsVisible="{Binding IsSegmentationPanelVisible}"
+                                Background="#E61F2937"
+                                BorderBrush="#667085"
+                                BorderThickness="1"
+                                CornerRadius="12"
+                                Padding="14"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Margin="16"
+                                ZIndex="100">
+                            <StackPanel Spacing="10">
+
+                                <TextBlock Text="Segmentation"
+                                        Foreground="White"
+                                        FontSize="16"
+                                        FontWeight="Bold"/>
+
+                                <!-- 选模型 -->
+                                <StackPanel Spacing="8"
+                                            IsVisible="{Binding ShowSegmentationModelChooser}">
+                                    <TextBlock Text="Choose model"
+                                            Foreground="#E5E7EB"
+                                            FontSize="13"/>
+
+                                    <WrapPanel>
+                                        <Button Content="SAM"
+                                                Command="{Binding ChooseSamModelCommand}"
+                                                Margin="4"
+                                                Background="#F8FAFC"
+                                                Foreground="#111827"/>
+
+                                        <Button Content="MobileSAM"
+                                                Command="{Binding ChooseMobileSamModelCommand}"
+                                                Margin="4"
+                                                Background="#F8FAFC"
+                                                Foreground="#111827"/>
+
+                                        <Button Content="Close"
+                                                Command="{Binding CloseSegmentationPanelCommand}"
+                                                Margin="4"
+                                                Background="#F8FAFC"
+                                                Foreground="#111827"/>
+                                    </WrapPanel>
+                                </StackPanel>
+
+                                <!-- 选 prompt -->
+                                <StackPanel Spacing="8"
+                                            IsVisible="{Binding ShowSegmentationPromptTools}">
+                                    <TextBlock Text="{Binding SelectedSegmentationModel}"
+                                            Foreground="#FBBF24"
+                                            FontWeight="Bold"
+                                            FontSize="14"/>
+
+                                    <WrapPanel>
+                                        <Button Content="➕ Point"
+                                                Command="{Binding SegmentAddPointPromptCommand}"
+                                                Margin="4"
+                                                Background="#F8FAFC"
+                                                Foreground="#111827"/>
+
+                                        <Button Content="➖ Point"
+                                                Command="{Binding SegmentRemovePointPromptCommand}"
+                                                Margin="4"
+                                                Background="#F8FAFC"
+                                                Foreground="#111827"/>
+
+                                        <Button Content="▭ Box Prompt"
+                                                Command="{Binding SegmentBoxPromptCommand}"
+                                                Margin="4"
+                                                Background="#F8FAFC"
+                                                Foreground="#111827"/>
+
+                                        <Button Content="Clear"
+                                                Command="{Binding ClearSegmentationPromptsCommand}"
+                                                Margin="4"
+                                                Background="#F8FAFC"
+                                                Foreground="#111827"/>
+
+                                        <Button Content="Close"
+                                                Command="{Binding CloseSegmentationPanelCommand}"
+                                                Margin="4"
+                                                Background="#F8FAFC"
+                                                Foreground="#111827"/>
+                                        <Button Content="Accept Mask"
+                                                Command="{Binding ConvertSamMaskToLabelCommand}"
+                                                Margin="4"
+                                                Background="#F8FAFC"
+                                                Foreground="#111827"/>
+                                    </WrapPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                           <!-- ecoding 进度条 -->
+                        <StackPanel Spacing="6"
+                                    IsVisible="{Binding IsSamEncoding}">
+                            <TextBlock Text="{Binding SamEncodingText}"
+                                    Foreground="White"
+                                    FontSize="12"/>
+                            <ProgressBar Minimum="0"
+                                        Maximum="100"
+                                        Value="{Binding SamEncodingProgress}"
+                                        Width="220"
+                                        Height="10"/>
+                        </StackPanel>
+                          <!-- Base image -->
+                        <Image Name="MainImage"
+                            Source="{Binding CurrentImage}"
+                            Stretch="Uniform"/>
+                        <Image Source="{Binding SegmentationMaskBitmap}"
+                                Stretch="Uniform"
+                                IsVisible="{Binding HasSegmentationMask}"/>
+                        <!-- Overlay -->
+                        <Grid Name="OverlayCanvas"
+                            Background="#01000000"
+                            ClipToBounds="True"
+                            PointerPressed="OverlayCanvas_OnPointerPressed"
+                            PointerMoved="OverlayCanvas_OnPointerMoved"
+                            PointerReleased="OverlayCanvas_OnPointerReleased">
+                        <!-- ① 已完成形状 -->
+                        <ItemsControl ItemsSource="{Binding DisplayOverlayShapes}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.Styles>
+                                <Style Selector="ContentPresenter">
+                                    <Setter Property="Canvas.Left" Value="0"/>
+                                    <Setter Property="Canvas.Top" Value="0"/>
+                                </Style>
+                            </ItemsControl.Styles>
+                            <ItemsControl.ItemTemplate>
+                               <DataTemplate x:DataType="models:OverlayShapeViewModel">
+                                    <Grid>
+                                        <!-- polygon -->
+                                        <Polygon Points="{Binding PolygonPoints}"
+                                                Stroke="{Binding Stroke}"
+                                                StrokeThickness="3"
+                                                Fill="{Binding Fill}"
+                                                IsVisible="{Binding ShapeType, Converter={StaticResource ShapeTypeEqualsConverter}, ConverterParameter=polygon}"/>
+
+                                        <!-- rectangle -->
+                                        <Polygon Points="{Binding PolygonPoints}"
+                                                Stroke="{Binding Stroke}"
+                                                StrokeThickness="3"
+                                                Fill="{Binding Fill}"
+                                                IsVisible="{Binding ShapeType, Converter={StaticResource ShapeTypeEqualsConverter}, ConverterParameter=rectangle}"/>
+                                      
+                                        <!-- line -->
+                                        <Polyline Points="{Binding PolylinePoints}"
+                                                Stroke="{Binding Stroke}"
+                                                StrokeThickness="3"
+                                                IsVisible="{Binding ShapeType, Converter={StaticResource ShapeTypeEqualsConverter}, ConverterParameter=line}"/>
+
+                                        <!-- angle 两条边 -->
+                                        <Polyline Points="{Binding AnglePolylinePoints}"
+                                                Stroke="{Binding Stroke}"
+                                                StrokeThickness="3"
+                                                IsVisible="{Binding ShapeType, Converter={StaticResource ShapeTypeEqualsConverter}, ConverterParameter=angle}"/>
+
+                                        <!-- angle 延长虚线 -->
+                                        <Polyline Points="{Binding AngleGuideLinePoints}"
+                                                Stroke="#888888"
+                                                StrokeThickness="2"
+                                                StrokeDashArray="4,4"
+                                                IsVisible="{Binding ShapeType, Converter={StaticResource ShapeTypeEqualsConverter}, ConverterParameter=angle}"/>
+
+                                        <!-- 文字层：要放在 Canvas 里 -->
+                                        <Canvas IsHitTestVisible="False">
+
+                                            <!-- line 长度文字 -->
+                                            <Border Canvas.Left="{Binding MeasureTextLeft}"
+                                                    Canvas.Top="{Binding MeasureTextTop}"
+                                                    Background="#AA000000"
+                                                    CornerRadius="4"
+                                                    Padding="4,2"
+                                                    IsVisible="{Binding ShapeType, Converter={StaticResource ShapeTypeEqualsConverter}, ConverterParameter=line}">
+                                                <TextBlock Text="{Binding MeasureText}"
+                                                        Foreground="White"
+                                                        FontSize="12"
+                                                        FontWeight="Bold"/>
+                                            </Border>
+
+                                            <!-- angle 角度文字 -->
+                                            <Border Canvas.Left="{Binding AngleTextLeft}"
+                                                    Canvas.Top="{Binding AngleTextTop}"
+                                                    Background="#AA000000"
+                                                    CornerRadius="4"
+                                                    Padding="4,2"
+                                                    IsVisible="{Binding ShapeType, Converter={StaticResource ShapeTypeEqualsConverter}, ConverterParameter=angle}">
+                                                <TextBlock Text="{Binding AngleText}"
+                                                        Foreground="White"
+                                                        FontSize="12"
+                                                        FontWeight="Bold"/>
+                                            </Border>
+
+                                        </Canvas>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <!-- ①.5 全局 ruler -->
+                        <ContentControl Content="{Binding DisplayRulerShape}">
+                            <ContentControl.DataTemplates>
+                                <DataTemplate x:DataType="models:OverlayShapeViewModel">
+                                    <Polyline Points="{Binding PolylinePoints}"
+                                            Stroke="{Binding Stroke}"
+                                            StrokeThickness="3"/>
+                                </DataTemplate>
+                            </ContentControl.DataTemplates>
+                        </ContentControl>
+                        <!--这里是尺子的标注-->
+                        <Border IsVisible="{Binding ShowRulerLabel}"
+                                Canvas.Left="{Binding RulerLabelLeft}"
+                                Canvas.Top="{Binding RulerLabelTop}"
+                                Background="#CC000000"
+                                CornerRadius="4"
+                                Padding="6,2"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top">
+                            <TextBlock Text="{Binding RulerLabelText}"
+                                    Foreground="White"
+                                    FontSize="12"
+                                    FontWeight="Bold"/>
+                        </Border>
+                        <!-- ② 已完成端点 -->
+                <!-- ② 已完成端点 -->
+                <ItemsControl ItemsSource="{Binding DisplayCompletedPoints}"
+                            x:CompileBindings="False">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.Styles>
+                        <Style Selector="ContentPresenter">
+                            <Setter Property="Canvas.Left"
+                                    Value="{Binding DataContext.Left, RelativeSource={RelativeSource Self}}"/>
+                            <Setter Property="Canvas.Top"
+                                    Value="{Binding DataContext.Top, RelativeSource={RelativeSource Self}}"/>
+                        </Style>
+                    </ItemsControl.Styles>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="models:OverlayPointViewModel">
+                            <Border Width="10"
+                                    Height="10"
+                                    CornerRadius="5"
+                                    Background="White"
+                                    BorderBrush="Black"
+                                    BorderThickness="1"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- ③ SAM prompt 点 -->
+                <ItemsControl ItemsSource="{Binding SamPromptPoints}"
+                            x:CompileBindings="False">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.Styles>
+                        <Style Selector="ContentPresenter">
+                            <Setter Property="Canvas.Left"
+                                    Value="{Binding DataContext.Left, RelativeSource={RelativeSource Self}}"/>
+                            <Setter Property="Canvas.Top"
+                                    Value="{Binding DataContext.Top, RelativeSource={RelativeSource Self}}"/>
+                        </Style>
+                    </ItemsControl.Styles>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="models:SamPromptPointViewModel">
+                            <Border Width="8"
+                                    Height="8"
+                                    CornerRadius="6"
+                                    Background="Red"
+                                    BorderBrush="White"
+                                    BorderThickness="2"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- ④ SAM box preview -->
+                <Canvas IsHitTestVisible="False">
+                    <Border IsVisible="{Binding IsSamBoxPreviewVisible}"
+                            Width="{Binding SamBoxPreviewWidth}"
+                            Height="{Binding SamBoxPreviewHeight}"
+                            Canvas.Left="{Binding SamBoxPreviewLeft}"
+                            Canvas.Top="{Binding SamBoxPreviewTop}"
+                            BorderBrush="Yellow"
+                            BorderThickness="3"
+                            Background="#30FFFF00"/>
+                </Canvas>
+                           <!-- s删除框操作提示词 -->
+                        <Border IsVisible="{Binding ShowDeleteBoxHint}"
+                                Background="#AA000000"
+                                CornerRadius="4"
+                                Padding="8,4"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Margin="12">
+                            <TextBlock Text="{Binding DeleteBoxHintText}"
+                                    Foreground="White"
+                                    FontSize="12"
+                                    FontWeight="SemiBold"/>
+                        </Border>
+                        <!-- ③ 当前绘制折线 -->
+                        <Polyline Points="{Binding CurrentDrawingPolylinePoints}"
+                                Stroke="Yellow"
+                                StrokeThickness="3"
+                                IsVisible="{Binding IsCurrentDrawingVisible}"/>
+                        <!-- ④ delete box -->
+                         <Polyline Points="{Binding CurrentDeleteBoxPoints}"
+                                    Stroke="Yellow"
+                                    StrokeThickness="2"
+                                    StrokeDashArray="6,4"
+                                    IsVisible="{Binding IsDeleteBoxVisible}"/>
+                       <!-- 5 color box -->
+                        <Polyline Points="{Binding CurrentColorBoxPoints}"
+                                    Stroke="Orange"
+                                    StrokeThickness="2"
+                                    StrokeDashArray="6,4"
+                                    IsVisible="{Binding IsColorBoxVisible}"/>
+                        <!-- 6 当前绘制端点 -->
+                        <ItemsControl ItemsSource="{Binding DisplayCurrentDrawingPoints}"
+              x:CompileBindings="False">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.Styles>
+                            <Style Selector="ContentPresenter">
+                                <Setter Property="Canvas.Left"
+                                        Value="{Binding DataContext.Left, RelativeSource={RelativeSource Self}}"/>
+                                <Setter Property="Canvas.Top"
+                                        Value="{Binding DataContext.Top, RelativeSource={RelativeSource Self}}"/>
+                            </Style>
+                        </ItemsControl.Styles>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="models:OverlayPointViewModel">
+                                <Border Width="10"
+                                        Height="10"
+                                        CornerRadius="5"
+                                        Background="Yellow"
+                                        BorderBrush="Black"
+                                        BorderThickness="1"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                </Grid>
+            </Grid>
+                    <!-- 无图片时的占位文字 -->
+                    <TextBlock Text="Image display area"
+                            IsVisible="{Binding ShowPlaceholder}"
+                            Foreground="White"
+                            FontSize="24"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+
+            <!-- ── 4. Right panel ──────────────────────────────────────── -->
+            <Border Grid.Column="3"
+                    Background="#F8F8F8"
+                    BorderBrush="#D0D0D0"
+                    BorderThickness="1,0,0,0"
+                    Padding="10">
+                <StackPanel Spacing="12">
+
+                    <TextBlock Text="Labels" FontSize="20" FontWeight="Bold"/>
+                    <ListBox ItemsSource="{Binding DisplayAnnotationLabels}"
+                            SelectedItem="{Binding SelectedAnnotationLabel}"
+                            Name="LabelsListBox"
+                            DoubleTapped="LabelsListBox_OnDoubleTapped"
+                            Height="180">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <TextBlock Text="Label Name"
+                               FontWeight="Bold"
+                               Margin="0,8,0,0"
+                               IsVisible="{Binding SelectedAnnotationLabel,
+                                           Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                    <TextBox Text="{Binding SelectedAnnotationLabel.Name, Mode=TwoWay}"
+                            Watermark="Edit label name"/>
+
+                    <Separator/>
+
+                 <TextBlock Text="Results" FontSize="20" FontWeight="Bold"/>
+
+                <DataGrid ItemsSource="{Binding MeasurementRecords}"
+                        AutoGenerateColumns="False"
+                        Height="260"
+                        CanUserResizeColumns="True"
+                        HeadersVisibility="Column">
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="70"/>
+                        <DataGridTextColumn Header="Label" Binding="{Binding LabelName}" Width="100"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding ShapeType}" Width="80"/>
+
+                        <DataGridTextColumn Header="Area" Binding="{Binding Area}" Width="100"/>
+                        <DataGridTextColumn Header="Area Px" Binding="{Binding AreaPx}" Width="90"/>
+                        <DataGridTextColumn Header="Perimeter" Binding="{Binding Perimeter}" Width="100"/>
+                        <DataGridTextColumn Header="Width" Binding="{Binding Width}" Width="90"/>
+                        <DataGridTextColumn Header="Height" Binding="{Binding Height}" Width="90"/>
+                        <DataGridTextColumn Header="Aspect Ratio" Binding="{Binding AspectRatio}" Width="110"/>
+                        <DataGridTextColumn Header="Circularity" Binding="{Binding Circularity}" Width="110"/>
+                        <DataGridTextColumn Header="Eq. Diameter" Binding="{Binding EquivalentDiameter}" Width="120"/>
+                        <DataGridTextColumn Header="Line Length" Binding="{Binding LineLength}" Width="110"/>
+                        <DataGridTextColumn Header="Line Px" Binding="{Binding LinePx}" Width="90"/>
+                        <DataGridTextColumn Header="Angle Degree" Binding="{Binding AngleDegree}" Width="110"/>
+
+                        <DataGridTextColumn Header="Mean RGB" Binding="{Binding MeanRgb}" Width="120"/>
+                        <DataGridTextColumn Header="Hex" Binding="{Binding HexColor}" Width="100"/>
+                        <DataGridTextColumn Header="Lab" Binding="{Binding Lab}" Width="130"/>
+
+                        <DataGridTextColumn Header="R" Binding="{Binding MeanR}" Width="70"/>
+                        <DataGridTextColumn Header="G" Binding="{Binding MeanG}" Width="70"/>
+                        <DataGridTextColumn Header="B" Binding="{Binding MeanB}" Width="70"/>
+
+                        <DataGridTextColumn Header="L" Binding="{Binding LabL}" Width="70"/>
+                        <DataGridTextColumn Header="a" Binding="{Binding LabA}" Width="70"/>
+                        <DataGridTextColumn Header="b" Binding="{Binding LabB}" Width="70"/>
+
+                        <DataGridTextColumn Header="Dominant"
+                                            Binding="{Binding DominantColorHex}"
+                                            Width="120"/>
+
+                        <DataGridTextColumn Header="Color Distribution"
+                                            Binding="{Binding ColorDistribution}"
+                                            Width="350"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                    <Separator/>
+
+                    <WrapPanel Orientation="Horizontal" ItemWidth="120" ItemHeight="40">
+                        <Button Content="Save"      Command="{Binding SaveCommand}"      Margin="4"/>
+                        <Button Content="Export Results" Command="{Binding ExportResultsCommand}" Margin="4"/>
+                        <Button Content="Convert"   Command="{Binding ConvertCommand}"   Margin="4"/>
+                        <Button Content="Reload"    Command="{Binding ReloadCommand}"    Margin="4"/>
+                        <Button Content="Delete"    Command="{Binding DeleteLabelCommand}" Margin="4"/>
+                    </WrapPanel>
+                    <TextBlock Text="Mask Color"
+                            FontWeight="Bold"
+                            Margin="0,8,0,0"/>
+
+                    <WrapPanel Orientation="Horizontal">
+                        <Button Content="Cyan"  Command="{Binding SetCyanColorCommand}" Margin="4"/>
+                        <Button Content="Red"   Command="{Binding SetRedColorCommand}" Margin="4"/>
+                        <Button Content="Green" Command="{Binding SetGreenColorCommand}" Margin="4"/>
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+
+        </Grid>
+    </DockPanel>
+</Window>

@@ -1,0 +1,37 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="BioIMA.Avalonia.Views.EditLabelWindow"
+        Width="320"
+        Height="260"
+        CanResize="False"
+        Title="Edit Label">
+    <StackPanel Margin="16" Spacing="12">
+
+        <TextBlock Text="Label Name" FontWeight="Bold"/>
+        <TextBox Name="NameTextBox"/>
+
+        <TextBlock Text="Mask Color" FontWeight="Bold"/>
+        <WrapPanel Name="ColorPanel" ItemWidth="36" ItemHeight="36">
+            <Border Name="ColorCyan"    Width="28" Height="28" Background="#00BCD4" Margin="4" BorderBrush="Black" BorderThickness="1" CornerRadius="4"/>
+            <Border Name="ColorRed"     Width="28" Height="28" Background="#F44336" Margin="4" BorderBrush="Black" BorderThickness="1" CornerRadius="4"/>
+            <Border Name="ColorGreen"   Width="28" Height="28" Background="#4CAF50" Margin="4" BorderBrush="Black" BorderThickness="1" CornerRadius="4"/>
+            <Border Name="ColorBlue"    Width="28" Height="28" Background="#2196F3" Margin="4" BorderBrush="Black" BorderThickness="1" CornerRadius="4"/>
+            <Border Name="ColorOrange"  Width="28" Height="28" Background="#FF9800" Margin="4" BorderBrush="Black" BorderThickness="1" CornerRadius="4"/>
+            <Border Name="ColorPurple"  Width="28" Height="28" Background="#9C27B0" Margin="4" BorderBrush="Black" BorderThickness="1" CornerRadius="4"/>
+            <Border Name="ColorPink"    Width="28" Height="28" Background="#E91E63" Margin="4" BorderBrush="Black" BorderThickness="1" CornerRadius="4"/>
+            <Border Name="ColorYellow"  Width="28" Height="28" Background="#FFEB3B" Margin="4" BorderBrush="Black" BorderThickness="1" CornerRadius="4"/>
+            <Border Name="ColorLime"    Width="28" Height="28" Background="#CDDC39" Margin="4" BorderBrush="Black" BorderThickness="1" CornerRadius="4"/>
+            <Border Name="ColorTeal"    Width="28" Height="28" Background="#009688" Margin="4" BorderBrush="Black" BorderThickness="1" CornerRadius="4"/>
+            <Border Name="ColorBrown"   Width="28" Height="28" Background="#795548" Margin="4" BorderBrush="Black" BorderThickness="1" CornerRadius="4"/>
+            <Border Name="ColorWhite"   Width="28" Height="28" Background="#FFFFFF" Margin="4" BorderBrush="Black" BorderThickness="1" CornerRadius="4"/>
+        </WrapPanel>
+
+        <Separator/>
+
+        <WrapPanel HorizontalAlignment="Right">
+            <Button Content="Delete" Name="DeleteButton" Margin="4"/>
+            <Button Content="OK"     Name="OkButton"     Margin="4"/>
+            <Button Content="Cancel" Name="CancelButton" Margin="4"/>
+        </WrapPanel>
+    </StackPanel>
+</Window>

@@ -1,0 +1,128 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="BioIMA.Avalonia.Views.AverageColorWindow"
+        Width="450"
+        Height="700"
+        CanResize="False"
+        Title="Color Analysis">
+
+    <ScrollViewer>
+        <StackPanel Margin="16" Spacing="12">
+
+            <!-- ReportRoot：只包内容，不含按钮 -->
+            <Border Name="ReportRoot"
+                    Background="White"
+                    Padding="16">
+                <StackPanel Spacing="12">
+
+                    <!-- Preview 图，Mean Color 前面 -->
+                    <Border Name="OverviewPanel"
+                            BorderBrush="#DDDDDD"
+                            BorderThickness="0.5"
+                            Background="#F8F8F8"
+                            Padding="6"
+                            IsVisible="False">
+                        <Image Name="OverviewImage"
+                               Height="160"
+                               Stretch="Uniform"
+                               HorizontalAlignment="Center"/>
+                    </Border>
+
+                    <TextBlock Text="Mean Color"
+                               FontSize="16"
+                               FontWeight="Bold"/>
+
+                    <Grid ColumnDefinitions="*,100" RowDefinitions="Auto,Auto,Auto">
+                        <TextBlock Name="RgbTextBlock"
+                                   Grid.Row="0" Grid.Column="0"
+                                   FontSize="15" FontWeight="Bold"/>
+                        <TextBlock Name="HexTextBlock"
+                                   Grid.Row="1" Grid.Column="0"
+                                   FontSize="15"/>
+                        <TextBlock Name="LabTextBlock"
+                                   Grid.Row="2" Grid.Column="0"
+                                   FontSize="15"/>
+                        <Border Name="ColorPreview"
+                                Grid.Row="0" Grid.RowSpan="3" Grid.Column="1"
+                                Width="80" Height="80"
+                                BorderBrush="Gray" BorderThickness="1"
+                                HorizontalAlignment="Center"/>
+                    </Grid>
+
+                    <Separator/>
+
+                    <TextBlock Text="Color Distribution"
+                               FontSize="16"
+                               FontWeight="Bold"/>
+
+                    <!-- 选择cluste的k -->
+                
+                    <Grid ColumnDefinitions="Auto,100,Auto,*"
+                        Margin="0,0,0,6">
+
+                        <TextBlock Grid.Column="0"
+                                Text="Number of color classes (K):"
+                                VerticalAlignment="Center"
+                                Margin="0,0,8,0"/>
+
+                        <ComboBox Name="ClusterCountComboBox"
+                                Grid.Column="1"
+                                Width="90"
+                                FontSize="16"
+                                SelectedIndex="3">
+                            <ComboBoxItem Content="2"/>
+                            <ComboBoxItem Content="3"/>
+                            <ComboBoxItem Content="4"/>
+                            <ComboBoxItem Content="5"/>
+                            <ComboBoxItem Content="6"/>
+                            <ComboBoxItem Content="7"/>
+                            <ComboBoxItem Content="8"/>
+                            <ComboBoxItem Content="9"/>
+                            <ComboBoxItem Content="10"/>
+                            <ComboBoxItem Content="11"/>
+                            <ComboBoxItem Content="12"/>
+                        </ComboBox>
+
+                        <Button Name="RecalculateButton"
+                                Grid.Column="2"
+                                Content="Recalculate"
+                                Margin="8,0,0,0"/>
+                    </Grid>
+                    <ItemsControl Name="ColorClusterItems"
+                                  x:CompileBindings="False">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="40,90,70,*" Margin="0,4">
+                                    <Border Grid.Column="0"
+                                            Width="28" Height="28"
+                                            Background="{Binding Brush}"
+                                            BorderBrush="Gray" BorderThickness="1"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding Hex}"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2"
+                                               Text="{Binding PercentageText}"
+                                               VerticalAlignment="Center"/>
+                                    <ProgressBar Grid.Column="3"
+                                                 Minimum="0" Maximum="100"
+                                                 Value="{Binding Percentage}"
+                                                 Height="12"
+                                                 VerticalAlignment="Center"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                </StackPanel>
+            </Border>  <!--ReportRoot 这里关闭le -->
+
+            <!-- 按钮，，，在 ReportRoot 外，不会出现在截图里 -->
+            <WrapPanel HorizontalAlignment="Right">
+                <Button Name="SaveButton" Content="Save" Margin="4"/>
+                <Button Name="SaveReportButton" Content="Save Report PNG" Margin="4"/>
+                <Button Name="CancelButton" Content="Cancel" Margin="4"/>
+            </WrapPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</Window>
