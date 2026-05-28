@@ -65,7 +65,7 @@
         </Button>
 
         <Button Command="{Binding RulerCommand}" Height="40" Width="40">
-            <Image Source="avares://BioIMA.Avalonia/Images/ruler.png"
+            <Image Source="avares://BioIMA.Avalonia/Images/ruler4.png"
                    Width="22" Height="22" Stretch="Uniform"/>
         </Button>
 
@@ -81,7 +81,7 @@
 
         <Button Command="{Binding SegmentCommand}" Height="40" Width="40">
             <Image Source="avares://BioIMA.Avalonia/Images/brain.png"
-                   Width="22" Height="22" Stretch="Uniform"/>
+                   Width="28" Height="28" Stretch="Uniform"/>
         </Button>
 
         <Button Command="{Binding ColorBoxCommand}" Height="40" Width="40">
@@ -111,7 +111,6 @@
 
     </StackPanel>
 </Border>
-               
 
             <!-- ── 2. File panel ───────────────────────────────────────── -->
             <Border Grid.Column="1"
@@ -520,96 +519,113 @@
                     BorderBrush="#D0D0D0"
                     BorderThickness="1,0,0,0"
                     Padding="10">
-                <StackPanel Spacing="12">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="12">
 
-                    <TextBlock Text="Labels" FontSize="20" FontWeight="Bold"/>
-                    <ListBox ItemsSource="{Binding DisplayAnnotationLabels}"
-                            SelectedItem="{Binding SelectedAnnotationLabel}"
-                            Name="LabelsListBox"
-                            DoubleTapped="LabelsListBox_OnDoubleTapped"
-                            Height="180">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}" />
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                    <TextBlock Text="Label Name"
-                               FontWeight="Bold"
-                               Margin="0,8,0,0"
-                               IsVisible="{Binding SelectedAnnotationLabel,
-                                           Converter={x:Static ObjectConverters.IsNotNull}}"/>
-                    <TextBox Text="{Binding SelectedAnnotationLabel.Name, Mode=TwoWay}"
-                            Watermark="Edit label name"/>
+                        <TextBlock Text="Labels" FontSize="20" FontWeight="Bold"/>
+                        <ListBox ItemsSource="{Binding DisplayAnnotationLabels}"
+                                SelectedItem="{Binding SelectedAnnotationLabel}"
+                                Name="LabelsListBox"
+                                DoubleTapped="LabelsListBox_OnDoubleTapped"
+                                Height="180">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <TextBlock Text="Label Name"
+                                FontWeight="Bold"
+                                Margin="0,8,0,0"
+                                IsVisible="{Binding SelectedAnnotationLabel,
+                                            Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                        <TextBox Text="{Binding SelectedAnnotationLabel.Name, Mode=TwoWay}"
+                                Watermark="Edit label name"/>
 
-                    <Separator/>
+                        <Separator/>
 
-                 <TextBlock Text="Results" FontSize="20" FontWeight="Bold"/>
+                                <TextBlock Text="Mask Preview"
+                                        FontSize="16"
+                                        FontWeight="Bold"
+                                        Margin="0,6,0,0"/>
 
-                <DataGrid ItemsSource="{Binding MeasurementRecords}"
-                        AutoGenerateColumns="False"
-                        Height="260"
-                        CanUserResizeColumns="True"
-                        HeadersVisibility="Column">
+                                <Border BorderBrush="#D0D0D0"
+                                        BorderThickness="1"
+                                        Background="White"
+                                        Padding="6"
+                                        MinHeight="120"
+                                        IsVisible="{Binding HasSelectedMaskPreview}">
+                                    <Image Source="{Binding SelectedMaskPreviewBitmap}"
+                                        Height="130"
+                                        Stretch="Uniform"
+                                        HorizontalAlignment="Center"/>
+                                </Border>
 
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="70"/>
-                        <DataGridTextColumn Header="Label" Binding="{Binding LabelName}" Width="100"/>
-                        <DataGridTextColumn Header="Type" Binding="{Binding ShapeType}" Width="80"/>
+                        <Separator/>
 
-                        <DataGridTextColumn Header="Area" Binding="{Binding Area}" Width="100"/>
-                        <DataGridTextColumn Header="Area Px" Binding="{Binding AreaPx}" Width="90"/>
-                        <DataGridTextColumn Header="Perimeter" Binding="{Binding Perimeter}" Width="100"/>
-                        <DataGridTextColumn Header="Width" Binding="{Binding Width}" Width="90"/>
-                        <DataGridTextColumn Header="Height" Binding="{Binding Height}" Width="90"/>
-                        <DataGridTextColumn Header="Aspect Ratio" Binding="{Binding AspectRatio}" Width="110"/>
-                        <DataGridTextColumn Header="Circularity" Binding="{Binding Circularity}" Width="110"/>
-                        <DataGridTextColumn Header="Eq. Diameter" Binding="{Binding EquivalentDiameter}" Width="120"/>
-                        <DataGridTextColumn Header="Line Length" Binding="{Binding LineLength}" Width="110"/>
-                        <DataGridTextColumn Header="Line Px" Binding="{Binding LinePx}" Width="90"/>
-                        <DataGridTextColumn Header="Angle Degree" Binding="{Binding AngleDegree}" Width="110"/>
+                    <TextBlock Text="Results" FontSize="20" FontWeight="Bold"/>
 
-                        <DataGridTextColumn Header="Mean RGB" Binding="{Binding MeanRgb}" Width="120"/>
-                        <DataGridTextColumn Header="Hex" Binding="{Binding HexColor}" Width="100"/>
-                        <DataGridTextColumn Header="Lab" Binding="{Binding Lab}" Width="130"/>
+                    <DataGrid ItemsSource="{Binding MeasurementRecords}"
+                            AutoGenerateColumns="False"
+                            Height="260"
+                            CanUserResizeColumns="True"
+                            HeadersVisibility="Column">
 
-                        <DataGridTextColumn Header="R" Binding="{Binding MeanR}" Width="70"/>
-                        <DataGridTextColumn Header="G" Binding="{Binding MeanG}" Width="70"/>
-                        <DataGridTextColumn Header="B" Binding="{Binding MeanB}" Width="70"/>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="70"/>
+                            <DataGridTextColumn Header="Label" Binding="{Binding LabelName}" Width="100"/>
+                            <DataGridTextColumn Header="Type" Binding="{Binding ShapeType}" Width="80"/>
 
-                        <DataGridTextColumn Header="L" Binding="{Binding LabL}" Width="70"/>
-                        <DataGridTextColumn Header="a" Binding="{Binding LabA}" Width="70"/>
-                        <DataGridTextColumn Header="b" Binding="{Binding LabB}" Width="70"/>
+                            <DataGridTextColumn Header="Area" Binding="{Binding Area}" Width="100"/>
+                            <DataGridTextColumn Header="Area Px" Binding="{Binding AreaPx}" Width="90"/>
+                            <DataGridTextColumn Header="Perimeter" Binding="{Binding Perimeter}" Width="100"/>
+                            <DataGridTextColumn Header="Width" Binding="{Binding Width}" Width="90"/>
+                            <DataGridTextColumn Header="Height" Binding="{Binding Height}" Width="90"/>
+                            <DataGridTextColumn Header="Aspect Ratio" Binding="{Binding AspectRatio}" Width="110"/>
+                            <DataGridTextColumn Header="Circularity" Binding="{Binding Circularity}" Width="110"/>
+                            <DataGridTextColumn Header="Eq. Diameter" Binding="{Binding EquivalentDiameter}" Width="120"/>
+                            <DataGridTextColumn Header="Line Length" Binding="{Binding LineLength}" Width="110"/>
+                            <DataGridTextColumn Header="Line Px" Binding="{Binding LinePx}" Width="90"/>
+                            <DataGridTextColumn Header="Angle Degree" Binding="{Binding AngleDegree}" Width="110"/>
 
-                        <DataGridTextColumn Header="Dominant"
-                                            Binding="{Binding DominantColorHex}"
-                                            Width="120"/>
+                            <DataGridTextColumn Header="Mean RGB" Binding="{Binding MeanRgb}" Width="120"/>
+                            <DataGridTextColumn Header="Hex" Binding="{Binding HexColor}" Width="100"/>
+                            <DataGridTextColumn Header="Lab" Binding="{Binding Lab}" Width="130"/>
 
-                        <DataGridTextColumn Header="Color Distribution"
-                                            Binding="{Binding ColorDistribution}"
-                                            Width="350"/>
-                    </DataGrid.Columns>
-                </DataGrid>
+                            <DataGridTextColumn Header="R" Binding="{Binding MeanR}" Width="70"/>
+                            <DataGridTextColumn Header="G" Binding="{Binding MeanG}" Width="70"/>
+                            <DataGridTextColumn Header="B" Binding="{Binding MeanB}" Width="70"/>
 
-                    <Separator/>
+                            <DataGridTextColumn Header="L" Binding="{Binding LabL}" Width="70"/>
+                            <DataGridTextColumn Header="a" Binding="{Binding LabA}" Width="70"/>
+                            <DataGridTextColumn Header="b" Binding="{Binding LabB}" Width="70"/>
 
-                    <WrapPanel Orientation="Horizontal" ItemWidth="120" ItemHeight="40">
-                        <Button Content="Save"      Command="{Binding SaveCommand}"      Margin="4"/>
-                        <Button Content="Export Results" Command="{Binding ExportResultsCommand}" Margin="4"/>
-                        <Button Content="Convert"   Command="{Binding ConvertCommand}"   Margin="4"/>
-                        <Button Content="Reload"    Command="{Binding ReloadCommand}"    Margin="4"/>
-                        <Button Content="Delete"    Command="{Binding DeleteLabelCommand}" Margin="4"/>
-                    </WrapPanel>
-                    <TextBlock Text="Mask Color"
-                            FontWeight="Bold"
-                            Margin="0,8,0,0"/>
+                            <DataGridTextColumn Header="K"
+                                                Binding="{Binding ColorClusterK}"
+                                                Width="60"/>
+                            <DataGridTextColumn Header="Dominant"
+                                                Binding="{Binding DominantColorHex}"
+                                                Width="120"/>
 
-                    <WrapPanel Orientation="Horizontal">
-                        <Button Content="Cyan"  Command="{Binding SetCyanColorCommand}" Margin="4"/>
-                        <Button Content="Red"   Command="{Binding SetRedColorCommand}" Margin="4"/>
-                        <Button Content="Green" Command="{Binding SetGreenColorCommand}" Margin="4"/>
-                    </WrapPanel>
-                </StackPanel>
+                            <DataGridTextColumn Header="Color Distribution"
+                                                Binding="{Binding ColorDistribution}"
+                                                Width="350"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                        <Separator/>
+
+                        <WrapPanel Orientation="Horizontal" ItemWidth="120" ItemHeight="40">
+                            <Button Content="Save"      Command="{Binding SaveCommand}"      Margin="4"/>
+                            <Button Content="Export Results" Command="{Binding ExportResultsCommand}" Margin="4"/>
+                            <Button Content="Delete"    Command="{Binding DeleteLabelCommand}" Margin="4"/>
+                            <Button Content="Reload"    Command="{Binding ReloadCommand}"    Margin="4"/>
+                        
+                        </WrapPanel>
+                        <Separator/>
+
+                    </StackPanel>
+                </ScrollViewer>
             </Border>
 
         </Grid>

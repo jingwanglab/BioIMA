@@ -17,6 +17,7 @@ using global::Avalonia.Media.Imaging;
 using global::Avalonia.Platform.Storage;
 using global::Avalonia.Threading;
 using global::Avalonia.Platform;
+using  global::Avalonia.Media.Imaging;
 // MVVM 工具
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -27,6 +28,7 @@ using BioIMA.Avalonia.Models;
 using BioIMA.Avalonia.Views;
 using BioIMA.Avalonia.Segmentation;
 using BioIMA.Avalonia.Services;
+
 //确定简称
 using Point = Avalonia.Point; 
 using Window = Avalonia.Controls.Window;
@@ -133,6 +135,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private ImageFileItem?   selectedImageFile;
     [ObservableProperty] private AnnotationLabel? selectedAnnotationLabel;
     [ObservableProperty] private LabelItem?       selectedLabel;
+    
 
 
     //自动分割面板属性
@@ -165,7 +168,19 @@ public partial class MainWindowViewModel : ViewModelBase
 
     //颜色的默认k-means。k。每次改 K 并 Save 后，可把这个 K 记住，下一次窗口默认用上一次的 K
     [ObservableProperty] private int colorClusterCount = 5;
+
+    //mask preview
+    [ObservableProperty]
+    private Bitmap? selectedMaskPreviewBitmap;
+
+    public bool HasSelectedMaskPreview => SelectedMaskPreviewBitmap is not null;
+
+    partial void OnSelectedMaskPreviewBitmapChanged(Bitmap? value)
+    {
+        OnPropertyChanged(nameof(HasSelectedMaskPreview));
+    }
     
+   
     // ════════════════════════════════════════════════════════════════════════
     // 集合属性 yu 字段区
     // ════════════════════════════════════════════════════════════════════════
@@ -213,10 +228,21 @@ public partial class MainWindowViewModel : ViewModelBase
 
         public int Height { get; set; }
 
+        // public byte[] Mask { get; set; } = Array.Empty<byte>();
+
+        // // 只用于 preview / overlay，不用于测量
+        // public List<PointD> DisplayContour { get; set; } = new();
+        // 当前用于测量的 mask
         public byte[] Mask { get; set; } = Array.Empty<byte>();
 
-        // 只用于 preview / overlay，不用于测量
+        // 原始 SAM mask，作为备份
+        public byte[] OriginalMask { get; set; } = Array.Empty<byte>();
+
+        // 只用于 overlay / preview 显示，不用于原始 SAM mask 测量
         public List<PointD> DisplayContour { get; set; } = new();
+
+        // 用户是否拖动过端点修改边界
+        public bool IsEditedByUser { get; set; }
     }
 
     //本次颜色结果字段
@@ -523,6 +549,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         RefreshOverlayBindings();
         RefreshSelectedLabelProperties();
+        RefreshSelectedMaskPreview();
     }
     // ════════════════════════════════════════════════════════════════════════
     // 图像视口更新（由 code-behind 在每次点击前调用）
@@ -1210,10 +1237,42 @@ public partial class MainWindowViewModel : ViewModelBase
         RefreshOverlayBindings();
     }
 
+    // public void EndDragVertex()
+    // {
+    //     _draggingShape = null;
+    //     _draggingVertexIndex = -1;
+    // }
     public void EndDragVertex()
     {
+        if (IsDraggingVertex)
+        {
+            MarkSelectedMaskLabelAsEdited();
+        }
+
+        //IsDraggingVertex = false;
         _draggingShape = null;
         _draggingVertexIndex = -1;
+
+        RefreshOverlayBindings();
+    }
+    private void MarkSelectedMaskLabelAsEdited()
+    {
+        if (SelectedAnnotationLabel is null)
+            return;
+
+        if (!_maskLabelDataByLabelId.TryGetValue(SelectedAnnotationLabel.Id, out var maskData))
+            return;
+
+        var shape = CurrentAnnotationDocument.Shapes
+            .FirstOrDefault(s => s.LabelId == SelectedAnnotationLabel.Id);
+
+        if (shape is null || shape.Points.Count < 3)
+            return;
+
+        maskData.IsEditedByUser = true;
+        maskData.DisplayContour = shape.Points.ToList();
+
+        StatusText = $"{SelectedAnnotationLabel.Name} boundary edited. Measurement will use the edited boundary.";
     }
     //----------------------
     //测量多边形和举行mask
@@ -2009,6 +2068,41 @@ public partial class MainWindowViewModel : ViewModelBase
         return preview;
     }
 
+    //生成preview窗口
+    private void RefreshSelectedMaskPreview()
+    {
+        SelectedMaskPreviewBitmap = null;
+
+        if (CurrentImage is null || SelectedAnnotationLabel is null)
+            return;
+
+        var label = SelectedAnnotationLabel;
+
+        var shape = CurrentAnnotationDocument.Shapes
+            .FirstOrDefault(s => s.LabelId == label.Id);
+
+        if (shape is null)
+            return;
+
+        IReadOnlyList<PointD> previewPoints;
+
+        // 如果是 SAM mask label，优先用它的 DisplayContour
+        if (_maskLabelDataByLabelId.TryGetValue(label.Id, out var maskData) &&
+            maskData.DisplayContour.Count >= 3)
+        {
+            previewPoints = maskData.DisplayContour;
+        }
+        else
+        {
+            previewPoints = shape.Points;
+        }
+
+        if (previewPoints.Count < 3)
+            return;
+
+        SelectedMaskPreviewBitmap = BuildColorAnalysisPreview(previewPoints);
+    }
+
     ////////////--------------自动分割的方法------------------------
     partial void OnIsSegmentationPanelVisibleChanged(bool value)
     {
@@ -2337,18 +2431,29 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
+        // var label = new AnnotationLabel
+        // {
+        //     Id = Guid.NewGuid().ToString("N"),
+        //     Name = $"sam_mask{CurrentAnnotationDocument.Labels.Count + 1}",
+        //     Type = "mask",
+        //     IsVisible = true,
+        //     StrokeColor = "#FFFF0000",
+        //     FillColor = "#6600FFFF"
+        // };
+        
+        // note：ShapeType 仍然写 polygon，是为了复用现在的 overlay 显示系统
+        // 但 Measure 时会优先检查 _maskLabelDataByLabelId，所以不会按 polygon 测
+
         var label = new AnnotationLabel
         {
             Id = Guid.NewGuid().ToString("N"),
             Name = $"sam_mask{CurrentAnnotationDocument.Labels.Count + 1}",
-            Type = "mask",
+            Type = "polygon",   // 完全兼容 label list / edit window
             IsVisible = true,
             StrokeColor = "#FFFF0000",
             FillColor = "#6600FFFF"
         };
 
-        // note：ShapeType 仍然写 polygon，是为了复用现在的 overlay 显示系统
-        // 但 Measure 时会优先检查 _maskLabelDataByLabelId，所以不会按 polygon 测
         var shape = new AnnotationShape
         {
             LabelId = label.Id,
@@ -2361,21 +2466,44 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentAnnotationDocument.Labels.Add(label);
         CurrentAnnotationDocument.Shapes.Add(shape);
 
+        // // Labels panel 绑定的是 DisplayAnnotationLabels，
+        // // 手动画 polygon/rectangle 时也会把 label 加到 AnnotationLabels
+        // AnnotationLabels.Add(label);
+        // 加到右侧 Labels list 使用的集合里
+        AnnotationLabels.Add(label);
+
         _maskLabelDataByLabelId[label.Id] = new MaskLabelData
         {
             Width = _lastSamMaskWidth,
             Height = _lastSamMaskHeight,
             Mask = binaryMask,
-            DisplayContour = simplifiedDisplayContour
+            OriginalMask = binaryMask.ToArray(),
+            DisplayContour = simplifiedDisplayContour,
+            IsEditedByUser = false
         };
 
         SelectedAnnotationLabel = label;
+        CurrentLabelText = label.Name;
 
-        // 转成正式 label 后，隐藏临时 SAM overlay，避免叠在一起
+        // 转正式 label 后，隐藏临时 SAM overlay，避免叠在一起
         SegmentationMaskBitmap = null;
         HasSegmentationMask = false;
 
+        // 刷新 label list 和 overlay
+        RefreshLabelLists();
         RefreshOverlayBindings();
+
+        OnPropertyChanged(nameof(CurrentAnnotationDocument));
+        OnPropertyChanged(nameof(SelectedAnnotationLabel));
+        OnPropertyChanged(nameof(DisplayAnnotationLabels));
+
+        RefreshOverlayBindings();
+
+        // // 转成正式 label 后，隐藏临时 SAM overlay，避免叠在一起
+        // SegmentationMaskBitmap = null;
+        // HasSegmentationMask = false;
+
+        // RefreshOverlayBindings();
 
         StatusText = $"SAM mask converted to label: {label.Name}. You can now click Measure.";
     }
@@ -3032,11 +3160,40 @@ public partial class MainWindowViewModel : ViewModelBase
 
         // !!：如果这个 label 背后有 exact mask，就按 mask 测量
         //SAM label 虽然显示为 polygon，但测量时会先进入 MeasureMaskLabel()，不会走 polygon 的面积算法
+        // if (_maskLabelDataByLabelId.TryGetValue(label.Id, out var maskData))
+        // {
+        //     await MeasureMaskLabel(label, shape, maskData);
+        //     return;
+        // }
         if (_maskLabelDataByLabelId.TryGetValue(label.Id, out var maskData))
         {
+            if (maskData.IsEditedByUser)
+            {
+                if (shape.Points.Count < 3)
+                {
+                    StatusText = "Edited mask label needs at least 3 points.";
+                    return;
+                }
+
+                var editedMask = RasterizePolygonToMask(
+                    shape.Points,
+                    maskData.Width,
+                    maskData.Height);
+
+                maskData.Mask = editedMask;
+                maskData.DisplayContour = shape.Points.ToList();
+            }
+            else
+            {
+                // 没有手动改过时，继续使用原始 SAM mask，保证精度
+                if (maskData.OriginalMask.Length == maskData.Mask.Length)
+                    maskData.Mask = maskData.OriginalMask.ToArray();
+            }
+
             await MeasureMaskLabel(label, shape, maskData);
             return;
         }
+        
 
         switch (shape.ShapeType)
         {
@@ -3234,7 +3391,41 @@ public partial class MainWindowViewModel : ViewModelBase
 
         return binary;
     }
-    
+    ////RasterizePolygonToMask()
+    private static byte[] RasterizePolygonToMask(
+    IReadOnlyList<PointD> pts,
+    int width,
+    int height)
+    {
+        var mask = new byte[width * height];
+
+        if (pts.Count < 3)
+            return mask;
+
+        var minX = (int)Math.Floor(pts.Min(p => p.X));
+        var maxX = (int)Math.Ceiling(pts.Max(p => p.X));
+        var minY = (int)Math.Floor(pts.Min(p => p.Y));
+        var maxY = (int)Math.Ceiling(pts.Max(p => p.Y));
+
+        minX = Math.Max(0, minX);
+        minY = Math.Max(0, minY);
+        maxX = Math.Min(width - 1, maxX);
+        maxY = Math.Min(height - 1, maxY);
+
+        for (int y = minY; y <= maxY; y++)
+        {
+            for (int x = minX; x <= maxX; x++)
+            {
+                var px = x + 0.5;
+                var py = y + 0.5;
+
+                if (IsPointInPolygon(px, py, pts))
+                    mask[y * width + x] = 1;
+            }
+        }
+
+        return mask;
+    }
     //segmask几何测量    geometric measurement
     //exact mask pixel count。perimeter 是 raster perimeter，
     // //不是 polygon perimeter。比简化 polygon perimeter 更一致

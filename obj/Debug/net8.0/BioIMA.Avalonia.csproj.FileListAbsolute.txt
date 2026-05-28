@@ -130,6 +130,7 @@
 /Users/xiner/BioIMA_Migration/BioIMA.Avalonia/obj/Debug/net8.0/Avalonia/resources
 /Users/xiner/BioIMA_Migration/BioIMA.Avalonia/obj/Debug/net8.0/BioIMA.Avalonia.GeneratedMSBuildEditorConfig.editorconfig
 /Users/xiner/BioIMA_Migration/BioIMA.Avalonia/obj/Debug/net8.0/BioIMA.Avalonia.csproj.CoreCompileInputs.cache
+/Users/xiner/BioIMA_Migration/BioIMA.Avalonia/obj/Debug/net8.0/BioIMA.Avalonia.sourcelink.json
 /Users/xiner/BioIMA_Migration/BioIMA.Avalonia/obj/Debug/net8.0/BioIMA.Avalonia.csproj.CopyComplete
 /Users/xiner/BioIMA_Migration/BioIMA.Avalonia/obj/Debug/net8.0/BioIMA.Avalonia.dll
 /Users/xiner/BioIMA_Migration/BioIMA.Avalonia/obj/Debug/net8.0/refint/BioIMA.Avalonia.dll
