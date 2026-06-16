@@ -21,6 +21,9 @@ public sealed class SamPredictor : IDisposable
         _encoder?.Dispose();
         _decoder?.Dispose();
 
+    // 把模型复制到用户可写目录，绕开 macOS app bundle 的只读/权限限制
+        modelFolder = EnsureModelsReady(modelFolder);
+
         var options = new SessionOptions
         {
             EnableMemoryPattern = false,
@@ -39,6 +42,27 @@ public sealed class SamPredictor : IDisposable
         _encoder = new InferenceSession(encoderPath, options);
         _decoder = new InferenceSession(decoderPath, options);
         IsReady = true;
+    }
+    private static string EnsureModelsReady(string sourceFolder)
+    {
+        // macOS: ~/Library/Application Support/BioIMA/SAMmodel
+        var targetDir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "BioIMA", "SAMmodel");
+        Directory.CreateDirectory(targetDir);
+
+        foreach (var name in new[] { "encoder-quant.onnx", "decoder-quant.onnx" })
+        {
+            var src = Path.Combine(sourceFolder, name);
+            var dst = Path.Combine(targetDir, name);
+            // 不存在或大小不一致zai复制，避免每次启动都重复拷贝
+            if (File.Exists(src) &&
+                (!File.Exists(dst) || new FileInfo(dst).Length != new FileInfo(src).Length))
+            {
+                File.Copy(src, dst, overwrite: true);
+            }
+        }
+        return targetDir;
     }
 
     public float[] Encode(Bitmap image)

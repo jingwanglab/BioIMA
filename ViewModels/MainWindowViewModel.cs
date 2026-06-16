@@ -7,6 +7,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
+
+using Avalonia.Platform.Storage;
 using Magick = ImageMagick;
 // Avalonia 基础引用
 using global::Avalonia;
@@ -166,7 +169,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private double lastRulerPixelLength;
     [ObservableProperty] private bool scaleDialogPending;
 
-    //颜色的默认k-means。k。每次改 K 并 Save 后，可把这个 K 记住，下一次窗口默认用上一次的 K
+    //颜色的默认k-means。k。每次改 K 并 Save 后把这个 K 记住，下一次窗口默认用上一次的 K
     [ObservableProperty] private int colorClusterCount = 5;
 
     //mask preview
@@ -204,6 +207,73 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private PointD? _samBoxStartImagePoint;
     private PointD? _samBoxEndImagePoint;
+
+    //json DTO 类
+    private sealed class AnnotationProjectJson
+    {
+        public string Version { get; set; } = "1.0";
+
+        public string ImagePath { get; set; } = "";
+
+        public int ImageWidth { get; set; }
+
+        public int ImageHeight { get; set; }
+
+        public List<AnnotationLabelJson> Labels { get; set; } = new();
+
+        public List<AnnotationShapeJson> Shapes { get; set; } = new();
+
+        public List<MaskLabelJson> MaskLabels { get; set; } = new();
+    }
+
+    private sealed class AnnotationLabelJson
+    {
+        public string Id { get; set; } = "";
+
+        public string Name { get; set; } = "";
+
+        public string Type { get; set; } = "";
+
+        public bool IsVisible { get; set; } = true;
+
+        public string StrokeColor { get; set; } = "";
+
+        public string FillColor { get; set; } = "";
+    }
+
+    private sealed class AnnotationShapeJson
+    {
+        public string LabelId { get; set; } = "";
+
+        public string ShapeType { get; set; } = "";
+
+        public List<PointDJson> Points { get; set; } = new();
+    }
+
+    private sealed class PointDJson
+    {
+        public double X { get; set; }
+
+        public double Y { get; set; }
+    }
+
+    private sealed class MaskLabelJson
+    {
+        public string LabelId { get; set; } = "";
+
+        public int Width { get; set; }
+
+        public int Height { get; set; }
+
+        public List<int> MaskRle { get; set; } = new();
+
+        public List<int> OriginalMaskRle { get; set; } = new();
+
+        public List<PointDJson> DisplayContour { get; set; } = new();
+
+        public bool IsEditedByUser { get; set; }
+    }
+
     //计算属性
     public bool IsDraggingVertex => _draggingShape is not null && _draggingVertexIndex >= 0;
     
@@ -649,6 +719,10 @@ public partial class MainWindowViewModel : ViewModelBase
                 _ = RunSamPointSegmentationAsync(x, y);
                 break;
 
+            case ToolMode.ColorCalibrationBox:
+                HandleColorCalibrationBoxClick(x, y);
+                break;
+
             case ToolMode.SegmentBox:
                 StatusText = $"SAM box prompt click at ({x:F1}, {y:F1})";
                 break;
@@ -936,6 +1010,7 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentDrawingPoints.Clear();
         RefreshOverlayBindings();
         RefreshLabelLists();
+        RefreshSelectedMaskPreview();
         StatusText = $"Polygon '{label.Name}' finalized — labels={CurrentAnnotationDocument.Labels.Count}, shapes={CurrentAnnotationDocument.Shapes.Count}";
     }
 
@@ -976,6 +1051,7 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentDrawingPoints.Clear();
         RefreshOverlayBindings();
         RefreshLabelLists();
+        RefreshSelectedMaskPreview();
         StatusText = $"Rectangle '{label.Name}' finalized";
     }
     private void FinalizeLine()
@@ -1254,6 +1330,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _draggingVertexIndex = -1;
 
         RefreshOverlayBindings();
+        RefreshSelectedMaskPreview();
     }
     private void MarkSelectedMaskLabelAsEdited()
     {
@@ -1631,10 +1708,11 @@ public partial class MainWindowViewModel : ViewModelBase
                 int i = yy * stride + xx * 4;
 
                 // 前面已验证过当前图像是 RGBA 顺序
-                byte r = managedBuffer[i + 0];
-                byte g = managedBuffer[i + 1];
-                byte b = managedBuffer[i + 2];
-                byte a = managedBuffer[i + 3];
+                // byte r = managedBuffer[i + 0];
+                // byte g = managedBuffer[i + 1];
+                // byte b = managedBuffer[i + 2];
+                // byte a = managedBuffer[i + 3];
+                var (r, g, b, a) = ReadPixel4(managedBuffer, i);
 
                 if (a == 0)
                     continue;
@@ -2492,6 +2570,7 @@ public partial class MainWindowViewModel : ViewModelBase
         // 刷新 label list 和 overlay
         RefreshLabelLists();
         RefreshOverlayBindings();
+        RefreshSelectedMaskPreview();
 
         OnPropertyChanged(nameof(CurrentAnnotationDocument));
         OnPropertyChanged(nameof(SelectedAnnotationLabel));
@@ -2807,13 +2886,24 @@ public partial class MainWindowViewModel : ViewModelBase
         AreaText   = "-";
         PixelText  = "-";
         _labelCounter = 1;
+
         SegmentationMaskBitmap = null;
         HasSegmentationMask = false;
         _samEmbedding = null;
         _samPromotions.Clear();
         IsSamEmbeddingReady = false;
 
+        _lastSamMask = null;
+        _lastSamMaskWidth = 0;
+        _lastSamMaskHeight = 0;
+        _maskLabelDataByLabelId.Clear();
+
+        CurrentTool = ToolMode.None;
+        CurrentToolText = "None";
+        SelectedMaskPreviewBitmap = null;
+
         RefreshOverlayBindings();
+        RefreshLabelLists();
     }
 
     // ════════════════════════════════════════════════════════════════════════
@@ -3025,6 +3115,253 @@ public partial class MainWindowViewModel : ViewModelBase
         RefreshOverlayBindings();
         StatusText = "Label deleted.";
     }
+    //------ rotate image command-------------//
+    [RelayCommand]
+    private void RotateImageClockwise()
+    {
+        if (CurrentImage is null)
+        {
+            StatusText = "No image loaded.";
+            return;
+        }
+
+        var oldWidth = CurrentImage.PixelSize.Width;
+        var oldHeight = CurrentImage.PixelSize.Height;
+
+        var rotated = RotateBitmapClockwise(CurrentImage);
+
+        if (rotated is null)
+        {
+            StatusText = "Failed to rotate image.";
+            return;
+        }
+
+        CurrentImage = rotated;
+
+        // annotation 坐标也同步旋转
+        RotateAnnotationPointsClockwise(oldWidth, oldHeight);
+
+        // mask-backed label 的 mask 也同步旋转
+        RotateMaskLabelDataClockwise();
+
+        // SAM embedding 失效，需要重新 encode
+        _samEmbedding = null;
+        IsSamEmbeddingReady = false;
+        _samPromotions.Clear();
+        SegmentationMaskBitmap = null;
+        HasSegmentationMask = false;
+
+        RefreshOverlayBindings();
+        RefreshSelectedMaskPreview();
+
+        StatusText = "Image rotated 90° clockwise.";
+    }
+    //Rotate bitmap helper//
+    private static Bitmap? RotateBitmapClockwise(Bitmap source)
+    {
+        var oldW = source.PixelSize.Width;
+        var oldH = source.PixelSize.Height;
+
+        if (oldW <= 0 || oldH <= 0)
+            return null;
+
+        var oldStride = oldW * 4;
+        var oldBufferSize = oldStride * oldH;
+        var oldPixels = new byte[oldBufferSize];
+
+        IntPtr unmanagedBuffer = IntPtr.Zero;
+
+        try
+        {
+            unmanagedBuffer = Marshal.AllocHGlobal(oldBufferSize);
+
+            source.CopyPixels(
+                new PixelRect(0, 0, oldW, oldH),
+                unmanagedBuffer,
+                oldBufferSize,
+                oldStride);
+
+            Marshal.Copy(unmanagedBuffer, oldPixels, 0, oldBufferSize);
+        }
+        finally
+        {
+            if (unmanagedBuffer != IntPtr.Zero)
+                Marshal.FreeHGlobal(unmanagedBuffer);
+        }
+
+        var newW = oldH;
+        var newH = oldW;
+        var newStride = newW * 4;
+        var newPixels = new byte[newStride * newH];
+
+        for (int y = 0; y < oldH; y++)
+        {
+            for (int x = 0; x < oldW; x++)
+            {
+                var oldIndex = y * oldStride + x * 4;
+
+                var newX = oldH - 1 - y;
+                var newY = x;
+                var newIndex = newY * newStride + newX * 4;
+
+                newPixels[newIndex + 0] = oldPixels[oldIndex + 0];
+                newPixels[newIndex + 1] = oldPixels[oldIndex + 1];
+                newPixels[newIndex + 2] = oldPixels[oldIndex + 2];
+                newPixels[newIndex + 3] = oldPixels[oldIndex + 3];
+            }
+        }
+
+        var rotated = new WriteableBitmap(
+            new PixelSize(newW, newH),
+            new Vector(96, 96),
+            PixelFormat.Rgba8888,
+            AlphaFormat.Unpremul);
+
+        using (var fb = rotated.Lock())
+        {
+            Marshal.Copy(newPixels, 0, fb.Address, newPixels.Length);
+        }
+
+        return rotated;
+    }
+    private void RotateAnnotationPointsClockwise(int oldWidth, int oldHeight)
+    {
+        foreach (var shape in CurrentAnnotationDocument.Shapes)
+        {
+            for (int i = 0; i < shape.Points.Count; i++)
+            {
+                var p = shape.Points[i];
+
+                var newX = oldHeight - p.Y;
+                var newY = p.X;
+
+                shape.Points[i] = new PointD(newX, newY);
+            }
+        }
+    }
+    private void RotateMaskLabelDataClockwise()
+    {
+        foreach (var kvp in _maskLabelDataByLabelId)
+        {
+            var labelId = kvp.Key;
+            var maskData = kvp.Value;
+
+            var oldW = maskData.Width;
+            var oldH = maskData.Height;
+
+            if (oldW <= 0 || oldH <= 0)
+                continue;
+
+            maskData.Mask = RotateByteMaskClockwise(maskData.Mask, oldW, oldH);
+            maskData.OriginalMask = RotateByteMaskClockwise(maskData.OriginalMask, oldW, oldH);
+
+            maskData.Width = oldH;
+            maskData.Height = oldW;
+
+            var shape = CurrentAnnotationDocument.Shapes
+                .FirstOrDefault(s => s.LabelId == labelId);
+
+            if (shape is not null && shape.Points.Count >= 3)
+                maskData.DisplayContour = shape.Points.ToList();
+        }
+    }
+
+    private static byte[] RotateByteMaskClockwise(byte[] mask, int oldW, int oldH)
+    {
+        if (mask.Length == 0)
+            return mask;
+
+        var newW = oldH;
+        var newH = oldW;
+        var rotated = new byte[newW * newH];
+
+        for (int y = 0; y < oldH; y++)
+        {
+            for (int x = 0; x < oldW; x++)
+            {
+                var oldIndex = y * oldW + x;
+
+                if (oldIndex < 0 || oldIndex >= mask.Length)
+                    continue;
+
+                var newX = oldH - 1 - y;
+                var newY = x;
+                var newIndex = newY * newW + newX;
+
+                if (newIndex >= 0 && newIndex < rotated.Length)
+                    rotated[newIndex] = mask[oldIndex];
+            }
+        }
+
+        return rotated;
+    }
+    //reset image command//
+    [RelayCommand]
+    private async Task ResetImage()
+    {
+        if (string.IsNullOrWhiteSpace(CurrentImagePath) || !File.Exists(CurrentImagePath))
+        {
+            StatusText = "Original image path is not available.";
+            return;
+        }
+
+        try
+        {
+            var imagePath = CurrentImagePath;
+
+            var extension = Path.GetExtension(imagePath).ToLowerInvariant();
+
+            if (extension == ".heic" || extension == ".heif")
+            {
+                var tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".png");
+
+                try
+                {
+                    using var magickImage = new Magick.MagickImage(imagePath);
+                    magickImage.Format = Magick.MagickFormat.Png;
+                    await magickImage.WriteAsync(tempPath);
+
+                    await using var stream = File.OpenRead(tempPath);
+                    CurrentImage = new Bitmap(stream);
+                }
+                finally
+                {
+                    if (File.Exists(tempPath))
+                        File.Delete(tempPath);
+                }
+            }
+            else
+            {
+                await using var stream = File.OpenRead(imagePath);
+                CurrentImage = new Bitmap(stream);
+            }
+
+            ResetAnnotationStateForNewImage(imagePath);
+
+            StatusText = "Image reset to original. Existing annotations were cleared to prevent coordinate mismatch.";
+        }
+        catch (Exception ex)
+        {
+            StatusText = $"Failed to reset image: {ex.Message}";
+        }
+    }
+    //-------颜色校准box的命令-------------//
+    [RelayCommand]
+    private void ImageColorCorrection()
+    {
+        if (CurrentImage is null)
+        {
+            StatusText = "Please open an image before color correction.";
+            return;
+        }
+
+        CurrentTool = ToolMode.ColorCalibrationBox;
+        CurrentToolText = "Color Correction";
+        CurrentDrawingPoints.Clear();
+        RefreshDrawingBindings();
+
+        StatusText = "Color correction selected. Step 1/2: click the first corner of a neutral white/gray reference region.";
+    }
     //-------------------加改变label颜色命令-------------//
     [RelayCommand]
     private void SetCyanColor()
@@ -3158,8 +3495,8 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        // !!：如果这个 label 背后有 exact mask，就按 mask 测量
-        //SAM label 虽然显示为 polygon，但测量时会先进入 MeasureMaskLabel()，不会走 polygon 的面积算法
+        // !!：这个 label 背后有 exact mask，就按 mask 测量
+        //SAM label 虽然显示为 polygon，测量时会先进入 MeasureMaskLabel()，不走 polygon 的面积算法
         // if (_maskLabelDataByLabelId.TryGetValue(label.Id, out var maskData))
         // {
         //     await MeasureMaskLabel(label, shape, maskData);
@@ -3607,6 +3944,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
         return Math.Sqrt(dx * dx + dy * dy);
     }
+
+
+
     //-----------颜色测量的命令-------------------
     [RelayCommand]
     private void ColorBox()
@@ -3910,7 +4250,640 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentDrawingPoints.Clear();
         RefreshDrawingBindings();
     }
-    // ── 其他命令（待实现）────────────────────────────────────────────────────
+    private void HandleColorCalibrationBoxClick(double imageX, double imageY)
+    {
+        CurrentDrawingPoints.Add(new PointD(imageX, imageY));
+        RefreshDrawingBindings();
+
+        if (CurrentDrawingPoints.Count == 1)
+        {
+            StatusText = "Step 2/2: click the opposite corner to define the white/gray reference region.";
+            return;
+        }
+
+        if (CurrentDrawingPoints.Count >= 2)
+        {
+            FinalizeColorCalibrationBox();
+        }
+    }
+    //---对整张图做颜色校正--------------------------------------------//
+    //private void FinalizeColorCalibrationBox()
+    private async void FinalizeColorCalibrationBox()
+    {
+        if (CurrentDrawingPoints.Count < 2 || CurrentImage is null)
+            return;
+
+        var p1 = CurrentDrawingPoints[0];
+        var p2 = CurrentDrawingPoints[1];
+
+        var minX = (int)Math.Floor(Math.Min(p1.X, p2.X));
+        var maxX = (int)Math.Ceiling(Math.Max(p1.X, p2.X));
+        var minY = (int)Math.Floor(Math.Min(p1.Y, p2.Y));
+        var maxY = (int)Math.Ceiling(Math.Max(p1.Y, p2.Y));
+
+        minX = Math.Max(0, minX);
+        minY = Math.Max(0, minY);
+        maxX = Math.Min(CurrentImage.PixelSize.Width - 1, maxX);
+        maxY = Math.Min(CurrentImage.PixelSize.Height - 1, maxY);
+
+        var width = maxX - minX + 1;
+        var height = maxY - minY + 1;
+
+        if (width <= 0 || height <= 0)
+        {
+            StatusText = "Invalid color correction reference region.";
+            CurrentDrawingPoints.Clear();
+            RefreshDrawingBindings();
+            return;
+        }
+
+        if (!TryComputeMeanColorInBox(
+                minX,
+                minY,
+                width,
+                height,
+                out var meanR,
+                out var meanG,
+                out var meanB))
+        {
+            StatusText = "No valid pixels in reference region.";
+            CurrentDrawingPoints.Clear();
+            RefreshDrawingBindings();
+            return;
+        }
+
+        StatusText = "Applying color correction...";
+
+        var sourceImage = CurrentImage;
+
+        var corrected = await Task.Run(() =>
+            ApplyNeutralColorCorrection(sourceImage, meanR, meanG, meanB));
+
+        if (corrected is null)
+        {
+            StatusText = "Color correction failed.";
+            CurrentDrawingPoints.Clear();
+            RefreshDrawingBindings();
+            return;
+        }
+
+        CurrentImage = corrected;
+
+        // 图像像素改变了，SAM embedding 需要重新生成
+        _samEmbedding = null;
+        IsSamEmbeddingReady = false;
+        _samPromotions.Clear();
+        SegmentationMaskBitmap = null;
+        HasSegmentationMask = false;
+
+        CurrentDrawingPoints.Clear();
+        RefreshDrawingBindings();
+        RefreshOverlayBindings();
+
+        StatusText =
+            $"Color correction applied. Reference RGB = {meanR:F0}, {meanG:F0}, {meanB:F0}.";
+    }
+    //-------------------cross plantform unified pixel read/write helper-------------//
+    private static bool UseBgraPixelOrder()
+    {
+        return RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+    }
+
+    private static (byte R, byte G, byte B, byte A) ReadPixel4(byte[] buffer, int index)
+    {
+        if (UseBgraPixelOrder())
+        {
+            // Windows: BGRA
+            byte b = buffer[index + 0];
+            byte g = buffer[index + 1];
+            byte r = buffer[index + 2];
+            byte a = buffer[index + 3];
+
+            return (r, g, b, a);
+        }
+        else
+        {
+            // macOS: RGBA
+            byte r = buffer[index + 0];
+            byte g = buffer[index + 1];
+            byte b = buffer[index + 2];
+            byte a = buffer[index + 3];
+
+            return (r, g, b, a);
+        }
+    }
+
+    private static void WritePixel4(byte[] buffer, int index, byte r, byte g, byte b, byte a)
+    {
+        if (UseBgraPixelOrder())
+        {
+            // Windows: BGRA
+            buffer[index + 0] = b;
+            buffer[index + 1] = g;
+            buffer[index + 2] = r;
+            buffer[index + 3] = a;
+        }
+        else
+        {
+            // macOS: RGBA
+            buffer[index + 0] = r;
+            buffer[index + 1] = g;
+            buffer[index + 2] = b;
+            buffer[index + 3] = a;
+        }
+    }
+
+    private static PixelFormat GetPlatformPixelFormat()
+    {
+        return UseBgraPixelOrder()
+            ? PixelFormat.Bgra8888
+            : PixelFormat.Rgba8888;
+    }
+    //-------------------框选区域算平均rgb-------------//
+        private bool TryComputeMeanColorInBox(
+        int minX,
+        int minY,
+        int width,
+        int height,
+        out double meanR,
+        out double meanG,
+        out double meanB)
+    {
+        meanR = meanG = meanB = 0;
+
+        if (CurrentImage is null || width <= 0 || height <= 0)
+            return false;
+
+        var stride = width * 4;
+        var bufferSize = stride * height;
+        var managedBuffer = new byte[bufferSize];
+
+        IntPtr unmanagedBuffer = IntPtr.Zero;
+
+        try
+        {
+            unmanagedBuffer = Marshal.AllocHGlobal(bufferSize);
+
+            CurrentImage.CopyPixels(
+                new PixelRect(minX, minY, width, height),
+                unmanagedBuffer,
+                bufferSize,
+                stride);
+
+            Marshal.Copy(unmanagedBuffer, managedBuffer, 0, bufferSize);
+        }
+        finally
+        {
+            if (unmanagedBuffer != IntPtr.Zero)
+                Marshal.FreeHGlobal(unmanagedBuffer);
+        }
+
+        double sumR = 0;
+        double sumG = 0;
+        double sumB = 0;
+        long count = 0;
+
+        for (int i = 0; i < managedBuffer.Length; i += 4)
+        {
+            // CopyPixels 按 RGBA 读取
+            // byte r = managedBuffer[i + 0];
+            // byte g = managedBuffer[i + 1];
+            // byte b = managedBuffer[i + 2];
+            // byte a = managedBuffer[i + 3];
+            var (r, g, b, a) = ReadPixel4(managedBuffer, i);
+
+            if (a == 0)
+                continue;
+
+            sumR += r;
+            sumG += g;
+            sumB += b;
+            count++;
+        }
+
+        if (count == 0)
+            return false;
+
+        meanR = sumR / count;
+        meanG = sumG / count;
+        meanB = sumB / count;
+
+        return true;
+    }
+    //--整图颜色校正函数--------------------------------------------//
+    //----修改：不再 Save 到 MemoryStream 再重新读，，用 Parallel.For 按行处理像素 //
+    //--------------------------------------------//
+    private static Bitmap? ApplyNeutralColorCorrection(
+        Bitmap source,
+        double referenceR,
+        double referenceG,
+        double referenceB)
+    {
+        var w = source.PixelSize.Width;
+        var h = source.PixelSize.Height;
+
+        if (w <= 0 || h <= 0)
+            return null;
+
+        // 用参考区域的平均亮度作为目标，不强行变白，避免过曝
+        var target = (referenceR + referenceG + referenceB) / 3.0;
+
+        var scaleR = target / Math.Max(referenceR, 1.0);
+        var scaleG = target / Math.Max(referenceG, 1.0);
+        var scaleB = target / Math.Max(referenceB, 1.0);
+
+        var stride = w * 4;
+        var bufferSize = stride * h;
+        var pixels = new byte[bufferSize];
+
+        IntPtr unmanagedBuffer = IntPtr.Zero;
+
+        try
+        {
+            unmanagedBuffer = Marshal.AllocHGlobal(bufferSize);
+
+            source.CopyPixels(
+                new PixelRect(0, 0, w, h),
+                unmanagedBuffer,
+                bufferSize,
+                stride);
+
+            Marshal.Copy(unmanagedBuffer, pixels, 0, bufferSize);
+        }
+        finally
+        {
+            if (unmanagedBuffer != IntPtr.Zero)
+                Marshal.FreeHGlobal(unmanagedBuffer);
+        }
+
+        // 比普通 for 稍快，尤其是大图
+        Parallel.For(0, h, y =>
+        {
+            var rowStart = y * stride;
+
+            for (int x = 0; x < w; x++)
+            {
+                var i = rowStart + x * 4;
+
+                // byte r = pixels[i + 0];
+                // byte g = pixels[i + 1];
+                // byte b = pixels[i + 2];
+                // byte a = pixels[i + 3];
+                var (r, g, b, a) = ReadPixel4(pixels, i);
+
+                if (a == 0)
+                    continue;
+
+                // pixels[i + 0] = ClampToByte(r * scaleR);
+                // pixels[i + 1] = ClampToByte(g * scaleG);
+                // pixels[i + 2] = ClampToByte(b * scaleB);
+                // pixels[i + 3] = a;
+                var newR = ClampToByte(r * scaleR);
+                var newG = ClampToByte(g * scaleG);
+                var newB = ClampToByte(b * scaleB);
+
+                WritePixel4(pixels, i, newR, newG, newB, a);
+            }
+        });
+
+        var corrected = new WriteableBitmap(
+            new PixelSize(w, h),
+            new Vector(96, 96),
+            // PixelFormat.Rgba8888,
+            GetPlatformPixelFormat(),
+            AlphaFormat.Unpremul);
+
+        using (var fb = corrected.Lock())
+        {
+            Marshal.Copy(pixels, 0, fb.Address, pixels.Length);
+        }
+
+        return corrected;
+    }
+
+    private static byte ClampToByte(double value)
+    {
+        if (value < 0)
+            return 0;
+
+        if (value > 255)
+            return 255;
+
+        return (byte)Math.Round(value);
+    }
+
+
+    //RLE 编码 / 解码 helper
+    private static List<int> EncodeMaskRle(byte[] mask)
+    {
+        var rle = new List<int>();
+
+        if (mask.Length == 0)
+            return rle;
+
+        byte current = mask[0];
+        int count = 1;
+
+        for (int i = 1; i < mask.Length; i++)
+        {
+            if (mask[i] == current)
+            {
+                count++;
+            }
+            else
+            {
+                rle.Add(count);
+                rle.Add(current);
+
+                current = mask[i];
+                count = 1;
+            }
+        }
+
+        rle.Add(count);
+        rle.Add(current);
+
+        return rle;
+    }
+
+    private static byte[] DecodeMaskRle(IReadOnlyList<int> rle, int expectedLength)
+    {
+        var mask = new byte[expectedLength];
+        int offset = 0;
+
+        for (int i = 0; i + 1 < rle.Count; i += 2)
+        {
+            int count = rle[i];
+            byte value = (byte)rle[i + 1];
+
+            for (int j = 0; j < count && offset < mask.Length; j++)
+            {
+                mask[offset] = value;
+                offset++;
+            }
+        }
+
+        return mask;
+    }
+   //save annotation json command
+   [RelayCommand]
+    private async Task SaveAnnotationJson()
+    {
+        if (_hostWindow is null)
+        {
+            StatusText = "Host window is not available.";
+            return;
+        }
+
+        if (CurrentImage is null)
+        {
+            StatusText = "No image loaded.";
+            return;
+        }
+
+        var suggestedName = "BioIMA_annotations.json";
+
+        if (!string.IsNullOrWhiteSpace(CurrentImagePath))
+        {
+            var baseName = Path.GetFileNameWithoutExtension(CurrentImagePath);
+            suggestedName = $"{baseName}_annotations.json";
+        }
+
+        var file = await _hostWindow.StorageProvider.SaveFilePickerAsync(
+            new FilePickerSaveOptions
+            {
+                Title = "Save annotation JSON",
+                SuggestedFileName = suggestedName,
+                DefaultExtension = "json",
+                FileTypeChoices =
+                [
+                    new FilePickerFileType("BioIMA annotation JSON")
+                    {
+                        Patterns = ["*.json"]
+                    }
+                ]
+            });
+
+        if (file is null)
+        {
+            StatusText = "Save annotation cancelled.";
+            return;
+        }
+
+        var project = new AnnotationProjectJson
+        {
+            Version = "1.0",
+            ImagePath = CurrentAnnotationDocument.ImagePath,
+            ImageWidth = CurrentImage.PixelSize.Width,
+            ImageHeight = CurrentImage.PixelSize.Height,
+
+            Labels = CurrentAnnotationDocument.Labels
+                .Select(label => new AnnotationLabelJson
+                {
+                    Id = label.Id,
+                    Name = label.Name,
+                    Type = label.Type,
+                    IsVisible = label.IsVisible,
+                    StrokeColor = label.StrokeColor,
+                    FillColor = label.FillColor
+                })
+                .ToList(),
+
+            Shapes = CurrentAnnotationDocument.Shapes
+                .Select(shape => new AnnotationShapeJson
+                {
+                    LabelId = shape.LabelId,
+                    ShapeType = shape.ShapeType,
+                    Points = shape.Points
+                        .Select(p => new PointDJson { X = p.X, Y = p.Y })
+                        .ToList()
+                })
+                .ToList()
+        };
+
+        foreach (var kvp in _maskLabelDataByLabelId)
+        {
+            var labelId = kvp.Key;
+            var maskData = kvp.Value;
+
+            project.MaskLabels.Add(new MaskLabelJson
+            {
+                LabelId = labelId,
+                Width = maskData.Width,
+                Height = maskData.Height,
+                MaskRle = EncodeMaskRle(maskData.Mask),
+                OriginalMaskRle = EncodeMaskRle(maskData.OriginalMask.Length > 0
+                    ? maskData.OriginalMask
+                    : maskData.Mask),
+                IsEditedByUser = maskData.IsEditedByUser,
+                DisplayContour = maskData.DisplayContour
+                    .Select(p => new PointDJson { X = p.X, Y = p.Y })
+                    .ToList()
+            });
+        }
+
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = true
+        };
+
+        await using var stream = await file.OpenWriteAsync();
+        await JsonSerializer.SerializeAsync(stream, project, options);
+
+        StatusText = $"Annotation JSON saved: {file.Name}";
+    }
+
+    //LoadAnnotationJson
+    [RelayCommand]
+    private async Task LoadAnnotationJson()
+    {
+        if (_hostWindow is null)
+        {
+            StatusText = "Host window is not available.";
+            return;
+        }
+
+        var files = await _hostWindow.StorageProvider.OpenFilePickerAsync(
+            new FilePickerOpenOptions
+            {
+                Title = "Load annotation JSON",
+                AllowMultiple = false,
+                FileTypeFilter =
+                [
+                    new FilePickerFileType("BioIMA annotation JSON")
+                    {
+                        Patterns = ["*.json"]
+                    }
+                ]
+            });
+
+        var file = files.FirstOrDefault();
+
+        if (file is null)
+        {
+            StatusText = "Load annotation cancelled.";
+            return;
+        }
+
+        AnnotationProjectJson? project;
+
+        await using (var stream = await file.OpenReadAsync())
+        {
+            project = await JsonSerializer.DeserializeAsync<AnnotationProjectJson>(stream);
+        }
+
+        if (project is null)
+        {
+            StatusText = "Failed to read annotation JSON.";
+            return;
+        }
+
+        CurrentAnnotationDocument = new ImageAnnotationDocument
+        {
+            ImagePath = !string.IsNullOrWhiteSpace(CurrentImagePath)
+                ? CurrentImagePath
+                : project.ImagePath
+        };
+
+        AnnotationLabels.Clear();
+        _maskLabelDataByLabelId.Clear();
+
+        foreach (var labelJson in project.Labels)
+        {
+            var label = new AnnotationLabel
+            {
+                Id = labelJson.Id,
+                Name = labelJson.Name,
+                Type = labelJson.Type,
+                IsVisible = labelJson.IsVisible,
+                StrokeColor = labelJson.StrokeColor,
+                FillColor = labelJson.FillColor
+            };
+
+            CurrentAnnotationDocument.Labels.Add(label);
+            AnnotationLabels.Add(label);
+        }
+
+        foreach (var shapeJson in project.Shapes)
+        {
+            var shape = new AnnotationShape
+            {
+                LabelId = shapeJson.LabelId,
+                ShapeType = shapeJson.ShapeType,
+                Points = shapeJson.Points
+                    .Select(p => new PointD(p.X, p.Y))
+                    .ToList()
+            };
+
+            CurrentAnnotationDocument.Shapes.Add(shape);
+        }
+
+        foreach (var maskJson in project.MaskLabels)
+        {
+            var expectedLength = maskJson.Width * maskJson.Height;
+
+            var mask = DecodeMaskRle(maskJson.MaskRle, expectedLength);
+
+            var originalMask = maskJson.OriginalMaskRle.Count > 0
+                ? DecodeMaskRle(maskJson.OriginalMaskRle, expectedLength)
+                : mask.ToArray();
+
+            _maskLabelDataByLabelId[maskJson.LabelId] = new MaskLabelData
+            {
+                Width = maskJson.Width,
+                Height = maskJson.Height,
+                Mask = mask,
+                OriginalMask = originalMask,
+                IsEditedByUser = maskJson.IsEditedByUser,
+                DisplayContour = maskJson.DisplayContour
+                    .Select(p => new PointD(p.X, p.Y))
+                    .ToList()
+            };
+        }
+
+        SelectedAnnotationLabel = AnnotationLabels.FirstOrDefault();
+        CurrentLabelText = SelectedAnnotationLabel?.Name ?? "None";
+
+        RefreshLabelLists();
+        RefreshOverlayBindings();
+        RefreshSelectedMaskPreview();
+
+        if (CurrentImage is not null &&
+            (CurrentImage.PixelSize.Width != project.ImageWidth ||
+            CurrentImage.PixelSize.Height != project.ImageHeight))
+        {
+            StatusText =
+                $"Annotation loaded, but image size differs from saved annotation size ({project.ImageWidth}×{project.ImageHeight}). Please check alignment.";
+        }
+        else
+        {
+            StatusText = $"Annotation JSON loaded: {file.Name}";
+        }
+    }
+ ////set defult color cluster k
+    [RelayCommand]
+    private void SetDefaultColorClusterK(string? value)
+    {
+        if (!int.TryParse(value, out var k))
+        {
+            StatusText = "Invalid color cluster K.";
+            return;
+        }
+
+        k = Math.Clamp(k, 2, 12);
+        ColorClusterCount = k;
+
+        StatusText = $"Default color cluster K set to {ColorClusterCount}.";
+    }
+   ///next session  k 
+    [RelayCommand]
+    private void ResetSettings()
+    {
+        ColorClusterCount = 5;
+
+        StatusText = "Settings reset. Default color cluster K = 5.";
+    }
+    // ── 其他待实现命令────────────────────────────────────────────────────
 
     [RelayCommand] private void Undo()     => StatusText = "Undo clicked";
     [RelayCommand] private void Redo()     => StatusText = "Redo clicked";
@@ -3918,7 +4891,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand] private void Option()   => StatusText = "Option clicked";
     [RelayCommand] private void Settings() => StatusText = "Settings clicked";
     [RelayCommand] private void Tools()    => StatusText = "Tools clicked";
-    [RelayCommand] private void Image()    => StatusText = "Image clicked";
+    //[RelayCommand] private void Image()    => StatusText = "Image clicked";
     [RelayCommand] private void AddLabel() => StatusText = "Add label clicked";
     [RelayCommand] private void Convert()  => StatusText = "Convert clicked";
 }

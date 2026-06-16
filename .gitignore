@@ -1,0 +1,12 @@
+# Build artifacts
+bin/
+obj/
+Releases/
+*.nupkg
+*.exe
+*.pkg
+*.dll
+*.dmg
+
+# OS files
+.DS_Store

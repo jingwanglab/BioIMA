@@ -18,11 +18,120 @@
         <!-- Top menu -->
         <Border DockPanel.Dock="Top" Background="#2C7DA0" Padding="8">
             <StackPanel Orientation="Horizontal" Spacing="12">
-                <Button Content="Save"     Command="{Binding SaveCommand}"     />
-                <Button Content="Option"   Command="{Binding OptionCommand}"   />
-                <Button Content="Settings" Command="{Binding SettingsCommand}" />
-                <Button Content="Tools"    Command="{Binding ToolsCommand}"    />
-                <Button Content="Image"    Command="{Binding ImageCommand}"    />
+
+               <Button Content="Save">
+                <Button.Flyout>
+                    <MenuFlyout>
+                        <MenuItem Header="Save Annotation JSON"
+                                Command="{Binding SaveAnnotationJsonCommand}" />
+
+                        <MenuItem Header="Export Results CSV"
+                                Command="{Binding ExportResultsCommand}" />
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+
+            <Button Content="Load">
+                <Button.Flyout>
+                    <MenuFlyout>
+                        <MenuItem Header="Open Image"
+                                Command="{Binding OpenImageCommand}" />
+
+                        <MenuItem Header="Open Folder"
+                                Command="{Binding OpenFolderCommand}" />
+
+                        <MenuItem Header="Load Annotation JSON"
+                                Command="{Binding LoadAnnotationJsonCommand}" />
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+
+            <Button Content="Settings">
+                <Button.Flyout>
+                    <MenuFlyout>
+                        <MenuItem Header="Default Color Cluster K">
+                            <MenuItem Header="K = 2"
+                                    Command="{Binding SetDefaultColorClusterKCommand}"
+                                    CommandParameter="2"/>
+                            <MenuItem Header="K = 3"
+                                    Command="{Binding SetDefaultColorClusterKCommand}"
+                                    CommandParameter="3"/>
+                            <MenuItem Header="K = 4"
+                                    Command="{Binding SetDefaultColorClusterKCommand}"
+                                    CommandParameter="4"/>
+                            <MenuItem Header="K = 5"
+                                    Command="{Binding SetDefaultColorClusterKCommand}"
+                                    CommandParameter="5"/>
+                            <MenuItem Header="K = 6"
+                                    Command="{Binding SetDefaultColorClusterKCommand}"
+                                    CommandParameter="6"/>
+                            <MenuItem Header="K = 7"
+                                    Command="{Binding SetDefaultColorClusterKCommand}"
+                                    CommandParameter="7"/>
+                            <MenuItem Header="K = 8"
+                                    Command="{Binding SetDefaultColorClusterKCommand}"
+                                    CommandParameter="8"/>
+                            <MenuItem Header="K = 9"
+                                    Command="{Binding SetDefaultColorClusterKCommand}"
+                                    CommandParameter="9"/>
+                            <MenuItem Header="K = 10"
+                                    Command="{Binding SetDefaultColorClusterKCommand}"
+                                    CommandParameter="10"/>
+                            <MenuItem Header="K = 11"
+                                    Command="{Binding SetDefaultColorClusterKCommand}"
+                                    CommandParameter="11"/>
+                            <MenuItem Header="K = 12"
+                                    Command="{Binding SetDefaultColorClusterKCommand}"
+                                    CommandParameter="12"/>
+                        </MenuItem>
+
+                        <MenuItem Header="Reset Settings"
+                                Command="{Binding ResetSettingsCommand}" />
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+
+            <Button Content="Tools">
+                <Button.Flyout>
+                    <MenuFlyout>
+                        <MenuItem Header="Polygon"
+                                Command="{Binding PolygonCommand}" />
+
+                        <MenuItem Header="Rectangle"
+                                Command="{Binding RectangleCommand}" />
+
+                        <MenuItem Header="Line"
+                                Command="{Binding LineCommand}" />
+
+                        <MenuItem Header="Angle"
+                                Command="{Binding AngleCommand}" />
+
+                        <MenuItem Header="Ruler"
+                                Command="{Binding RulerCommand}" />
+
+                        <MenuItem Header="SAM Segmentation"
+                                Command="{Binding SegmentCommand}" />
+
+                        <MenuItem Header="Color Box"
+                                Command="{Binding ColorBoxCommand}" />
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+
+            <Button Content="Image">
+                <Button.Flyout>
+                    <MenuFlyout>
+                        <MenuItem Header="Rotate 90° Clockwise"
+                                Command="{Binding RotateImageClockwiseCommand}" />
+
+                        <MenuItem Header="Reset Image"
+                                Command="{Binding ResetImageCommand}" />
+
+                        <MenuItem Header="Color Correction"
+                                Command="{Binding ImageColorCorrectionCommand}" />
+                    </MenuFlyout>
+                </Button.Flyout>
+                </Button>
                 <Button Content="Measure" Command="{Binding MeasureCommand}"   />
             </StackPanel>
         </Border>
@@ -40,7 +149,7 @@
     <StackPanel Spacing="10">
 
         <Button Command="{Binding OpenImageCommand}" Height="40" Width="40">
-            <Image Source="avares://BioIMA.Avalonia/Images/openfile.png"
+            <Image Source="avares://BioIMA.Avalonia/Images/openimg.png"
                    Width="22" Height="22" Stretch="Uniform"/>
         </Button>
 
@@ -113,27 +222,52 @@
 </Border>
 
             <!-- ── 2. File panel ───────────────────────────────────────── -->
-            <Border Grid.Column="1"
-                    Background="#F4F4F4"
-                    BorderBrush="#D0D0D0"
-                    BorderThickness="0,0,1,0"
-                    Padding="8">
-                <StackPanel Spacing="8">
-                    <TextBlock Text="Files" FontSize="20" FontWeight="Bold"/>
+           
+        <Border Grid.Column="1"
+                Background="White"
+                BorderBrush="#E0E0E0"
+                BorderThickness="0,0,1,0"
+                Padding="12">
+            <DockPanel>
+
+            
+                <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,8">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Border Width="4" CornerRadius="2" Background="#2D7DD2"/>
+                        <TextBlock Text="Files"
+                                FontSize="16"
+                                FontWeight="SemiBold"
+                                VerticalAlignment="Center"/>
+                    </StackPanel>
                     <TextBlock Text="{Binding CurrentFolderText}"
-                               TextWrapping="Wrap"
-                               FontSize="12"
-                               Foreground="Gray"/>
+                            TextWrapping="Wrap"
+                            FontSize="11"
+                            Foreground="#888888"
+                            Margin="12,0,0,0"/>
+                </StackPanel>
+
+                <Border DockPanel.Dock="Top"
+                        BorderBrush="#E5E5E5"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Background="#FAFAFA">
                     <ListBox ItemsSource="{Binding ImageFiles}"
-                             SelectedItem="{Binding SelectedImageFile}">
+                            SelectedItem="{Binding SelectedImageFile}"
+                            Background="Transparent"
+                            BorderThickness="0">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding DisplayName}" />
+                                <TextBlock Text="{Binding DisplayName}"
+                                        FontSize="13"
+                                        Padding="4,3"
+                                        TextTrimming="CharacterEllipsis"/>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
-                </StackPanel>
-            </Border>
+                </Border>
+
+            </DockPanel>
+        </Border>
 
             <!-- ── 3. Image display ────────────────────────────────────── -->
  
@@ -514,44 +648,73 @@
             </Border>
 
             <!-- ── 4. Right panel ──────────────────────────────────────── -->
+            
             <Border Grid.Column="3"
-                    Background="#F8F8F8"
-                    BorderBrush="#D0D0D0"
+                    Background="White"
+                    BorderBrush="#E0E0E0"
                     BorderThickness="1,0,0,0"
-                    Padding="10">
+                    Padding="12">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Spacing="12">
+                    <StackPanel Spacing="10">
 
-                        <TextBlock Text="Labels" FontSize="20" FontWeight="Bold"/>
-                        <ListBox ItemsSource="{Binding DisplayAnnotationLabels}"
-                                SelectedItem="{Binding SelectedAnnotationLabel}"
-                                Name="LabelsListBox"
-                                DoubleTapped="LabelsListBox_OnDoubleTapped"
-                                Height="180">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Name}" />
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                        <TextBlock Text="Label Name"
-                                FontWeight="Bold"
-                                Margin="0,8,0,0"
-                                IsVisible="{Binding SelectedAnnotationLabel,
-                                            Converter={x:Static ObjectConverters.IsNotNull}}"/>
-                        <TextBox Text="{Binding SelectedAnnotationLabel.Name, Mode=TwoWay}"
-                                Watermark="Edit label name"/>
+                        <!-- Labels Section -->
+                        <Border Background="White"
+                                BorderBrush="#E5E5E5"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="10">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Border Width="4" CornerRadius="2" Background="#3B7597"/>
+                                    <TextBlock Text="Labels" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
 
-                        <Separator/>
-
-                                <TextBlock Text="Mask Preview"
-                                        FontSize="16"
-                                        FontWeight="Bold"
-                                        Margin="0,6,0,0"/>
-
-                                <Border BorderBrush="#D0D0D0"
+                                <ListBox ItemsSource="{Binding DisplayAnnotationLabels}"
+                                        SelectedItem="{Binding SelectedAnnotationLabel}"
+                                        Name="LabelsListBox"
+                                        DoubleTapped="LabelsListBox_OnDoubleTapped"
+                                        Height="160"
+                                        BorderBrush="#E5E5E5"
                                         BorderThickness="1"
-                                        Background="White"
+                                        CornerRadius="6">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Name}" Padding="4,2"/>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+
+                                <TextBlock Text="Label Name"
+                                        FontSize="12"
+                                        FontWeight="SemiBold"
+                                        Foreground="#555555"
+                                        Margin="0,4,0,0"
+                                        IsVisible="{Binding SelectedAnnotationLabel,
+                                                    Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                                <TextBox Text="{Binding SelectedAnnotationLabel.Name, Mode=TwoWay}"
+                                        Watermark="Edit label name"
+                                        CornerRadius="6"
+                                        BorderBrush="#CCCCCC"
+                                        Padding="8,6"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Preview Section -->
+                        <Border Background="White"
+                                BorderBrush="#E5E5E5"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="10">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Border Width="4" CornerRadius="2" Background="#3B7597"/>
+                                    <TextBlock Text="Preview" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <Border BorderBrush="#E5E5E5"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Background="#FAFAFA"
                                         Padding="6"
                                         MinHeight="120"
                                         IsVisible="{Binding HasSelectedMaskPreview}">
@@ -561,68 +724,130 @@
                                         HorizontalAlignment="Center"/>
                                 </Border>
 
-                        <Separator/>
+                                <Border BorderBrush="#E5E5E5"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Background="#FAFAFA"
+                                        MinHeight="80"
+                                        IsVisible="{Binding !HasSelectedMaskPreview}">
+                                    <TextBlock Text="No selection"
+                                            Foreground="#BBBBBB"
+                                            FontSize="13"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
 
-                    <TextBlock Text="Results" FontSize="20" FontWeight="Bold"/>
+                        <!-- Results Section -->
+                        <Border Background="White"
+                                BorderBrush="#E5E5E5"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="10">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Border Width="4" CornerRadius="2" Background="#3B7597"/>
+                                    <TextBlock Text="Results" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
 
-                    <DataGrid ItemsSource="{Binding MeasurementRecords}"
-                            AutoGenerateColumns="False"
-                            Height="260"
-                            CanUserResizeColumns="True"
-                            HeadersVisibility="Column">
+                                <DataGrid ItemsSource="{Binding MeasurementRecords}"
+                                        AutoGenerateColumns="False"
+                                        Height="200"
+                                        CanUserResizeColumns="True"
+                                        HeadersVisibility="Column"
+                                        BorderBrush="#E5E5E5"
+                                        BorderThickness="1"
+                                        CornerRadius="6">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="70"/>
+                                        <DataGridTextColumn Header="Label" Binding="{Binding LabelName}" Width="100"/>
+                                        <DataGridTextColumn Header="Type" Binding="{Binding ShapeType}" Width="80"/>
 
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="70"/>
-                            <DataGridTextColumn Header="Label" Binding="{Binding LabelName}" Width="100"/>
-                            <DataGridTextColumn Header="Type" Binding="{Binding ShapeType}" Width="80"/>
+                                        <DataGridTextColumn Header="Area" Binding="{Binding Area}" Width="100"/>
+                                        <DataGridTextColumn Header="Area Px" Binding="{Binding AreaPx}" Width="90"/>
+                                        <DataGridTextColumn Header="Perimeter" Binding="{Binding Perimeter}" Width="100"/>
+                                        <DataGridTextColumn Header="Width" Binding="{Binding Width}" Width="90"/>
+                                        <DataGridTextColumn Header="Height" Binding="{Binding Height}" Width="90"/>
+                                        <DataGridTextColumn Header="Aspect Ratio" Binding="{Binding AspectRatio}" Width="110"/>
+                                        <DataGridTextColumn Header="Circularity" Binding="{Binding Circularity}" Width="110"/>
+                                        <DataGridTextColumn Header="Eq. Diameter" Binding="{Binding EquivalentDiameter}" Width="120"/>
+                                        <DataGridTextColumn Header="Line Length" Binding="{Binding LineLength}" Width="110"/>
+                                        <DataGridTextColumn Header="Line Px" Binding="{Binding LinePx}" Width="90"/>
+                                        <DataGridTextColumn Header="Angle Degree" Binding="{Binding AngleDegree}" Width="110"/>
 
-                            <DataGridTextColumn Header="Area" Binding="{Binding Area}" Width="100"/>
-                            <DataGridTextColumn Header="Area Px" Binding="{Binding AreaPx}" Width="90"/>
-                            <DataGridTextColumn Header="Perimeter" Binding="{Binding Perimeter}" Width="100"/>
-                            <DataGridTextColumn Header="Width" Binding="{Binding Width}" Width="90"/>
-                            <DataGridTextColumn Header="Height" Binding="{Binding Height}" Width="90"/>
-                            <DataGridTextColumn Header="Aspect Ratio" Binding="{Binding AspectRatio}" Width="110"/>
-                            <DataGridTextColumn Header="Circularity" Binding="{Binding Circularity}" Width="110"/>
-                            <DataGridTextColumn Header="Eq. Diameter" Binding="{Binding EquivalentDiameter}" Width="120"/>
-                            <DataGridTextColumn Header="Line Length" Binding="{Binding LineLength}" Width="110"/>
-                            <DataGridTextColumn Header="Line Px" Binding="{Binding LinePx}" Width="90"/>
-                            <DataGridTextColumn Header="Angle Degree" Binding="{Binding AngleDegree}" Width="110"/>
+                                        <DataGridTextColumn Header="Mean RGB" Binding="{Binding MeanRgb}" Width="120"/>
+                                        <DataGridTextColumn Header="Hex" Binding="{Binding HexColor}" Width="100"/>
+                                        <DataGridTextColumn Header="Lab" Binding="{Binding Lab}" Width="130"/>
 
-                            <DataGridTextColumn Header="Mean RGB" Binding="{Binding MeanRgb}" Width="120"/>
-                            <DataGridTextColumn Header="Hex" Binding="{Binding HexColor}" Width="100"/>
-                            <DataGridTextColumn Header="Lab" Binding="{Binding Lab}" Width="130"/>
+                                        <DataGridTextColumn Header="R" Binding="{Binding MeanR}" Width="70"/>
+                                        <DataGridTextColumn Header="G" Binding="{Binding MeanG}" Width="70"/>
+                                        <DataGridTextColumn Header="B" Binding="{Binding MeanB}" Width="70"/>
 
-                            <DataGridTextColumn Header="R" Binding="{Binding MeanR}" Width="70"/>
-                            <DataGridTextColumn Header="G" Binding="{Binding MeanG}" Width="70"/>
-                            <DataGridTextColumn Header="B" Binding="{Binding MeanB}" Width="70"/>
+                                        <DataGridTextColumn Header="L" Binding="{Binding LabL}" Width="70"/>
+                                        <DataGridTextColumn Header="a" Binding="{Binding LabA}" Width="70"/>
+                                        <DataGridTextColumn Header="b" Binding="{Binding LabB}" Width="70"/>
 
-                            <DataGridTextColumn Header="L" Binding="{Binding LabL}" Width="70"/>
-                            <DataGridTextColumn Header="a" Binding="{Binding LabA}" Width="70"/>
-                            <DataGridTextColumn Header="b" Binding="{Binding LabB}" Width="70"/>
+                                        <DataGridTextColumn Header="K"
+                                                            Binding="{Binding ColorClusterK}"
+                                                            Width="60"/>
+                                        <DataGridTextColumn Header="Dominant"
+                                                            Binding="{Binding DominantColorHex}"
+                                                            Width="120"/>
+                                        <DataGridTextColumn Header="Color Distribution"
+                                                            Binding="{Binding ColorDistribution}"
+                                                            Width="350"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </StackPanel>
+                        </Border>
 
-                            <DataGridTextColumn Header="K"
-                                                Binding="{Binding ColorClusterK}"
-                                                Width="60"/>
-                            <DataGridTextColumn Header="Dominant"
-                                                Binding="{Binding DominantColorHex}"
-                                                Width="120"/>
+                        <!-- Actions Section -->
+                        <Border Background="White"
+                                BorderBrush="#E5E5E5"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="10">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Border Width="4" CornerRadius="2" Background="#3B7597"/>
+                                    <TextBlock Text="Actions" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
 
-                            <DataGridTextColumn Header="Color Distribution"
-                                                Binding="{Binding ColorDistribution}"
-                                                Width="350"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                                <WrapPanel Orientation="Horizontal">
+                                    <!-- <Button Content="Save"
+                                            Command="{Binding SaveCommand}"
+                                            Background="#2D7DD2"
+                                            Foreground="White"
+                                            CornerRadius="6"
+                                            Padding="16,8"
+                                            Margin="0,0,8,8"/> -->
+                                    <Button Content="Export"
+                                            Command="{Binding ExportResultsCommand}"
+                                            Background="#6EADBC"
+                                            Foreground="White"
+                                            CornerRadius="6"
+                                            Padding="16,8"
+                                            Margin="0,0,8,8"/>
+                                    
+                                    <Button Content="Delete"
+                                            Command="{Binding DeleteLabelCommand}"
+                                            Background="#4A4466"
+                                            Foreground="White"
+                                            CornerRadius="6"
+                                            Padding="16,8"
+                                            Margin="0,0,8,8"/>
 
-                        <Separator/>
-
-                        <WrapPanel Orientation="Horizontal" ItemWidth="120" ItemHeight="40">
-                            <Button Content="Save"      Command="{Binding SaveCommand}"      Margin="4"/>
-                            <Button Content="Export Results" Command="{Binding ExportResultsCommand}" Margin="4"/>
-                            <Button Content="Delete"    Command="{Binding DeleteLabelCommand}" Margin="4"/>
-                            <Button Content="Reload"    Command="{Binding ReloadCommand}"    Margin="4"/>
-                        
-                        </WrapPanel>
-                        <Separator/>
+                                    <Button Content="Reload"
+                                            Command="{Binding ReloadCommand}"
+                                            Background="#EEEEEE"
+                                            Foreground="#478B8D"
+                                            CornerRadius="6"
+                                            Padding="16,8"
+                                            Margin="0,0,0,8"/>         
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
 
                     </StackPanel>
                 </ScrollViewer>
