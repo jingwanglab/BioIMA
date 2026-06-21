@@ -59,11 +59,11 @@ If macOS blocks the app because it was downloaded from the internet, open it usi
 * macOS or Windows
 
 ---
-##Contact
+## Contact
 
 For questions, issues, or feature requests, please use the GitHub Issues page.
 
 
-##Acknowledgements
+## Acknowledgements
 
 BioIMA uses open source tools and libraries including Avalonia UI, .NET, ONNX Runtime, and SAM-related model components.
