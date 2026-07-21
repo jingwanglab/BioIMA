@@ -5,6 +5,7 @@
 BioIMA is designed for biological images such as seeds, petals, leaves, flowers, inflorescences, and other organismal or plant phenotyping images. It combines manual annotation tools with prompt-based segmentation and quantitative measurement functions in a local desktop environment.
 
 <img width="9978" height="7215" alt="Fig 1 2_01" src="https://github.com/user-attachments/assets/e373b708-0c94-403c-b1f4-a1e3d70c0a10" />
+<img width="1591" height="946" alt="f1" src="https://github.com/user-attachments/assets/932dcd55-ecfd-44f9-901a-b2ad4705d4b5" />
 
 ---
 
