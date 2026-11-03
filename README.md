@@ -5,10 +5,9 @@
 BioIMA is designed for biological images such as seeds, petals, leaves, flowers, inflorescences, and other organismal or plant phenotyping images. It combines manual annotation tools with prompt-based segmentation and quantitative measurement functions in a local desktop environment.
 
 <img width="9978" height="7215" alt="Fig 1 2_01" src="https://github.com/user-attachments/assets/e373b708-0c94-403c-b1f4-a1e3d70c0a10" />
-<img width="3196" height="1950" alt="Kapture 2026-11-02 at 16 48 24" src="https://github.com/user-attachments/assets/a402adb7-6ae2-4dcb-87f9-10ddffc65334" />
-<img width="3200" height="1950" alt="Kapture 2026-11-02 at 23 02 39" src="https://github.com/user-attachments/assets/07b33f87-7d16-4961-8a6e-69ec1bb17fde" />
+<img width="3200" height="1950" alt="K1_batch" src="https://github.com/user-attachments/assets/066b1664-9ba5-4495-8a2c-1eb85525afab" />
 
-<img width="1591" height="946" alt="f1" src="https://github.com/user-attachments/assets/932dcd55-ecfd-44f9-901a-b2ad4705d4b5" />
+
 ---
 
 ## Features
@@ -23,7 +22,7 @@ BioIMA is designed for biological images such as seeds, petals, leaves, flowers,
 
 **Segmentation**
 
-* SAM-assisted segmentation with point and box prompts
+* SAM-assisted segmentation with point and box prompts, with two selectable models: **SAM** (more accurate) and **MobileSAM** (much lighter and faster, recommended for large folders and slower computers)
 * Accepted SAM masks become editable polygon labels and are measured automatically (can be switched off in Settings)
 * **Edit Boundary** to drag, add or delete vertices; the Results row is updated when editing finishes
 * **Replace selected label**: select a label, re-prompt the object with points or a box, and replace its outline and its Results row
@@ -59,7 +58,7 @@ BioIMA is designed for biological images such as seeds, petals, leaves, flowers,
 
 1. **Load > Open Folder** (or Open Image) and pick an image.
 2. Set the scale with the **Ruler** tool (left toolbar or Tools > Ruler): click two points on a known length, drag the ends to adjust, enter the length and unit, and click **Set scale**.
-3. Open **Segmentation** (brain icon or Tools > SAM Segmentation), choose the SAM model, click on an object, and click **Accept Mask**. The object is added to the Results table.
+3. Open **Segmentation** (brain icon or Tools > SAM Segmentation), choose **SAM** or **MobileSAM**, click on an object, and click **Accept Mask**. The object is added to the Results table.
 4. For many similar objects, click **Find similar...**, or use **Count Objects** for a quick count.
 5. For a whole folder, segment one example object, open **Tools > Batch Measure**, click **Use current object**, choose a mode, and click **Run on folder**.
 6. **Save > Export Results CSV** writes the Results table.
@@ -97,7 +96,7 @@ Supported platforms:
 
 ## macOS notes
 
-On macOS, BioIMA includes adaptation for packaged application execution. SAM model files are copied to a writable directory on first launch to avoid permission issues caused by read-only application bundle paths.
+On macOS, BioIMA includes adaptation for packaged application execution. SAM and MobileSAM model files are copied to a writable directory on first launch to avoid permission issues caused by read-only application bundle paths.
 
 If macOS blocks the app because it was downloaded from the internet, open it using the standard macOS security workflow, such as right clicking the app and selecting **Open**.
 
@@ -110,8 +109,42 @@ If macOS blocks the app because it was downloaded from the internet, open it usi
 * .NET 8 SDK
 * Git
 * macOS or Windows
-* SAM ONNX model files in the `SAMmodel` folder (included in releases)
+* SAM ONNX model files (included in releases):
+  * `SAMmodel/encoder-quant.onnx` and `SAMmodel/decoder-quant.onnx` for SAM
+  * `SAMmodel/mobile/mobile_sam_image_encoder.onnx` and `SAMmodel/mobile/sam_mask_decoder_single.onnx` for MobileSAM
 
+### Run
+
+```bash
+git clone <repository-url>
+cd <repository-folder>/BioIMA.Avalonia
+dotnet restore
+dotnet run
+```
+
+### Package releases (maintainers)
+
+`build-release.sh` publishes self-contained builds for Windows (x64) and macOS (Apple Silicon) and packs them with [Velopack](https://velopack.io) (`vpk` must be installed):
+
+```bash
+./build-release.sh 1.1.0   # version number is optional
+```
+
+The script first checks that all four model files exist, rebuilds the `publish-win` and `publish-mac` folders from scratch, verifies that the models were copied into each of them, and writes the installers to `Releases-win` and `Releases-mac`.
+
+### Build and run
+
+```bash
+git clone <repository-url>
+cd <repository-folder>
+dotnet restore
+dotnet build
+dotnet run --project BioIMA.Avalonia
+```
+
+BioIMA.Avalonia (the application) references the BioIMA.Core project, which sits next to it in the same repository.
+
+---
 
 ## Contact
 
@@ -119,4 +152,4 @@ For questions, issues, or feature requests, please use the GitHub Issues page.
 
 ## Acknowledgements
 
-BioIMA uses open source tools and libraries including Avalonia UI, .NET, ONNX Runtime, Magick.NET, and SAM-related model components.
+BioIMA uses open source tools and libraries including Avalonia UI, .NET, ONNX Runtime, Magick.NET, and SAM and MobileSAM model components.
