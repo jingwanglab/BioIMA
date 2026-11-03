@@ -6,6 +6,7 @@ BioIMA is designed for biological images such as seeds, petals, leaves, flowers,
 
 <img width="9978" height="7215" alt="Fig 1 2_01" src="https://github.com/user-attachments/assets/e373b708-0c94-403c-b1f4-a1e3d70c0a10" />
 <img width="1591" height="946" alt="f1" src="https://github.com/user-attachments/assets/932dcd55-ecfd-44f9-901a-b2ad4705d4b5" />
+<img width="3196" height="1950" alt="Kapture 2026-11-02 at 16 48 24" src="https://github.com/user-attachments/assets/a402adb7-6ae2-4dcb-87f9-10ddffc65334" />
 
 ---
 
