@@ -4,9 +4,12 @@
 
 BioIMA is designed for biological images such as seeds, petals, leaves, flowers, inflorescences, and other organismal or plant phenotyping images. It combines manual annotation tools with prompt-based segmentation and quantitative measurement functions in a local desktop environment.
 
+
 <img width="9978" height="7215" alt="Fig 1 2_01" src="https://github.com/user-attachments/assets/e373b708-0c94-403c-b1f4-a1e3d70c0a10" />
 <img width="3200" height="1950" alt="K1_batch" src="https://github.com/user-attachments/assets/066b1664-9ba5-4495-8a2c-1eb85525afab" />
 
+<img width="3200" height="1950" alt="K3_folder" src="https://github.com/user-attachments/assets/62b217c6-eec6-49e4-bc34-6d9dbce994d7" />
+<img width="3200" height="1950" alt="K_5" src="https://github.com/user-attachments/assets/f0702c79-15a1-4dcf-9a06-458f0e6f140b" />
 
 ---
 
@@ -42,6 +45,8 @@ BioIMA is designed for biological images such as seeds, petals, leaves, flowers,
 **Measurement**
 
 * Morphological measurements: area, perimeter, width, height, aspect ratio, circularity, equivalent diameter, line length, and angle
+* **Length and width along the object's own direction** (minimum-area rotated rectangle), reported in Results (`OrientedLength`, `OrientedWidth`, `OrientedAngle` in the CSV). Select a measured label to see the rotated box on the image, with the length line (yellow), the width line (white) and their values. Width/Height remain the horizontal/vertical bounding box.
+* Line and angle end points can be dragged after drawing; the value updates live
 * Color measurements: mean RGB, HEX, CIE Lab values, and color distribution
 * K-means based color distribution analysis with selectable cluster number K
 * Basic white/gray reference color correction for reducing lighting or scanner color bias
@@ -99,6 +104,9 @@ Supported platforms:
 On macOS, BioIMA includes adaptation for packaged application execution. SAM and MobileSAM model files are copied to a writable directory on first launch to avoid permission issues caused by read-only application bundle paths.
 
 If macOS blocks the app because it was downloaded from the internet, open it using the standard macOS security workflow, such as right clicking the app and selecting **Open**.
+
+
+---
 
 ## Contact
 
