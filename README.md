@@ -1,6 +1,6 @@
 # BioIMA
 
-**BioIMA** is a cross-platform desktop application for biological image measurement and analysis. It provides an interactive workflow for image annotation, scale calibration, SAM-assisted segmentation, morphological measurement, and color analysis.
+**BioIMA** is a cross-platform desktop application for biological image measurement and analysis. It provides an interactive workflow for image annotation, scale calibration, SAM-assisted segmentation, automatic counting, batch measurement of whole image folders, morphological measurement, and color analysis.
 
 BioIMA is designed for biological images such as seeds, petals, leaves, flowers, inflorescences, and other organismal or plant phenotyping images. It combines manual annotation tools with prompt-based segmentation and quantitative measurement functions in a local desktop environment.
 
@@ -9,18 +9,68 @@ BioIMA is designed for biological images such as seeds, petals, leaves, flowers,
 
 ---
 
-## 
+## Features
+
+**Annotation and scale**
 
 * Cross-platform desktop application built with Avalonia UI and .NET
-* Manual annotation tools for polygons, rectangles, lines, angles, and scale rulers
+* Manual annotation tools for polygons, rectangles, lines, angles, and a scale ruler
+* Scale ruler with draggable end points: place two points on a known length, adjust them, then enter the length and unit (mm, cm, μm, nm, inch). A scale bar that follows the zoom level is shown at the bottom-left of the image
+* Image folder browsing with previous / next image buttons
+* Supports PNG, JPG, BMP, TIFF (including 16-bit and CMYK) and HEIC/HEIF images
+
+**Segmentation**
+
 * SAM-assisted segmentation with point and box prompts
-* Accepted SAM masks can be converted into editable labels
-* Morphological measurements including area, perimeter, width, height, aspect ratio, circularity, equivalent diameter, line length, and angle
-* Color measurements including mean RGB, HEX, CIE Lab values, and color distribution
+* Accepted SAM masks become editable polygon labels and are measured automatically (can be switched off in Settings)
+* **Edit Boundary** to drag, add or delete vertices; the Results row is updated when editing finishes
+* **Replace selected label**: select a label, re-prompt the object with points or a box, and replace its outline and its Results row
+
+**Counting and batch work**
+
+* **Find similar**: segment one object, then find, outline and measure all similar objects in the image (adjustable size and colour tolerance, Ctrl/⌘+click to exclude an object)
+* **Count** (Tools > Count Objects, or the 123 button): fully automatic counting with numbered badges on each object; objects of another kind can be counted by clicking them
+* **Count folder**: count the objects in every image of the opened folder and export the counts as CSV
+* **Batch Measure** (Tools > Batch Measure): use one segmented object as an example, then locate, outline with SAM and measure matching objects in every image of the opened folder
+  * *Many per image* mode (seeds, berries, leaves...) or *One per image* mode (one main subject per image)
+  * Optional expected count per image; images with a different count, or where SAM and the colour mask disagree, are flagged
+  * Click any processed image in the list to view its saved result instantly
+  * Results of all images are merged into one Results table and one CSV
+* **Ignore colour** option: match objects by shape and size only, for objects that differ in colour but look alike
+
+**Measurement**
+
+* Morphological measurements: area, perimeter, width, height, aspect ratio, circularity, equivalent diameter, line length, and angle
+* Color measurements: mean RGB, HEX, CIE Lab values, and color distribution
 * K-means based color distribution analysis with selectable cluster number K
 * Basic white/gray reference color correction for reducing lighting or scanner color bias
+* Results Id is the folder name plus the counting order within each image (for example `batch2_1`, `batch2_2`); a custom prefix can be set in the Batch Measure panel
+
+**Files**
+
 * Annotation project saving and loading through JSON files
 * Measurement result export to CSV
+
+---
+
+## Quick start
+
+1. **Load > Open Folder** (or Open Image) and pick an image.
+2. Set the scale with the **Ruler** tool (left toolbar or Tools > Ruler): click two points on a known length, drag the ends to adjust, enter the length and unit, and click **Set scale**.
+3. Open **Segmentation** (brain icon or Tools > SAM Segmentation), choose the SAM model, click on an object, and click **Accept Mask**. The object is added to the Results table.
+4. For many similar objects, click **Find similar...**, or use **Count Objects** for a quick count.
+5. For a whole folder, segment one example object, open **Tools > Batch Measure**, click **Use current object**, choose a mode, and click **Run on folder**.
+6. **Save > Export Results CSV** writes the Results table.
+
+Hover over a button or a panel title to see a short description of what it does.
+
+---
+
+## Limitations
+
+* Find similar, Count and Batch Measure work best on images with a fairly uniform background. Objects that touch each other may be merged into one.
+* The scale is global: all images in a session share the same scale, so set it again when the magnification changes.
+* Batch review shows the saved result of each image; changes to a label can be made with Edit Boundary or Replace selected label.
 
 ---
 
@@ -58,13 +108,13 @@ If macOS blocks the app because it was downloaded from the internet, open it usi
 * .NET 8 SDK
 * Git
 * macOS or Windows
+* SAM ONNX model files in the `SAMmodel` folder (included in releases)
 
----
+
 ## Contact
 
 For questions, issues, or feature requests, please use the GitHub Issues page.
 
-
 ## Acknowledgements
 
-BioIMA uses open source tools and libraries including Avalonia UI, .NET, ONNX Runtime, and SAM-related model components.
+BioIMA uses open source tools and libraries including Avalonia UI, .NET, ONNX Runtime, Magick.NET, and SAM-related model components.
