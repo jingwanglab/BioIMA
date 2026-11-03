@@ -100,52 +100,6 @@ On macOS, BioIMA includes adaptation for packaged application execution. SAM and
 
 If macOS blocks the app because it was downloaded from the internet, open it using the standard macOS security workflow, such as right clicking the app and selecting **Open**.
 
----
-
-## Build from source
-
-### Requirements
-
-* .NET 8 SDK
-* Git
-* macOS or Windows
-* SAM ONNX model files (included in releases):
-  * `SAMmodel/encoder-quant.onnx` and `SAMmodel/decoder-quant.onnx` for SAM
-  * `SAMmodel/mobile/mobile_sam_image_encoder.onnx` and `SAMmodel/mobile/sam_mask_decoder_single.onnx` for MobileSAM
-
-### Run
-
-```bash
-git clone <repository-url>
-cd <repository-folder>/BioIMA.Avalonia
-dotnet restore
-dotnet run
-```
-
-### Package releases (maintainers)
-
-`build-release.sh` publishes self-contained builds for Windows (x64) and macOS (Apple Silicon) and packs them with [Velopack](https://velopack.io) (`vpk` must be installed):
-
-```bash
-./build-release.sh 1.1.0   # version number is optional
-```
-
-The script first checks that all four model files exist, rebuilds the `publish-win` and `publish-mac` folders from scratch, verifies that the models were copied into each of them, and writes the installers to `Releases-win` and `Releases-mac`.
-
-### Build and run
-
-```bash
-git clone <repository-url>
-cd <repository-folder>
-dotnet restore
-dotnet build
-dotnet run --project BioIMA.Avalonia
-```
-
-BioIMA.Avalonia (the application) references the BioIMA.Core project, which sits next to it in the same repository.
-
----
-
 ## Contact
 
 For questions, issues, or feature requests, please use the GitHub Issues page.
